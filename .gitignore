@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+.Trashes
+._*
+
+# WebStrom
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# VisualStudioCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Dependency directories
+node_modules/
+
+# Build
+dist/
