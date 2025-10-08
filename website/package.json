@@ -1,0 +1,25 @@
+{
+  "name": "@resolid/website",
+  "type": "module",
+  "private": true,
+  "description": "The Resolid Website.",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "peerDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24"
+  },
+  "homepage": "https://www.resolid.tech",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/resolid/framework.git",
+    "directory": "website"
+  }
+}

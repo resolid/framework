@@ -11,6 +11,11 @@
   A modern full-stack framework for building fast, scalable, and maintainable web applications.
 </p>
 
+## Features
+
+- Lightning fast full-stack Node.js framework
+-
+
 ## Website
 
 [resolid.tech](https://www.resolid.tech)
@@ -21,7 +26,7 @@
 
 ## License
 
-[MIT](./LICENSE).
+MIT License (MIT). Please see [LICENSE](./LICENSE) for more information.
 
 ## Thanks
 

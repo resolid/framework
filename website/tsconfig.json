@@ -1,0 +1,4 @@
+{
+  "extends": "@resolid/config/tsconfig/react",
+  "include": ["app/**/*"]
+}
