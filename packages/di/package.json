@@ -1,0 +1,43 @@
+{
+  "name": "@resolid/di",
+  "type": "module",
+  "license": "MIT",
+  "private": false,
+  "sideEffects": false,
+  "version": "0.0.1",
+  "description": "The Resolid DI Container package.",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsdown",
+    "test": "vitest run",
+    "bench": "vitest bench",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "peerDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24"
+  },
+  "homepage": "https://www.resolid.tech",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/resolid/framework.git",
+    "directory": "packages/di"
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "extends": "@resolid/config/tsconfig/base",
+  "include": ["src/**/*", "tsdown.config.ts", "vitest.config.ts"]
+}
