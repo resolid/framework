@@ -4,9 +4,7 @@
   "private": true,
   "description": "The Resolid Website.",
   "scripts": {
-    "lint": "eslint .",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "lint": "eslint ."
   },
   "dependencies": {},
   "devDependencies": {},
