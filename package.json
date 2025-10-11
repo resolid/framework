@@ -16,7 +16,7 @@
     "@changesets/cli": "^2.29.7",
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
-    "@resolid/config": "^3.8.0",
+    "@resolid/config": "^3.9.0",
     "@svitejs/changesets-changelog-github-compact": "^1.2.0",
     "@types/node": "^22.18.9",
     "@vitest/coverage-v8": "beta",
@@ -29,7 +29,7 @@
     "vitest": "beta"
   },
   "engines": {
-    "node": "^22.13.0 || >=24",
+    "node": "^20.19.0 || ^22.13.0 || >=24",
     "pnpm": "10.x"
   },
   "packageManager": "pnpm@10.18.2",
