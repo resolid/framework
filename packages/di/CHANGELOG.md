@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.2.2
+
+### Patch Changes
+
+- refactor: make lazyResolve internal ([`ab56fbd`](https://github.com/resolid/framework/commit/ab56fbd95526f0802f4e81f1a0c59e603fb59678))
+
 ## 0.2.1
 
 ### Patch Changes
