@@ -1,5 +1,4 @@
 import type { BindingConfig, Scope } from "../types";
-import { type Disposable, formatChain, isDisposable } from "../utils";
 
 type Resolve = (name: symbol) => unknown;
 type LazyResolve = <T = unknown>(name: symbol) => Readonly<{ value: T }>;
@@ -27,6 +26,10 @@ type ToFactory = (
   },
 ) => void;
 
+type Disposable = {
+  dispose: () => Promise<void> | void;
+};
+
 export type Container = {
   bind: (name: symbol) => {
     toValue: ToValue;
@@ -38,70 +41,51 @@ export type Container = {
 } & Disposable;
 
 export const createContainer = (): Container => {
-  const result = _createContainer();
+  const result = new DIContainer();
 
   return {
-    bind: result.bind,
-    resolve: result.resolve,
-    lazyResolve: result.lazyResolve,
-    dispose: result.dispose,
+    bind: (name: symbol) => result.bind(name),
+    resolve: <T>(name: symbol) => result.resolve<T>(name),
+    lazyResolve: <T>(name: symbol) => result.lazyResolve<T>(name),
+    dispose: () => result.dispose(),
   };
 };
 
-type CreateContainerResult = Container & {
-  bindings: Map<symbol, Binding>;
-  singletons: Map<symbol, unknown>;
-  constructing: symbol[];
-  dequeueLazyResolves: () => Promise<void>;
-};
+class DIContainer {
+  readonly #bindings: Map<symbol, Binding>;
+  readonly #singletons: Map<symbol, unknown>;
+  readonly #constructing: symbol[];
+  readonly #lazyResolveQueue: { name: symbol; resolve: (value: unknown) => void }[] = [];
 
-const _createContainer = (parent?: CreateContainerResult, item?: symbol, constructing?: symbol[]) => {
-  const bindings: CreateContainerResult["bindings"] = parent?.bindings ?? new Map();
-  const singletons: CreateContainerResult["singletons"] = parent?.singletons ?? new Map();
-  const currentConstructing: CreateContainerResult["constructing"] = item
-    ? [...(constructing ?? parent?.constructing ?? []), item]
-    : [];
+  constructor(parent?: DIContainer, item?: symbol, constructing?: symbol[]) {
+    this.#bindings = parent?.getBindings() ?? new Map();
+    this.#singletons = parent?.getSingletons() ?? new Map();
+    this.#constructing = item ? [...(constructing ?? parent?.getConstructing() ?? []), item] : [];
+  }
 
-  const lazyResolveQueue: { name: symbol; resolve: (value: unknown) => void }[] = [];
+  getBindings() {
+    return this.#bindings;
+  }
 
-  const container = {} as unknown as CreateContainerResult;
+  getSingletons() {
+    return this.#singletons;
+  }
 
-  const enqueueLazyResolve = (name: symbol) => {
-    return new Promise((resolve) => {
-      const lazy = (value: unknown) => {
-        resolve(value);
-      };
+  getConstructing() {
+    return this.#constructing;
+  }
 
-      lazyResolveQueue.push({
-        name,
-        resolve: lazy,
-      });
-    });
-  };
-
-  const dequeueLazyResolves = async () => {
-    for (const lazyResolve of lazyResolveQueue) {
-      try {
-        lazyResolve.resolve(await resolveBinding(lazyResolve.name, []));
-      } catch (e) {
-        throw new Error(
-          `Failed to resolve lazy resolver for name ${lazyResolve.name.toString()}: ${e instanceof Error ? e.message : String(e)}`,
-        );
-      }
-    }
-  };
-
-  const bind = (name: symbol) => {
+  bind(name: symbol) {
     const toValue: ToValue = (value) => {
-      bindings.set(name, { factory: () => value, scope: "singleton" });
+      this.#bindings.set(name, { factory: () => value, scope: "singleton" });
     };
 
     const toFunction: ToFunction = (fn) => {
-      bindings.set(name, { factory: () => fn, scope: "singleton" });
+      this.#bindings.set(name, { factory: () => fn, scope: "singleton" });
     };
 
     const toFactory: ToFactory = (fn, options?) => {
-      bindings.set(name, {
+      this.#bindings.set(name, {
         factory: (resolve, lazyResolve) => {
           return fn({ resolver: { resolve, lazyResolve }, config: options?.config });
         },
@@ -115,10 +99,10 @@ const _createContainer = (parent?: CreateContainerResult, item?: symbol, constru
       toFunction,
       toFactory,
     };
-  };
+  }
 
-  const resolveBinding = async <T>(name: symbol, constructing?: symbol[]) => {
-    const binding = bindings.get(name);
+  async #resolveBinding<T>(name: symbol, constructing?: symbol[]) {
+    const binding = this.#bindings.get(name);
 
     if (!binding) {
       throw new Error(`No binding found for name: ${name.toString()}`);
@@ -126,35 +110,57 @@ const _createContainer = (parent?: CreateContainerResult, item?: symbol, constru
 
     const isSingleton = binding.scope === "singleton";
 
-    if (isSingleton && singletons.has(name)) {
-      return singletons.get(name) as T;
+    if (isSingleton && this.#singletons.has(name)) {
+      return this.#singletons.get(name) as T;
     }
 
-    const child = _createContainer(container, name, constructing);
+    const child = new DIContainer(this, name, constructing);
 
-    const result = await binding.factory(child.resolve, child.lazyResolve);
+    const result = await binding.factory(
+      (n: symbol) => child.resolve(n),
+      (n: symbol) => child.lazyResolve(n),
+    );
 
     if (isSingleton) {
-      singletons.set(name, result);
+      this.#singletons.set(name, result);
     }
 
     await child.dequeueLazyResolves();
 
     return result as T;
-  };
+  }
 
-  const resolve = async <T>(name: symbol): Promise<T> => {
-    if (currentConstructing.includes(name)) {
-      throw new Error(`Circular dependency detected: ${formatChain(currentConstructing, name)}`);
+  async dequeueLazyResolves() {
+    for (const lazyResolve of this.#lazyResolveQueue) {
+      try {
+        lazyResolve.resolve(await this.#resolveBinding(lazyResolve.name, []));
+      } catch (e) {
+        throw new Error(
+          `Failed to resolve lazy resolver for name ${lazyResolve.name.toString()}: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }
+    }
+  }
+
+  async resolve<T>(name: symbol) {
+    if (this.#constructing.includes(name)) {
+      throw new Error(`Circular dependency detected: ${[...this.#constructing, name].map(String).join(" -> ")}`);
     }
 
-    return resolveBinding(name);
-  };
+    return this.#resolveBinding<T>(name);
+  }
 
-  const lazyResolve = <T>(name: symbol): Readonly<{ value: T }> => {
+  lazyResolve<T>(name: symbol) {
     let value: T | undefined;
 
-    enqueueLazyResolve(name).then((resolved) => {
+    new Promise((resolve) => {
+      this.#lazyResolveQueue.push({
+        name,
+        resolve: (value: unknown) => {
+          resolve(value);
+        },
+      });
+    }).then((resolved) => {
       value = resolved as T;
     });
 
@@ -169,15 +175,15 @@ const _createContainer = (parent?: CreateContainerResult, item?: symbol, constru
         return value;
       },
     };
-  };
+  }
 
-  const dispose = async () => {
+  async dispose() {
     const disposeErrors: Array<{ name: symbol; error: unknown }> = [];
 
-    for (const [name, instance] of singletons) {
-      if (isDisposable(instance)) {
+    for (const [name, instance] of this.#singletons) {
+      if (typeof (instance as Disposable).dispose === "function") {
         try {
-          await instance.dispose();
+          await (instance as Disposable).dispose();
         } catch (error) {
           disposeErrors.push({ name, error });
         }
@@ -191,18 +197,5 @@ const _createContainer = (parent?: CreateContainerResult, item?: symbol, constru
 
       throw new Error(`Failed to dispose ${disposeErrors.length} binding(s): ${errorMessages}`);
     }
-  };
-
-  Object.assign(container, {
-    bindings,
-    singletons,
-    constructing: currentConstructing,
-    dequeueLazyResolves,
-    bind,
-    resolve,
-    lazyResolve,
-    dispose,
-  });
-
-  return container;
-};
+  }
+}

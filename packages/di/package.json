@@ -10,6 +10,13 @@
     "access": "public",
     "provenance": true
   },
+  "keywords": [
+    "container",
+    "ioc",
+    "inversion of control",
+    "dependency injection",
+    "di"
+  ],
   "files": [
     "dist"
   ],
@@ -23,14 +30,11 @@
     "lint": "eslint .",
     "build": "tsdown",
     "test": "vitest run",
-    "bench": "vitest bench",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {},
   "devDependencies": {},
-  "peerDependencies": {
-    "typescript": "^5.9.3"
-  },
+  "peerDependencies": {},
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },

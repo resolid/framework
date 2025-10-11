@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Disposable } from "../utils";
-import { createContainer } from "./index";
+import { type Container, createContainer } from "./index";
 
 describe("Container", () => {
-  let container: ReturnType<typeof createContainer>;
+  let container: Container;
 
   beforeEach(() => {
     container = createContainer();
@@ -241,7 +240,9 @@ describe("Container", () => {
       const DISPOSABLE = Symbol("disposable");
       const disposeFn = vi.fn();
 
-      const instance: Disposable = {
+      const instance: {
+        dispose: () => Promise<void> | void;
+      } = {
         dispose: disposeFn,
       };
 
@@ -258,13 +259,19 @@ describe("Container", () => {
       const DISPOSABLE2 = Symbol("disposable2");
       const DISPOSABLE3 = Symbol("disposable3");
 
-      const instance1: Disposable = {
+      const instance1: {
+        dispose: () => Promise<void> | void;
+      } = {
         dispose: vi.fn().mockRejectedValue(new Error("Error 1")),
       };
-      const instance2: Disposable = {
+      const instance2: {
+        dispose: () => Promise<void> | void;
+      } = {
         dispose: vi.fn().mockRejectedValue(new Error("Error 2")),
       };
-      const instance3: Disposable = {
+      const instance3: {
+        dispose: () => Promise<void> | void;
+      } = {
         dispose: vi.fn(),
       };
 
