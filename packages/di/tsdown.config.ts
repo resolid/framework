@@ -9,4 +9,5 @@ export default defineConfig({
   dts: true,
   treeshake: true,
   clean: true,
+  minify: true,
 }) as UserConfig;
