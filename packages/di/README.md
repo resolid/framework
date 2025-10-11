@@ -1,6 +1,6 @@
 # Resolid: DI Container Package
 
-![GitHub License](https://img.shields.io/github/license/resolid/framework)
+![GitHub License](https://badgen.net/github/license/resolid/framework) ![NPM Version](https://badgen.net/npm/v/@resolid/di)
 
 <b>[Documentation](https://www.resolid.tech/docs/di)</b> | [Framework Bundle](https://github.com/resolid/framework)
 

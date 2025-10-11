@@ -4,8 +4,7 @@ import { defineConfig, type UserConfig } from "tsdown";
 export default defineConfig({
   entry: "src/index.ts",
   format: "esm",
-  platform: "node",
-  target: "node22.13",
+  target: "es2022",
   dts: true,
   treeshake: true,
   clean: true,

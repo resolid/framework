@@ -6,6 +6,10 @@
   "sideEffects": false,
   "version": "0.2.0",
   "description": "The Resolid DI Container package.",
+  "author": {
+    "name": "Huijie Wei",
+    "email": "hello@resolid.tech"
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true
@@ -20,6 +24,8 @@
   "files": [
     "dist"
   ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
