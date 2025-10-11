@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.2.0
+
+### Minor Changes
+
+- feat: use class-based container with private fields ([`0508f4b`](https://github.com/resolid/framework/commit/0508f4b83283a9327bea7f239ebeaec57fd3dd9d))
+
 ## 0.1.1
 
 ### Patch Changes
