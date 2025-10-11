@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.2.1
+
+### Patch Changes
+
+- chore: improve package metadata and build config ([`03ec558`](https://github.com/resolid/framework/commit/03ec558fa8bad36f7f89f9d9056487bf3ea48893))
+
 ## 0.2.0
 
 ### Minor Changes
