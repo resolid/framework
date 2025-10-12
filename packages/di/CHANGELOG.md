@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.3.0
+
+### Minor Changes
+
+- remove container bind method ([`bf98750`](https://github.com/resolid/framework/commit/bf98750e757fd9b60a8d896b7b444bd059c9b9b9))
+
 ## 0.2.2
 
 ### Patch Changes
