@@ -12,6 +12,8 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
+    # prevents this action from running on forks
+    if: github.repository == 'resolid/framework'
     name: Release
     runs-on: ubuntu-latest
     permissions:
@@ -21,6 +23,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Install PNPM
         uses: pnpm/action-setup@v4
@@ -34,15 +38,21 @@ jobs:
           registry-url: https://registry.npmjs.org/
           cache: "pnpm"
 
-      - name: Install
+      - name: Install Dependencies
         run: |
           npm install -g npm@latest
-          pnpm install --frozen-lockfile
+          pnpm install --frozen-lockfile --prefer-offline
 
       - name: Test
-        run: pnpm run test
+        run: pnpm run test --coverage
 
-      - name: Build Package
+      - name: Upload Coverage reports
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: resolid/framework
+
+      - name: Build Packages
         run: pnpm run build
 
       - name: Create Release Pull Request or Publish
