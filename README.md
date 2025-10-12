@@ -20,6 +20,10 @@
 
 [resolid.tech](https://www.resolid.tech)
 
+## Contributing Guide
+
+[CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## Code of Conduct
 
 [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
