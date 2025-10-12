@@ -4,7 +4,7 @@
   "license": "MIT",
   "private": false,
   "sideEffects": false,
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "The Resolid DI Container package.",
   "author": {
     "name": "Huijie Wei",
