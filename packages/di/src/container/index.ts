@@ -1,58 +1,58 @@
-export type Scope = "singleton" | "transient";
-
-export type BindingConfig = Record<string, unknown>;
-
 type Resolve = <T>(name: symbol) => Promise<T>;
 type LazyResolve = <T = unknown>(name: symbol) => Readonly<{ value: T }>;
 
-type Binding<Config extends BindingConfig = BindingConfig> = {
-  factory: (resolve: Resolve, lazyResolve: LazyResolve) => unknown | Promise<unknown>;
-  scope: Scope;
-  config?: Config;
-};
+export type Scope = "singleton" | "transient";
 
-type Resolver = {
-  resolve: Resolve;
-  lazyResolve: LazyResolve;
-};
-
-type ToValue = (value: unknown) => void;
-
-type ToFunction = (fn: (...args: unknown[]) => unknown) => void;
-
-type ToFactory = (
-  fn: ({ resolver, config }: { resolver: Resolver; config?: BindingConfig }) => unknown | Promise<unknown>,
-  options?: {
-    scope?: Scope;
-    config?: BindingConfig;
-  },
-) => void;
+export type BindingDefinition<Config extends Record<string, unknown> = Record<string, unknown>> =
+  | { name: symbol; value: unknown; callable?: never; factory?: never; scope?: never; config?: never }
+  | {
+      name: symbol;
+      callable: (...args: unknown[]) => unknown;
+      value?: never;
+      factory?: never;
+      scope?: never;
+      config?: never;
+    }
+  | {
+      name: symbol;
+      factory: (options: {
+        resolver: { resolve: Resolve; lazyResolve: LazyResolve };
+        config?: Config;
+      }) => unknown | Promise<unknown>;
+      scope?: Scope;
+      config?: Config;
+      value?: never;
+      callable?: never;
+    };
 
 type Disposable = {
   dispose: () => Promise<void> | void;
 };
 
 export type Container = {
-  bind: (name: symbol) => {
-    toValue: ToValue;
-    toFunction: ToFunction;
-    toFactory: ToFactory;
-  };
   resolve: Resolve;
 } & Disposable;
 
-export const createContainer = (): Container => {
-  const result = new DIContainer();
+export const createContainer = (definitions: readonly BindingDefinition[]): Container => {
+  const container = new DIContainer();
+
+  container.register(definitions);
 
   return {
-    bind: (name: symbol) => result.bind(name),
-    resolve: <T>(name: symbol) => result.resolve<T>(name),
-    dispose: () => result.dispose(),
+    resolve: <T>(name: symbol) => container.resolve<T>(name),
+    dispose: () => container.dispose(),
   };
 };
 
 class DIContainer {
-  readonly #bindings: Map<symbol, Binding>;
+  readonly #bindings: Map<
+    symbol,
+    {
+      factory: (resolve: Resolve, lazyResolve: LazyResolve) => unknown | Promise<unknown>;
+      scope: Scope;
+      config?: unknown;
+    }
+  >;
   readonly #singletons: Map<symbol, unknown>;
   readonly #constructing: symbol[];
   readonly #lazyResolveQueue: { name: symbol; resolve: (value: unknown) => void }[] = [];
@@ -76,30 +76,27 @@ class DIContainer {
     return this.#constructing;
   }
 
-  bind(name: symbol) {
-    const toValue: ToValue = (value) => {
-      this.#bindings.set(name, { factory: () => value, scope: "singleton" });
-    };
-
-    const toFunction: ToFunction = (fn) => {
-      this.#bindings.set(name, { factory: () => fn, scope: "singleton" });
-    };
-
-    const toFactory: ToFactory = (fn, options?) => {
-      this.#bindings.set(name, {
-        factory: (resolve, lazyResolve) => {
-          return fn({ resolver: { resolve, lazyResolve }, config: options?.config });
-        },
-        scope: options?.scope ?? "singleton",
-        config: options?.config,
-      });
-    };
-
-    return {
-      toValue,
-      toFunction,
-      toFactory,
-    };
+  register(definitions: readonly BindingDefinition[]) {
+    for (const definition of definitions) {
+      if (definition.callable) {
+        this.#bindings.set(definition.name, {
+          factory: () => definition.callable,
+          scope: "singleton",
+        });
+      } else if (definition.factory) {
+        this.#bindings.set(definition.name, {
+          factory: (resolve, lazyResolve) =>
+            definition.factory({ resolver: { resolve, lazyResolve }, config: definition.config }),
+          scope: definition.scope ?? "singleton",
+          config: definition.config,
+        });
+      } else {
+        this.#bindings.set(definition.name, {
+          factory: () => definition.value,
+          scope: "singleton",
+        });
+      }
+    }
   }
 
   async #resolveBinding<T>(name: symbol, constructing?: symbol[]) {
@@ -107,7 +104,7 @@ class DIContainer {
 
     if (!binding) {
       /* istanbul ignore next -- @preserve */
-      throw new Error(`No binding found for name: ${name.description ?? name.toString()}`);
+      throw new Error(`No binding found for ${name.description ?? name.toString()}.`);
     }
 
     const isSingleton = binding.scope === "singleton";
@@ -139,7 +136,7 @@ class DIContainer {
       } catch (e) {
         /* istanbul ignore next -- @preserve */
         throw new Error(
-          `Failed to resolve lazy resolver for name ${lazyResolve.name.description ?? lazyResolve.name.toString()}: ${e instanceof Error ? e.message : String(e)}`,
+          `Failed to resolve lazy binding ${lazyResolve.name.description ?? lazyResolve.name.toString()}: ${e instanceof Error ? e.message : String(e)}`,
         );
       }
     }
@@ -174,7 +171,7 @@ class DIContainer {
       get value(): T {
         if (!value) {
           throw new Error(
-            "Lazy binding is not yet resolved. Do not use lazy-resolved bindings before the binding construction ends.",
+            `Lazy binding is not yet resolved. Avoid accessing it before container construction finishes.`,
           );
         }
 
@@ -184,7 +181,7 @@ class DIContainer {
   }
 
   async dispose() {
-    const disposeErrors: Array<{ name: symbol; error: unknown }> = [];
+    const errors: Array<{ name: symbol; error: unknown }> = [];
 
     for (const [name, instance] of this.#singletons) {
       /* istanbul ignore else -- @preserve */
@@ -192,13 +189,15 @@ class DIContainer {
         try {
           await (instance as Disposable).dispose();
         } catch (error) {
-          disposeErrors.push({ name, error });
+          errors.push({ name, error });
         }
       }
     }
 
-    if (disposeErrors.length > 0) {
-      const errorMessages = disposeErrors
+    this.#singletons.clear();
+
+    if (errors.length > 0) {
+      const messages = errors
         .map(
           ({ name, error }) =>
             /* istanbul ignore next -- @preserve */
@@ -206,7 +205,7 @@ class DIContainer {
         )
         .join("; ");
 
-      throw new Error(`Failed to dispose ${disposeErrors.length} binding(s): ${errorMessages}`);
+      throw new Error(`Failed to dispose ${errors.length} binding(s):\n${messages}`);
     }
   }
 }

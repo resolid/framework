@@ -1,6 +1,8 @@
 # Resolid: DI Container Package
 
-![GitHub License](https://badgen.net/github/license/resolid/framework) ![NPM Version](https://badgen.net/npm/v/@resolid/di)
+![GitHub License](https://badgen.net/github/license/resolid/framework)
+![NPM Version](https://badgen.net/npm/v/@resolid/di)
+[![codecov](https://codecov.io/gh/resolid/framework/graph/badge.svg?token=MDJX7QMA2H&component=@resolid/di)](https://codecov.io/gh/resolid/framework)
 
 <b>[Documentation](https://www.resolid.tech/docs/di)</b> | [Framework Bundle](https://github.com/resolid/framework)
 
@@ -31,87 +33,125 @@ yarn add @resolid/di
 bun add @resolid/di
 ```
 
-### Usage
-
-#### Creating a container
+### Basic Usage
 
 ```js
 import { createContainer } from "@resolid/di";
 
-const container = createContainer();
-```
+const VALUE = Symbol("VALUE");
+const FUNCTION = Symbol("FUNCTION");
+const FACTORY = Symbol("FACTORY");
 
-#### Binding dependencies
-
-You can bind values, functions, or factories:
-
-1. Bind a value
-
-```js
-const TOKEN = Symbol("token");
-
-container.bind(TOKEN).toValue({ message: "Hello World" });
-
-const result = await container.resolve(TOKEN); // result = "Hello World"
-```
-
-2. Bind a function
-
-```js
-const FUNC_TOKEN = Symbol("func");
-
-container.bind(FUNC_TOKEN).toFunction(() => console.log("Hello from function"));
-
-const fn = await container.resolve(FUNC_TOKEN);
-const result = fn(); // result = "Hello from function"
-```
-
-3. Bind a factory
-
-Bind a factory, can with bellow options:
-
-- scope
-  - singleton (default): One instance per container.
-  - transient: A new instance each time resolved.
-
-- config is optional
-
-```js
-const TOKEN = Symbol("token");
-
-container.bind(TOKEN).toValue({ message: "Hello" });
-
-const FACTORY_TOKEN = Symbol("factory");
-
-container.bind(FACTORY_TOKEN).toFactory(
-  ({ resolver, config }) => {
-    const dep = resolver.resolve(TOKEN);
-    return `Factory resolved: ${dep.message} ${config.message}`;
+const container = createContainer([
+  { name: VALUE, value: "Hello World" },
+  {
+    name: FUNCTION,
+    callable: () => {
+      return "Hello World from callable";
+    },
   },
-  { scope: "singleton", config: { message: "World." } },
-);
+  {
+    name: FACTORY,
+    factory: async ({ resolver, config }) => {
+      const value = await resolver.resolve(VALUE);
 
-const result = await container.resolve(FACTORY_TOKEN); // result = "Factory resolved: Hello world."
+      return value + " " + config.message || "from factory!";
+    },
+    /**
+     * Scope of a binding.
+     * singleton (default): Only one instance is created and shared for all resolves.
+     * transient: A new instance is created on each resolve.
+     */
+    scope: "singleton",
+    /**
+     * Optional configuration object passed to a factory.
+     * Type is inferred from the factory definition.
+     * Used to provide parameters for instance creation.
+     */
+    config: { message: " from factory with config" },
+  },
+]);
+
+const valueResult = await container.resolve(VALUE);
+console.log(valueResult); // Output: "Hello World"
+
+const callable = await container.resolve(FUNCTION);
+const callableResult = callable();
+console.log(callableResult); // Output: "Hello World from callable"
+
+const factoryResult = await container.resolve(FACTORY);
+console.log(factoryResult); // Output: "Hello World from factory with config"
 ```
 
-4. Circular dependencies
+### Lazy Resolve
+
+You can create bindings that are resolved lazily, useful for circular dependencies or heavy computations:
 
 ```js
-const LAZY_DEP = Symbol("lazyDep");
-const CONSUMER = Symbol("consumer");
+const LAZY_A = Symbol("LAZY_A");
+const LAZY_B = Symbol("LAZY_B");
 
-container.bind(LAZY_DEP).toValue({ data: "lazy data" });
+const container = createContainer([
+  {
+    name: LAZY_A,
+    factory: ({ resolver }) => {
+      const b = resolver.lazyResolve(LAZY_B);
+      return `A depends on ${b.value}`;
+    },
+  },
+  {
+    name: LAZY_B,
+    factory: ({ resolver }) => {
+      const a = resolver.lazyResolve(LAZY_A);
+      return `B depends on ${a.value}`;
+    },
+  },
+]);
 
-container.bind(CONSUMER).toFactory(({ resolver }) => {
-  const lazy = resolver.lazyResolve(LAZY_DEP);
+// Accessing value after construction is safe
+await container.resolve(LAZY_A);
+await container.resolve(LAZY_B);
+```
 
-  return {
-    getLazyData: () => lazy.value.data,
-  };
-});
+> Note: Access `lazyResolve.value` **only after all bindings are constructed**, otherwise it will throw an error.
 
-const consumer = await container.resolve(CONSUMER);
-// consumer.getLazyData()).toBe("lazy data");
+### Circular Dependency Detection
+
+```js
+const A = Symbol("A");
+const B = Symbol("B");
+
+const container = createContainer([
+  {
+    name: A,
+    factory: ({ resolver }) => resolver.resolve(B),
+  },
+  {
+    name: B,
+    factory: ({ resolver }) => resolver.resolve(A),
+  },
+]);
+
+await container.resolve(A);
+// Throws Error: Circular dependency detected: A -> B -> A
+```
+
+### Dispose
+
+```js
+class Resource {
+  async dispose() {
+    console.log("Resource disposed");
+  }
+}
+
+const RESOURCE = Symbol("RESOURCE");
+
+const container = createContainer([{ name: RESOURCE, value: new Resource() }]);
+
+// Dispose all singleton instances
+await container.dispose();
+// Output: "Resource disposed"
 ```
 
 ## License
