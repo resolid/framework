@@ -1,5 +1,13 @@
 # @resolid/di
 
+## 0.3.0
+
+### Minor Changes
+
+- remove container bind method ([`31ba7bc`](https://github.com/resolid/framework/commit/31ba7bc487613fa11c524a871c11bad654b38976))
+
+  **BREAKING CHANGE**: container bind method is removed. Bindings must now be passed to createContainer
+
 ## 0.2.2
 
 ### Patch Changes
