@@ -15,11 +15,12 @@
     "provenance": true
   },
   "keywords": [
+    "resolid",
     "container",
     "ioc",
     "inversion of control",
-    "dependency injection",
-    "di"
+    "di",
+    "dependency injection"
   ],
   "files": [
     "dist"
