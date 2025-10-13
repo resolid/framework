@@ -1,5 +1,5 @@
 {
-  "name": "@resolid/website",
+  "name": "resolid-website",
   "type": "module",
   "private": true,
   "description": "The Resolid Website.",
@@ -8,9 +8,7 @@
   },
   "dependencies": {},
   "devDependencies": {},
-  "peerDependencies": {
-    "typescript": "^5.9.3"
-  },
+  "peerDependencies": {},
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
