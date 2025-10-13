@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.3.2
+
+### Patch Changes
+
+- chore: update package version ([`87ddc62`](https://github.com/resolid/framework/commit/87ddc620cd86b1b965115be520574d948044ae1d))
+
 ## 0.3.1
 
 ### Patch Changes
