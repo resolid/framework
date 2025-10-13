@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.3.1
+
+### Patch Changes
+
+- refactor: adjust exported types ([`9dba4dd`](https://github.com/resolid/framework/commit/9dba4ddb2664a9b652876ce8d55d81af73fb31c8))
+
 ## 0.3.0
 
 ### Minor Changes
