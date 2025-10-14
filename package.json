@@ -19,14 +19,11 @@
     "@resolid/config": "^3.9.0",
     "@svitejs/changesets-changelog-github-compact": "^1.2.0",
     "@types/node": "^22.18.10",
-    "@vitest/coverage-v8": "beta",
     "eslint": "^9.37.0",
     "lefthook": "^1.13.6",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.3.0",
-    "tsdown": "^0.15.6",
-    "typescript": "^5.9.3",
-    "vitest": "beta"
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24",

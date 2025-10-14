@@ -7,10 +7,10 @@
     "lint": "eslint ."
   },
   "dependencies": {},
-  "devDependencies": {},
-  "peerDependencies": {
+  "devDependencies": {
     "typescript": "^5.9.3"
   },
+  "peerDependencies": {},
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
