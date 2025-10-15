@@ -11,7 +11,14 @@ export type Resolver = {
 export type FactoryConfig = Record<string, unknown>;
 
 export type BindingDefinition<T = unknown, Config extends FactoryConfig = FactoryConfig> =
-  | { name: symbol; value: T; callable?: never; factory?: never; scope?: never; config?: never }
+  | {
+      name: symbol;
+      value: T;
+      callable?: never;
+      factory?: never;
+      scope?: never;
+      config?: never;
+    }
   | {
       name: symbol;
       callable: (...args: unknown[]) => T;
@@ -59,7 +66,10 @@ class DIContainer {
   >;
   readonly #singletons: Map<symbol, unknown>;
   readonly #constructing: symbol[];
-  readonly #lazyResolveQueue: { name: symbol; resolve: (value: unknown) => void }[] = [];
+  readonly #lazyResolveQueue: {
+    name: symbol;
+    resolve: (value: unknown) => void;
+  }[] = [];
 
   constructor(parent?: DIContainer, item?: symbol, constructing?: symbol[]) {
     this.#bindings = parent?.getBindings() ?? new Map();
@@ -90,7 +100,10 @@ class DIContainer {
       } else if (definition.factory) {
         this.#bindings.set(definition.name, {
           factory: (resolve, lazyResolve) =>
-            definition.factory({ resolver: { resolve, lazyResolve }, config: definition.config }),
+            definition.factory({
+              resolver: { resolve, lazyResolve },
+              config: definition.config,
+            }),
           scope: definition.scope ?? "singleton",
           config: definition.config,
         });

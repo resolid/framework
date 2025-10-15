@@ -1,7 +1,7 @@
 import { type Config, configure, dispose, getConsoleSink, getLogger, type Logger, withContext } from "@logtape/logtape";
 import type { Extension } from "@resolid/core";
 
-export const LOG_SYMBOL = Symbol("LOG");
+export const LOG_SYMBOL: unique symbol = Symbol("LOG");
 
 export type LogConfig = Omit<Config<string, string>, "reset">;
 

@@ -125,7 +125,10 @@ describe("Container", () => {
         },
       ]);
 
-      const service = await container.resolve<{ db: { query: () => string }; execute: () => string }>(SERVICE);
+      const service = await container.resolve<{
+        db: { query: () => string };
+        execute: () => string;
+      }>(SERVICE);
       expect(service.db).toHaveProperty("query");
       expect(service.execute()).toBe("executed");
     });

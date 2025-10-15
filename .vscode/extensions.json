@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "editorconfig.editorconfig",
+    "dbaeumer.vscode-eslint",
+    "vitest.explorer",
+    "jme797.prettier-vscode-extension"
+  ]
+}

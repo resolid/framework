@@ -1,19 +1,8 @@
 {
   "name": "@resolid/di",
-  "type": "module",
-  "license": "MIT",
-  "private": false,
-  "sideEffects": false,
   "version": "0.3.2",
+  "private": false,
   "description": "The Resolid DI Container package.",
-  "author": {
-    "name": "Huijie Wei",
-    "email": "hello@resolid.tech"
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  },
   "keywords": [
     "resolid",
     "container",
@@ -22,20 +11,33 @@
     "di",
     "dependency injection"
   ],
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "homepage": "https://www.resolid.tech",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/resolid/framework.git",
+    "directory": "packages/di"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Huijie Wei",
+    "email": "hello@resolid.tech"
+  },
+  "sideEffects": false,
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     }
   },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "lint": "eslint .",
     "build": "tsdown",
+    "lint": "eslint .",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
@@ -50,10 +52,8 @@
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
-  "homepage": "https://www.resolid.tech",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/resolid/framework.git",
-    "directory": "packages/di"
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }
