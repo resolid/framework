@@ -14,7 +14,6 @@
 ## Features
 
 - Lightning fast full-stack Node.js framework
--
 
 ## Website
 

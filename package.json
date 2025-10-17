@@ -1,41 +1,49 @@
 {
   "name": "resolid-framework",
-  "type": "module",
   "private": true,
   "description": "A modern full-stack framework for building fast, scalable, and maintainable web applications.",
+  "homepage": "https://www.resolid.tech",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/resolid/framework.git"
+  },
+  "type": "module",
   "scripts": {
+    "build": "pnpm run prepare:dev && pnpm run --filter ./website build",
+    "build:packages": "pnpm --filter @resolid/* build",
+    "dev": "pnpm run prepare:dev && pnpm run --filter ./website dev",
+    "format": "prettier . --write",
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "lefthook install",
     "lint": "pnpm run -r --if-present lint",
-    "format": "prettier --write .",
-    "build": "pnpm run -r --if-present build",
-    "test": "pnpm run -r --if-present test",
+    "prepare:dev": "pnpm run --silent --filter @resolid/dev build --log-level error",
+    "start": "pnpm run --filter ./website start",
+    "test:packages": "pnpm --filter @resolid/* test",
     "typecheck": "pnpm run -r --if-present typecheck"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
-    "@resolid/config": "^3.9.0",
+    "@resolid/config": "^3.10.2",
     "@svitejs/changesets-changelog-github-compact": "^1.2.0",
-    "@types/node": "^22.18.10",
-    "eslint": "^9.37.0",
+    "@tailwindcss/language-server": "^0.14.28",
+    "@types/node": "^22.18.11",
+    "eslint": "^9.38.0",
     "lefthook": "^1.13.6",
     "prettier": "^3.6.2",
-    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-tailwindcss": "^0.7.1",
     "typescript": "^5.9.3"
   },
+  "packageManager": "pnpm@10.18.3",
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24",
     "pnpm": "10.x"
   },
-  "packageManager": "pnpm@10.18.2",
-  "homepage": "https://www.resolid.tech",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/resolid/framework.git"
-  },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "lefthook"
+    ],
     "overrides": {
       "array-includes": "npm:@nolyfill/array-includes@^1",
       "array.prototype.findlast": "npm:@nolyfill/array.prototype.findlast@^1",
@@ -50,14 +58,10 @@
       "object.fromentries": "npm:@nolyfill/object.fromentries@^1",
       "object.values": "npm:@nolyfill/object.values@^1",
       "safe-regex-test": "npm:@nolyfill/safe-regex-test@^1",
+      "safer-buffer": "npm:@nolyfill/safer-buffer@^1",
       "string.prototype.includes": "npm:@nolyfill/string.prototype.includes@^1",
       "string.prototype.matchall": "npm:@nolyfill/string.prototype.matchall@^1",
-      "string.prototype.repeat": "npm:@nolyfill/string.prototype.repeat@^1",
-      "safer-buffer": "npm:@nolyfill/safer-buffer@^1"
-    },
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "lefthook"
-    ]
+      "string.prototype.repeat": "npm:@nolyfill/string.prototype.repeat@^1"
+    }
   }
 }

@@ -1,10 +1,17 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.useESLintClass": true,
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
   "editor.quickSuggestions": {
     "strings": "on"
   },
-  "npm.exclude": ["**/build/**", "**/.netlify/**", "**/.vercel/**"],
+  "npm.exclude": [
+    "**/build/**",
+    "**/.netlify/**",
+    "**/.vercel/**"
+  ],
   "files.watcherExclude": {
     "**/.netlify/**": true,
     "**/.vercel/**": true,
@@ -17,6 +24,11 @@
     "**/build/**": true
   },
   "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "debug.javascript.codelens.npmScripts": "never",
-  "editor.defaultFormatter": "Jme797.prettier-vscode-extension"
+  "tailwindCSS.classFunctions": [
+    "tx",
+    "tv"
+  ],
+  "tailwindCSS.experimental.configFile": "website/src/root.css"
 }

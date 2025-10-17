@@ -1,4 +1,14 @@
 {
   "extends": "@resolid/config/tsconfig/react",
-  "include": ["app/**/*"]
+  "include": [
+    ".react-router/types/**/*",
+    "src/**/*",
+    "env.d.ts",
+    "react-router.config.ts",
+    "resolid.config.ts",
+    "vite.config.ts"
+  ],
+  "compilerOptions": {
+    "rootDirs": [".", "./.react-router/types"]
+  }
 }

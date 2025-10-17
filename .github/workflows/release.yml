@@ -44,10 +44,10 @@ jobs:
           pnpm install --frozen-lockfile --prefer-offline
 
       - name: Test
-        run: pnpm run test
+        run: pnpm run test:packages
 
       - name: Build Packages
-        run: pnpm run build
+        run: pnpm run build:packages
 
       - name: Create Release Pull Request or Publish
         id: changesets
