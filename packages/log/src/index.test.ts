@@ -34,44 +34,43 @@ describe("logExtension", () => {
   });
 
   it("should return an object with 5 methods", () => {
-    const channel = log.channel("user");
-    expect(channel).toHaveProperty("debug");
-    expect(channel).toHaveProperty("info");
-    expect(channel).toHaveProperty("warn");
-    expect(channel).toHaveProperty("error");
-    expect(channel).toHaveProperty("fatal");
+    const userLogger = log.category("user");
+    expect(userLogger).toHaveProperty("debug");
+    expect(userLogger).toHaveProperty("info");
+    expect(userLogger).toHaveProperty("warn");
+    expect(userLogger).toHaveProperty("error");
+    expect(userLogger).toHaveProperty("fatal");
   });
 
   it("should call the underlying logger methods", () => {
-    const logger = log.channel("user");
-
+    const userLogger = log.category("user");
     const underlyingLogger = log.getLogger("user");
 
     const spyDebug = vi.spyOn(underlyingLogger, "debug");
 
-    logger.debug("test message");
+    userLogger.debug("test message");
 
     expect(spyDebug).toHaveBeenCalledWith("test message");
   });
 
-  it("should return the same channel object for the same category", () => {
-    const ch1 = log.channel("user");
-    const ch2 = log.channel("user");
+  it("should return the same logger for the same category", () => {
+    const logger1 = log.category("user");
+    const logger2 = log.category("user");
 
-    expect(ch1).toBe(ch2);
+    expect(logger1).toBe(logger2);
   });
 
   it("should support object, function, and template string messages", () => {
-    const logger = log.channel("user");
+    const userLogger = log.category("user");
 
-    expect(() => logger.info({ userId: 123 })).not.toThrow();
-    expect(() => logger.warn({ userId: 123 })).not.toThrow();
-    expect(() => logger.fatal({ userId: 123 })).not.toThrow();
+    expect(() => userLogger.info({ userId: 123 })).not.toThrow();
+    expect(() => userLogger.warn({ userId: 123 })).not.toThrow();
+    expect(() => userLogger.fatal({ userId: 123 })).not.toThrow();
 
-    expect(() => logger.error(() => [{ error: "fail" }])).not.toThrow();
+    expect(() => userLogger.error(() => [{ error: "fail" }])).not.toThrow();
 
     const userId = 456;
 
-    expect(() => logger.debug`User ${userId} logged in`).not.toThrow();
+    expect(() => userLogger.debug`User ${userId} logged in`).not.toThrow();
   });
 });

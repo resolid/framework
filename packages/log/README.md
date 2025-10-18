@@ -5,19 +5,19 @@
 
 <b>[Documentation](https://www.resolid.tech/docs/log)</b> | [Framework Bundle](https://github.com/resolid/framework)
 
-## TypeScript Logger with Channels and Context
+## TypeScript Logger with Categories and Context
 
 A lightweight, DI-friendly logging library built on top of logtape
-, providing simple channels, context support, and type-safe TypeScript integration.
+, providing simple categories, context support, and type-safe TypeScript integration.
 
 ### Features
 
-- Simple **channel-based logging**
+- Simple **category-based logging**
 - 5 main log levels: `debug`, `info`, `warn`, `error`, `fatal`
 - Supports **string, template literals, objects, and lazy callbacks**
 - Fully **TypeScript typed** with auto-complete support
 - **DI-friendly** extension for Resolid apps
-- Optional **channel caching** for performance in high-frequency logging
+- Optional **category caching** for performance in high-frequency logging
 
 ### Installation
 
@@ -44,9 +44,9 @@ const { context } = createApp({
   extensions: [[logExtension, logConfig]],
 });
 
-const { logger } = await context.resolve<LogService>(LOG_SYMBOL);
+const logger = await context.resolve<LogService>(LOG_SYMBOL);
 
-log.channel("user").info("message");
+log.category("user").info("message");
 ```
 
 > For more information, see the official Logtape website: [https://logtape.org](https://logtape.org)
