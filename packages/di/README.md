@@ -37,9 +37,9 @@ bun add @resolid/di
 ```js
 import { createContainer } from "@resolid/di";
 
-const VALUE = Symbol("VALUE");
-const FUNCTION = Symbol("FUNCTION");
-const FACTORY = Symbol("FACTORY");
+const VALUE = "VALUE";
+const FUNCTION = "FUNCTION";
+const FACTORY = "FACTORY";
 
 const container = createContainer([
   { name: VALUE, value: "Hello World" },
@@ -87,8 +87,8 @@ console.log(factoryResult); // Output: "Hello World from factory with config"
 You can create bindings that are resolved lazily, useful for circular dependencies or heavy computations:
 
 ```js
-const LAZY_A = Symbol("LAZY_A");
-const LAZY_B = Symbol("LAZY_B");
+const LAZY_A = "LAZY_A";
+const LAZY_B = "LAZY_B";
 
 const container = createContainer([
   {
@@ -117,8 +117,8 @@ await container.resolve(LAZY_B);
 ### Circular Dependency Detection
 
 ```js
-const A = Symbol("A");
-const B = Symbol("B");
+const A = "A";
+const B = "B";
 
 const container = createContainer([
   {
@@ -144,7 +144,7 @@ class Resource {
   }
 }
 
-const RESOURCE = Symbol("RESOURCE");
+const RESOURCE = "RESOURCE";
 
 const container = createContainer([{ name: RESOURCE, value: new Resource() }]);
 

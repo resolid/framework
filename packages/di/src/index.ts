@@ -1,5 +1,7 @@
-type Resolve = <T>(name: symbol) => T | Promise<T>;
-type LazyResolve = <T = unknown>(name: symbol) => Readonly<{ value: T }>;
+import { env } from "node:process";
+
+type Resolve = <T>(name: string) => Promise<T>;
+type LazyResolve = <T = unknown>(name: string) => Readonly<{ value: T }>;
 
 export type Scope = "singleton" | "transient";
 
@@ -12,7 +14,7 @@ export type FactoryConfig = Record<string, unknown>;
 
 export type BindingDefinition<T = unknown, Config extends FactoryConfig = FactoryConfig> =
   | {
-      name: symbol;
+      name: string;
       value: T;
       callable?: never;
       factory?: never;
@@ -20,7 +22,7 @@ export type BindingDefinition<T = unknown, Config extends FactoryConfig = Factor
       config?: never;
     }
   | {
-      name: symbol;
+      name: string;
       callable: (...args: unknown[]) => T;
       value?: never;
       factory?: never;
@@ -28,7 +30,7 @@ export type BindingDefinition<T = unknown, Config extends FactoryConfig = Factor
       config?: never;
     }
   | {
-      name: symbol;
+      name: string;
       factory: (options: { resolver: Resolver; config?: Config }) => T | Promise<T>;
       scope?: Scope;
       config?: Config;
@@ -45,33 +47,55 @@ export type Container = {
 } & Disposable;
 
 export const createContainer = (definitions: readonly BindingDefinition[]): Container => {
-  const container = new DIContainer();
+  const container = singleton("__RESOLID_CONTAINER", () => {
+    const container = new DIContainer();
+    container.register(definitions);
 
-  container.register(definitions);
+    return container;
+  });
 
   return {
-    resolve: <T>(name: symbol) => container.resolve<T>(name),
+    resolve: <T>(name: string) => container.resolve<T>(name),
     dispose: () => container.dispose(),
   };
 };
 
+/* istanbul ignore next -- @preserve */
+const singleton = <T>(key: string, getValue: () => T): T => {
+  if (env.NODE_ENV == "development") {
+    const globalStore = globalThis as Record<string, unknown>;
+
+    if (key in globalStore) {
+      return globalStore[key] as T;
+    }
+
+    const value = getValue();
+
+    globalStore[key] = value;
+
+    return value;
+  }
+
+  return getValue();
+};
+
 class DIContainer {
   readonly #bindings: Map<
-    symbol,
+    string,
     {
       factory: (resolve: Resolve, lazyResolve: LazyResolve) => unknown | Promise<unknown>;
       scope: Scope;
       config?: unknown;
     }
   >;
-  readonly #singletons: Map<symbol, unknown>;
-  readonly #constructing: symbol[];
+  readonly #singletons: Map<string, unknown>;
+  readonly #constructing: string[];
   readonly #lazyResolveQueue: {
-    name: symbol;
+    name: string;
     resolve: (value: unknown) => void;
   }[] = [];
 
-  constructor(parent?: DIContainer, item?: symbol, constructing?: symbol[]) {
+  constructor(parent?: DIContainer, item?: string, constructing?: string[]) {
     this.#bindings = parent?.getBindings() ?? new Map();
     this.#singletons = parent?.getSingletons() ?? new Map();
     /* istanbul ignore next -- @preserve */
@@ -116,12 +140,12 @@ class DIContainer {
     }
   }
 
-  async #resolveBinding<T>(name: symbol, constructing?: symbol[]) {
+  async #resolveBinding<T>(name: string, constructing?: string[]) {
     const binding = this.#bindings.get(name);
 
     if (!binding) {
       /* istanbul ignore next -- @preserve */
-      throw new Error(`No binding found for ${name.description ?? name.toString()}.`);
+      throw new Error(`No binding found for ${name}.`);
     }
 
     const isSingleton = binding.scope === "singleton";
@@ -133,8 +157,8 @@ class DIContainer {
     const child = new DIContainer(this, name, constructing);
 
     const result = await binding.factory(
-      (n: symbol) => child.resolve(n),
-      (n: symbol) => child.lazyResolve(n),
+      (n: string) => child.resolve(n),
+      (n: string) => child.lazyResolve(n),
     );
 
     if (isSingleton) {
@@ -153,24 +177,22 @@ class DIContainer {
       } catch (e) {
         /* istanbul ignore next -- @preserve */
         throw new Error(
-          `Failed to resolve lazy binding ${lazyResolve.name.description ?? lazyResolve.name.toString()}: ${e instanceof Error ? e.message : String(e)}`,
+          `Failed to resolve lazy binding ${lazyResolve.name}: ${e instanceof Error ? e.message : String(e)}`,
         );
       }
     }
   }
 
-  async resolve<T>(name: symbol) {
+  async resolve<T>(name: string) {
     if (this.#constructing.includes(name)) {
       /* istanbul ignore next -- @preserve */
-      throw new Error(
-        `Circular dependency detected: ${[...this.#constructing, name].map((s) => s.description ?? s.toString()).join(" -> ")}`,
-      );
+      throw new Error(`Circular dependency detected: ${[...this.#constructing, name].join(" -> ")}`);
     }
 
     return this.#resolveBinding<T>(name);
   }
 
-  lazyResolve<T>(name: symbol) {
+  lazyResolve<T>(name: string) {
     let value: T | undefined;
 
     new Promise((resolve) => {
@@ -198,7 +220,7 @@ class DIContainer {
   }
 
   async dispose() {
-    const errors: Array<{ name: symbol; error: unknown }> = [];
+    const errors: Array<{ name: string; error: unknown }> = [];
 
     for (const [name, instance] of this.#singletons) {
       /* istanbul ignore else -- @preserve */
@@ -218,7 +240,7 @@ class DIContainer {
         .map(
           ({ name, error }) =>
             /* istanbul ignore next -- @preserve */
-            `${name.description ?? name.toString()}: ${error instanceof Error ? error.message : String(error)}`,
+            `${name}: ${error instanceof Error ? error.message : String(error)}`,
         )
         .join("; ");
 

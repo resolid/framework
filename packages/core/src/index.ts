@@ -1,11 +1,4 @@
-import {
-  type BindingDefinition,
-  type Container,
-  createContainer,
-  type FactoryConfig,
-  type Resolver,
-  type Scope,
-} from "@resolid/di";
+import { type BindingDefinition, createContainer, type FactoryConfig, type Resolver, type Scope } from "@resolid/di";
 import { env } from "node:process";
 
 export type AppConfig = {
@@ -14,13 +7,13 @@ export type AppConfig = {
 };
 
 export type AppContext = AppConfig & {
-  readonly resolve: Container["resolve"];
+  readonly resolve: <T>(key: string) => Promise<T>;
 };
 
 type ExtensionBoot = (app: AppContext) => void | Promise<void>;
 
 export type Extension<T = unknown, Config extends FactoryConfig = FactoryConfig> = {
-  readonly name: symbol;
+  readonly name: string;
   readonly boot?: ExtensionBoot;
   readonly factory: (context: { resolver: Resolver; config?: Config; app: AppConfig }) => T | Promise<T>;
   readonly scope?: Scope;
@@ -28,8 +21,11 @@ export type Extension<T = unknown, Config extends FactoryConfig = FactoryConfig>
 
 export type CreateAppOptions = AppConfig & {
   readonly timezone?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  readonly extensions: (Extension<unknown, any> | [Extension<unknown, any>, FactoryConfig?])[];
+  readonly extensions: {
+    key: string;
+    extension: Extension;
+    config?: FactoryConfig;
+  }[];
 };
 
 export type AppInstance = {
@@ -45,19 +41,17 @@ export const createApp = ({ name, debug = false, timezone = "UTC", extensions }:
   const boots: ExtensionBoot[] = [];
 
   for (const item of extensions) {
-    const [extension, config] = Array.isArray(item) ? item : [item];
-
     bindings.push({
-      name: extension.name,
+      name: item.key,
       factory: ({ resolver, config }) => {
-        return extension.factory({ resolver, config, app: { name, debug } });
+        return item.extension.factory({ resolver, config, app: { name, debug } });
       },
-      scope: extension.scope,
-      config,
+      scope: item.extension.scope,
+      config: item.config,
     });
 
-    if (extension.boot) {
-      boots.push(extension.boot);
+    if (item.extension.boot) {
+      boots.push(item.extension.boot);
     }
   }
 

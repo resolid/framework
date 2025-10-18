@@ -9,16 +9,16 @@
   },
   "type": "module",
   "scripts": {
-    "build": "pnpm run prepare:dev && pnpm run --filter ./website build",
-    "build:packages": "pnpm --filter @resolid/* build",
     "dev": "pnpm run prepare:dev && pnpm run --filter ./website dev",
-    "format": "prettier . --write",
-    "preinstall": "npx only-allow pnpm",
-    "lint": "pnpm run -r --if-present lint",
-    "prepare:dev": "pnpm run --silent --filter @resolid/dev build --log-level error",
-    "start": "pnpm run --filter ./website start",
     "test:packages": "pnpm --filter @resolid/* test",
-    "typecheck": "pnpm run -r --if-present typecheck"
+    "build": "pnpm run prepare:dev && pnpm run --filter ./website build",
+    "start": "pnpm run --filter ./website start",
+    "build:packages": "pnpm --filter @resolid/* build",
+    "typecheck": "pnpm run -r --if-present typecheck",
+    "lint": "pnpm run -r --if-present lint",
+    "format": "prettier . --write",
+    "prepare:dev": "pnpm run --silent --filter @resolid/dev build --log-level error",
+    "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",

@@ -1,22 +1,28 @@
 import { createApp } from "@resolid/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { LOG_SYMBOL, logExtension, type LogService } from "./index";
+import { logExtension, type LogService } from "./index";
 
 describe("logExtension", () => {
+  const LOG_DI_KEY = "LOG";
   let log: LogService;
 
   beforeEach(async () => {
     const { context } = createApp({
       name: "TestApp",
       debug: true,
-      extensions: [logExtension],
+      extensions: [
+        {
+          key: LOG_DI_KEY,
+          extension: logExtension,
+        },
+      ],
     });
 
-    log = await context.resolve(LOG_SYMBOL);
+    log = await context.resolve(LOG_DI_KEY);
   });
 
   it("should have correct symbol name", () => {
-    expect(typeof LOG_SYMBOL).toBe("symbol");
+    expect(typeof LOG_DI_KEY).toBe("string");
   });
 
   it("should log initialization message", async () => {
@@ -25,10 +31,10 @@ describe("logExtension", () => {
     const { context } = createApp({
       name: "TestApp",
       debug: true,
-      extensions: [logExtension],
+      extensions: [{ key: LOG_DI_KEY, extension: logExtension }],
     });
 
-    await context.resolve<LogService>(LOG_SYMBOL);
+    await context.resolve<LogService>(LOG_DI_KEY);
 
     expect(consoleSpy).toHaveBeenCalledWith(`[TestApp] Initializing log extension...`);
   });

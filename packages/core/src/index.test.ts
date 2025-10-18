@@ -1,24 +1,30 @@
 import { describe, expect, it, type Mock, vi } from "vitest";
-import { createApp, type Extension } from "./index";
+import { createApp } from "./index";
 
 describe("createApp", () => {
   it("should register extensions and resolve them", async () => {
-    const LOG = Symbol("log");
-    const MAIL = Symbol("mail");
-
-    const logExtension: Extension = {
-      name: LOG,
-      factory: () => ({ log: vi.fn() }),
-    };
-
-    const mailExtension: Extension = {
-      name: MAIL,
-      factory: ({ config }) => ({ from: config?.form }),
-    };
+    const LOG = "LOG";
+    const MAIL = "MAIL";
 
     const { context } = createApp({
       name: "TestApp",
-      extensions: [logExtension, [mailExtension, { form: "from" }]],
+      extensions: [
+        {
+          key: LOG,
+          extension: {
+            name: "log",
+            factory: () => ({ log: vi.fn() }),
+          },
+        },
+        {
+          key: MAIL,
+          extension: {
+            name: "mail",
+            factory: ({ config }) => ({ from: config?.from }),
+          },
+          config: { from: "1" },
+        },
+      ],
     });
 
     const log = await context.resolve<{ log: Mock }>(LOG);
@@ -27,31 +33,37 @@ describe("createApp", () => {
     expect(typeof log.log).toBe("function");
 
     const mail = await context.resolve<{ from: string }>(MAIL);
-    expect(mail.from).toBe("from");
+    expect(mail.from).toBe("1");
   });
 
   it("should call boot functions", async () => {
     const order: string[] = [];
 
-    const extA: Extension = {
-      name: Symbol("A"),
-      factory: () => ({}),
-      boot: () => {
-        order.push("A");
-      },
-    };
-    const extB: Extension = {
-      name: Symbol("B"),
-      factory: () => ({}),
-      boot: async () => {
-        await new Promise((r) => setTimeout(r, 10));
-        order.push("B");
-      },
-    };
-
     const { app } = createApp({
       name: "TestApp",
-      extensions: [extA, extB],
+      extensions: [
+        {
+          key: "A",
+          extension: {
+            name: "a",
+            factory: () => ({}),
+            boot: () => {
+              order.push("A");
+            },
+          },
+        },
+        {
+          key: "B",
+          extension: {
+            name: "b",
+            factory: () => ({}),
+            boot: async () => {
+              await new Promise((r) => setTimeout(r, 10));
+              order.push("B");
+            },
+          },
+        },
+      ],
     });
 
     await app.run();
@@ -61,22 +73,25 @@ describe("createApp", () => {
   it("should call dispose functions", async () => {
     const order: string[] = [];
 
-    const A = Symbol("A");
-
-    const extA: Extension = {
-      name: A,
-      factory: () => {
-        return {
-          dispose: () => {
-            order.push("dispose");
-          },
-        };
-      },
-    };
+    const A = "A";
 
     const { app, context } = createApp({
       name: "TestApp",
-      extensions: [extA],
+      extensions: [
+        {
+          key: A,
+          extension: {
+            name: "a",
+            factory: () => {
+              return {
+                dispose: () => {
+                  order.push("dispose");
+                },
+              };
+            },
+          },
+        },
+      ],
     });
 
     await app.run();
@@ -89,18 +104,21 @@ describe("createApp", () => {
   });
 
   it("should throw when boot fails", async () => {
-    const errorExtension: Extension = {
-      name: Symbol("fail"),
-      factory: () => ({}),
-      boot: () => {
-        throw new Error("Boot failed");
-      },
-    };
-
     const { app } = createApp({
       name: "TestApp",
       debug: true,
-      extensions: [errorExtension],
+      extensions: [
+        {
+          key: "FAIL",
+          extension: {
+            name: "fail",
+            factory: () => ({}),
+            boot: () => {
+              throw new Error("Boot failed");
+            },
+          },
+        },
+      ],
     });
 
     await expect(app.run()).rejects.toThrow("Boot failed");
