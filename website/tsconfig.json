@@ -9,6 +9,10 @@
     "vite.config.ts"
   ],
   "compilerOptions": {
-    "rootDirs": [".", "./.react-router/types"]
+    "rootDirs": [".", "./.react-router/types"],
+    "paths": {
+      "@resolid/core": ["../packages/core/src"],
+      "@resolid/log": ["../packages/log/src"]
+    }
   }
 }

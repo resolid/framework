@@ -35,16 +35,26 @@ bun add @resolid/di
 
 ```ts
 import { createApp } from "@resolid/core";
-import { LOG_SYMBOL, type LogConfig, logExtension, type LogService } from "@resolid/log";
+import { type LogConfig, logExtension, type LogService } from "@resolid/log";
+
+const DI = {
+  LOG: "LOG",
+};
 
 const logConfig: LogConfig = {};
 
 const { context } = createApp({
   name: "App",
-  extensions: [[logExtension, logConfig]],
+  extensions: [
+    {
+      key: DI.LOG,
+      extension: logExtension,
+      config: logConfig,
+    },
+  ],
 });
 
-const logger = await context.resolve<LogService>(LOG_SYMBOL);
+const logger = await context.resolve<LogService>(DI.LOG);
 
 log.category("user").info("message");
 ```

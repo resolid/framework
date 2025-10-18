@@ -4,7 +4,7 @@ import { createContainer } from "./index";
 describe("Container", () => {
   describe("Basic binding functionality", () => {
     it("should bind and resolve values", async () => {
-      const name = Symbol("test");
+      const name = "test";
       const value = { foo: "bar" };
 
       const container = createContainer([
@@ -20,7 +20,7 @@ describe("Container", () => {
     });
 
     it("should bind and resolve functions", async () => {
-      const name = Symbol("testFn");
+      const name = "testFn";
       const callable = () => "hello";
 
       const container = createContainer([
@@ -37,7 +37,7 @@ describe("Container", () => {
     });
 
     it("should bind and resolve factory functions", async () => {
-      const name = Symbol("testFactory");
+      const name = "testFactory";
 
       const container = createContainer([
         {
@@ -54,7 +54,7 @@ describe("Container", () => {
     });
 
     it("should throw error when resolving non-existent binding", async () => {
-      const name = Symbol("nonExistent");
+      const name = "nonExistent";
 
       const container = createContainer([]);
 
@@ -64,7 +64,7 @@ describe("Container", () => {
 
   describe("Scope management", () => {
     it("should return same instance for singleton scope", async () => {
-      const name = Symbol("singleton");
+      const name = "singleton";
       let callCount = 0;
 
       const container = createContainer([
@@ -85,7 +85,7 @@ describe("Container", () => {
     });
 
     it("should return different instances for transient scope", async () => {
-      const name = Symbol("transient");
+      const name = "transient";
       let callCount = 0;
 
       const container = createContainer([
@@ -111,8 +111,8 @@ describe("Container", () => {
 
   describe("Dependency resolution", () => {
     it("should resolve nested dependencies", async () => {
-      const DATABASE = Symbol("database");
-      const SERVICE = Symbol("service");
+      const DATABASE = "database";
+      const SERVICE = "service";
 
       const container = createContainer([
         { name: DATABASE, value: { query: () => "data" } },
@@ -134,8 +134,8 @@ describe("Container", () => {
     });
 
     it("should detect circular dependencies", async () => {
-      const A = Symbol("A");
-      const B = Symbol("B");
+      const A = "A";
+      const B = "B";
 
       const container = createContainer([
         {
@@ -158,7 +158,7 @@ describe("Container", () => {
     });
 
     it("should detect self-referencing circular dependency", async () => {
-      const name = Symbol("self");
+      const name = "self";
 
       const container = createContainer([
         {
@@ -176,8 +176,8 @@ describe("Container", () => {
 
   describe("Lazy resolution", () => {
     it("should lazily resolve dependencies", async () => {
-      const LAZY = Symbol("lazy");
-      const CONSUMER = Symbol("consumer");
+      const LAZY = "lazy";
+      const CONSUMER = "consumer";
 
       const container = createContainer([
         { name: LAZY, value: { data: "lazy data" } },
@@ -198,8 +198,8 @@ describe("Container", () => {
     });
 
     it("should throw error when accessing lazy value synchronously in factory", async () => {
-      const LAZY = Symbol("lazy");
-      const CONSUMER = Symbol("consumer");
+      const LAZY = "lazy";
+      const CONSUMER = "consumer";
 
       const container = createContainer([
         { name: LAZY, value: { data: "lazy data" } },
@@ -219,8 +219,8 @@ describe("Container", () => {
     });
 
     it("should throw clear error when lazy resolution fails", async () => {
-      const NON_EXISTENT = Symbol("nonExistent");
-      const CONSUMER = Symbol("consumer");
+      const NON_EXISTENT = "nonExistent";
+      const CONSUMER = "consumer";
 
       const container = createContainer([
         {
@@ -236,9 +236,9 @@ describe("Container", () => {
     });
 
     it("should resolve correctly cycle of 3 bindings", async () => {
-      const A = Symbol("A");
-      const B = Symbol("B");
-      const C = Symbol("C");
+      const A = "A";
+      const B = "B";
+      const C = "C";
 
       const container = createContainer([
         {
@@ -283,7 +283,7 @@ describe("Container", () => {
 
   describe("Configuration passing", () => {
     it("should pass configuration to factory function", async () => {
-      const CONFIGURABLE = Symbol("configurable");
+      const CONFIGURABLE = "configurable";
       const config = { host: "localhost", port: 3000 };
 
       const container = createContainer([
@@ -303,7 +303,7 @@ describe("Container", () => {
 
   describe("Resource cleanup", () => {
     it("should dispose singleton instances on dispose", async () => {
-      const DISPOSABLE = Symbol("disposable");
+      const DISPOSABLE = "disposable";
       const disposeFn = vi.fn();
 
       const instance: {
@@ -322,9 +322,9 @@ describe("Container", () => {
     });
 
     it("should collect all errors when disposing multiple resources", async () => {
-      const DISPOSABLE1 = Symbol("disposable1");
-      const DISPOSABLE2 = Symbol("disposable2");
-      const DISPOSABLE3 = Symbol("disposable3");
+      const DISPOSABLE1 = "disposable1";
+      const DISPOSABLE2 = "disposable2";
+      const DISPOSABLE3 = "disposable3";
 
       const instance1: {
         dispose: () => Promise<void> | void;
@@ -362,7 +362,7 @@ describe("Container", () => {
 
   describe("Async factory functions", () => {
     it("should support async factory functions", async () => {
-      const ASYNC_FACTORY = Symbol("asyncFactory");
+      const ASYNC_FACTORY = "asyncFactory";
 
       const container = createContainer([
         {
@@ -379,9 +379,9 @@ describe("Container", () => {
     });
 
     it("should correctly resolve async dependency chains", async () => {
-      const A = Symbol("A");
-      const B = Symbol("B");
-      const C = Symbol("C");
+      const A = "A";
+      const B = "B";
+      const C = "C";
 
       const container = createContainer([
         {
@@ -415,7 +415,7 @@ describe("Container", () => {
 
   describe("Edge cases", () => {
     it("should handle undefined values", async () => {
-      const UNDEFINED_VALUE = Symbol("undefined");
+      const UNDEFINED_VALUE = "undefined";
 
       const container = createContainer([{ name: UNDEFINED_VALUE, value: undefined }]);
 
@@ -424,7 +424,7 @@ describe("Container", () => {
     });
 
     it("should handle null values", async () => {
-      const NULL_VALUE = Symbol("null");
+      const NULL_VALUE = "null";
 
       const container = createContainer([{ name: NULL_VALUE, value: null }]);
 
@@ -433,7 +433,7 @@ describe("Container", () => {
     });
 
     it("should handle complex objects", async () => {
-      const COMPLEX = Symbol("complex");
+      const COMPLEX = "complex";
       // noinspection JSUnusedGlobalSymbols
       const complexValue = {
         nested: {

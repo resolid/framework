@@ -13,10 +13,8 @@ import {
 } from "@logtape/logtape";
 import type { Extension } from "@resolid/core";
 
-export const LOG_SYMBOL: unique symbol = Symbol("LOG");
-
 export type LogConfig = { defaultSink?: Sink; defaultCategory?: string } & Omit<
-  Config<string, string>,
+  Partial<Config<string, string>>,
   "reset" | "loggers"
 > & {
     loggers?: ({ category: string } & Omit<LoggerConfig<string, string>, "category">)[];
@@ -33,7 +31,7 @@ export type LogService = LogCategory & {
 };
 
 export const logExtension: Extension<LogService, LogConfig> = {
-  name: LOG_SYMBOL,
+  name: "resolid-log-extension",
   factory: async ({ config, app }) => {
     console.log(`[${app.name}] Initializing log extension...`);
 
@@ -47,6 +45,7 @@ export const logExtension: Extension<LogService, LogConfig> = {
           getConsoleSink({
             formatter: getAnsiColorFormatter({
               timestamp: (t) => {
+                /* istanbul ignore next -- @preserve */
                 return new Date(t).toLocaleString("zh-CN", { hour12: false }).replace(/\//g, "-");
               },
             }),
