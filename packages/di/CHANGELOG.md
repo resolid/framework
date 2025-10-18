@@ -1,5 +1,13 @@
 # @resolid/di
 
+## 0.4.0
+
+### Minor Changes
+
+- feat: singleton and use string keys for HMR ([`21962ff`](https://github.com/resolid/framework/commit/21962ff57cae083cb393cafa9516cb1dbe3af76a))
+  - Make DI singleton HMR-friendly in development
+  - Switch binding keys from Symbol to string to prevent HMR issues
+
 ## 0.3.2
 
 ### Patch Changes
