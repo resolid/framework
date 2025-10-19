@@ -14,6 +14,7 @@ export type ReactRouterConfig = Omit<Config, "appDirectory" | "ssr">;
 export type DevConfigOptions = Platform & {
   devExclude?: (string | RegExp)[];
   appDirectory?: string;
+  includeFiles?: string[];
   reactRouterConfig?: ReactRouterConfig;
 };
 
@@ -27,6 +28,7 @@ export const defineDevConfig = ({
   nodeVersion = 22,
   devExclude,
   appDirectory = "src",
+  includeFiles = [],
   reactRouterConfig,
 }: DevConfigOptions): DevConfig => {
   const entryFile = "server.ts";
@@ -35,15 +37,18 @@ export const defineDevConfig = ({
     platform == "netlify"
       ? netlifyPreset({
           entryFile,
+          includeFiles,
           nodeVersion: nodeVersion as NodeVersions["netlify"],
         })
       : platform == "vercel"
         ? vercelPreset({
             entryFile,
+            includeFiles,
             nodeVersion: nodeVersion as NodeVersions["vercel"],
           })
         : nodePreset({
             entryFile,
+            includeFiles,
             nodeVersion: nodeVersion,
           });
 

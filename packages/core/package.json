@@ -42,11 +42,10 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "beta",
-    "tsdown": "^0.15.7",
+    "tsdown": "^0.15.8",
     "typescript": "^5.9.3",
     "vitest": "beta"
   },
-  "peerDependencies": {},
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },

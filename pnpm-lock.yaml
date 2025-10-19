@@ -74,8 +74,8 @@ importers:
         specifier: beta
         version: 4.0.0-beta.18(vitest@4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1))
       tsdown:
-        specifier: ^0.15.7
-        version: 0.15.7(typescript@5.9.3)
+        specifier: ^0.15.8
+        version: 0.15.8(typescript@5.9.3)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -95,8 +95,8 @@ importers:
         specifier: ^7.9.4
         version: 7.9.4(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.3)
       '@resolid/react-router-hono':
-        specifier: ^2.1.6
-        version: 2.1.6(@netlify/types@2.1.0)(@react-router/dev@7.9.4(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1)(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.3)(vite@7.1.10(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1)))(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(rollup@4.52.5)(vite@7.1.10(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1))
+        specifier: ^2.2.0
+        version: 2.2.0(@netlify/types@2.1.0)(@react-router/dev@7.9.4(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1)(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.3)(vite@7.1.10(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1)))(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(rollup@4.52.5)(vite@7.1.10(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1))
       hono:
         specifier: ^4.9.12
         version: 4.10.1
@@ -105,8 +105,8 @@ importers:
         version: 5.1.31
     devDependencies:
       tsdown:
-        specifier: ^0.15.7
-        version: 0.15.7(typescript@5.9.3)
+        specifier: ^0.15.8
+        version: 0.15.8(typescript@5.9.3)
       vite:
         specifier: ^7.1.10
         version: 7.1.10(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1)
@@ -117,8 +117,8 @@ importers:
         specifier: beta
         version: 4.0.0-beta.18(vitest@4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1))
       tsdown:
-        specifier: ^0.15.7
-        version: 0.15.7(typescript@5.9.3)
+        specifier: ^0.15.8
+        version: 0.15.8(typescript@5.9.3)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -139,8 +139,8 @@ importers:
         specifier: beta
         version: 4.0.0-beta.18(vitest@4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1))
       tsdown:
-        specifier: ^0.15.7
-        version: 0.15.7(typescript@5.9.3)
+        specifier: ^0.15.8
+        version: 0.15.8(typescript@5.9.3)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -912,8 +912,8 @@ packages:
       typescript:
         optional: true
 
-  '@resolid/react-router-hono@2.1.6':
-    resolution: {integrity: sha512-Vj7wf5XG9fpF8nVZEhAfsNUMF4uId3T4uPoOGmvqeYbE7HGrfxksN55oCee8E6SY4rd0VZUdSuESmIu2ipSAMw==}
+  '@resolid/react-router-hono@2.2.0':
+    resolution: {integrity: sha512-Zx8ZDyqYRTq8zWOAQCuzDEQMs4rHrjU7T3mUhVCh8QVjghkFtjIZxEOm4tYmVywdr3VuKrKGENJeb5FxTKOSMw==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
     peerDependencies:
       '@netlify/types': ^2.1.0
@@ -1469,8 +1469,8 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  baseline-browser-mapping@2.8.17:
-    resolution: {integrity: sha512-j5zJcx6golJYTG6c05LUZ3Z8Gi+M62zRT/ycz4Xq4iCOdpcxwg7ngEYD4KA0eWZC7U17qh/Smq8bYbACJ0ipBA==}
+  baseline-browser-mapping@2.8.18:
+    resolution: {integrity: sha512-UYmTpOBwgPScZpS4A+YbapwWuBwasxvO/2IOHArSsAhL/+ZdmATBXTex3t+l2hXwLVYK382ibr/nKoY9GKe86w==}
     hasBin: true
 
   better-path-resolve@1.0.0:
@@ -2985,8 +2985,8 @@ packages:
       typescript:
         optional: true
 
-  tsdown@0.15.7:
-    resolution: {integrity: sha512-uFaVgWAogjOMqjY+CQwrUt3C6wzy6ynt82CIoXymnbS17ipUZ8WDXUceJjkislUahF/BZc5+W44Ue3p2oWtqUg==}
+  tsdown@0.15.8:
+    resolution: {integrity: sha512-A9CY3lO2SC6G5wyQV38cNdPkDmCoIQ6zYVd+lLnEGH09BxNRTJkCHfb7cBeBxZYJDYGFtgg/3yBpEryYJjBd+Q==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
@@ -4141,13 +4141,14 @@ snapshots:
       - supports-color
       - vue-tsc
 
-  '@resolid/react-router-hono@2.1.6(@netlify/types@2.1.0)(@react-router/dev@7.9.4(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1)(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.3)(vite@7.1.10(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1)))(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(rollup@4.52.5)(vite@7.1.10(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1))':
+  '@resolid/react-router-hono@2.2.0(@netlify/types@2.1.0)(@react-router/dev@7.9.4(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1)(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.3)(vite@7.1.10(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1)))(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(rollup@4.52.5)(vite@7.1.10(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1))':
     dependencies:
       '@hono/node-server': 1.19.5(hono@4.10.1)
       '@netlify/types': 2.1.0
       '@react-router/dev': 7.9.4(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1)(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.3)(vite@7.1.10(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.1))
       '@vercel/nft': 0.30.3(rollup@4.52.5)
       esbuild: 0.25.11
+      fast-glob: 3.3.3
       hono: 4.10.1
       minimatch: 10.0.3
       react-router: 7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -4656,7 +4657,7 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  baseline-browser-mapping@2.8.17: {}
+  baseline-browser-mapping@2.8.18: {}
 
   better-path-resolve@1.0.0:
     dependencies:
@@ -4683,7 +4684,7 @@ snapshots:
 
   browserslist@4.26.3:
     dependencies:
-      baseline-browser-mapping: 2.8.17
+      baseline-browser-mapping: 2.8.18
       caniuse-lite: 1.0.30001751
       electron-to-chromium: 1.5.237
       node-releases: 2.0.25
@@ -6006,7 +6007,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  tsdown@0.15.7(typescript@5.9.3):
+  tsdown@0.15.8(typescript@5.9.3):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14

@@ -40,6 +40,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
+    "reasolid": "./dist/cli.js",
     "react-router": "./cli/react-router.js"
   },
   "files": [
@@ -52,10 +53,10 @@
   },
   "dependencies": {
     "@react-router/dev": "^7.9.4",
-    "@resolid/react-router-hono": "^2.1.6"
+    "@resolid/react-router-hono": "^2.2.0"
   },
   "devDependencies": {
-    "tsdown": "^0.15.7",
+    "tsdown": "^0.15.8",
     "vite": "^7.1.10"
   },
   "peerDependencies": {
