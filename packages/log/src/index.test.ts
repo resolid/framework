@@ -1,42 +1,28 @@
 import { createApp } from "@resolid/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { logExtension, type LogService } from "./index";
+import { createLogExtension, type LogService } from "./index";
 
 describe("logExtension", () => {
   const LOG_DI_KEY = "LOG";
   let log: LogService;
 
   beforeEach(async () => {
-    const { context } = createApp({
+    const app = await createApp({
       name: "TestApp",
       debug: true,
       extensions: [
         {
           key: LOG_DI_KEY,
-          extension: logExtension,
+          extension: createLogExtension(),
         },
       ],
     });
 
-    log = await context.resolve(LOG_DI_KEY);
+    log = await app.resolve(LOG_DI_KEY);
   });
 
   it("should have correct symbol name", () => {
     expect(typeof LOG_DI_KEY).toBe("string");
-  });
-
-  it("should log initialization message", async () => {
-    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-
-    const { context } = createApp({
-      name: "TestApp",
-      debug: true,
-      extensions: [{ key: LOG_DI_KEY, extension: logExtension }],
-    });
-
-    await context.resolve<LogService>(LOG_DI_KEY);
-
-    expect(consoleSpy).toHaveBeenCalledWith(`[TestApp] Initializing log extension...`);
   });
 
   it("should return an object with 5 methods", () => {

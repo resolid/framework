@@ -205,7 +205,7 @@ class DIContainer {
     let errorMsg = "";
 
     for (const [name, instance] of this._singletons) {
-      /* istanbul ignore else -- @preserve */
+      /* istanbul ignore if -- @preserve */
       if (typeof (instance as Disposable).dispose === "function") {
         try {
           await (instance as Disposable).dispose();

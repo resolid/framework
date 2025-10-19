@@ -1,12 +1,19 @@
 import { describe, expect, it, type Mock, vi } from "vitest";
-import { createApp } from "./index";
+import { createApp, type ExtensionBuilder } from "./index";
 
 describe("createApp", () => {
   it("should register extensions and resolve them", async () => {
     const LOG = "LOG";
     const MAIL = "MAIL";
 
-    const { context } = createApp({
+    const createMailExtension: ExtensionBuilder<{ from: string }, { from: string }> = ({ config } = {}) => {
+      return {
+        name: "mail",
+        factory: () => ({ from: config?.from ?? "" }),
+      };
+    };
+
+    const app = await createApp({
       name: "TestApp",
       extensions: [
         {
@@ -18,28 +25,118 @@ describe("createApp", () => {
         },
         {
           key: MAIL,
-          extension: {
-            name: "mail",
-            factory: ({ config }) => ({ from: config?.from }),
-          },
-          config: { from: "1" },
+          extension: createMailExtension({ config: { from: "1" } }),
         },
       ],
     });
 
-    const log = await context.resolve<{ log: Mock }>(LOG);
+    const log = await app.resolve<{ log: Mock }>(LOG);
 
     expect(log).toHaveProperty("log");
     expect(typeof log.log).toBe("function");
 
-    const mail = await context.resolve<{ from: string }>(MAIL);
+    const mail = await app.resolve<{ from: string }>(MAIL);
     expect(mail.from).toBe("1");
+  });
+
+  it("should inject services based on instanceProps mapping", async () => {
+    const createLogExtension: ExtensionBuilder<{ log: (msg: string) => void }> = () => ({
+      name: "LogExtension",
+      factory: () => {
+        return {
+          log: vi.fn((msg: string) => {
+            console.log(`[LOG]: ${msg}`);
+          }),
+        };
+      },
+    });
+
+    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const app = await createApp<{ logger: { log: (msg: string) => void } }>({
+      name: "TestApp",
+      debug: true,
+      extensions: [
+        {
+          key: "log",
+          extension: createLogExtension(),
+        },
+      ],
+      instanceProps: {
+        logger: "log",
+      },
+    });
+
+    await app.run();
+
+    expect(app.logger).toBeDefined();
+
+    expect(typeof app.logger.log).toBe("function");
+
+    app.logger.log("Hello App!");
+
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("Hello App!"));
+
+    consoleSpy.mockRestore();
+  });
+
+  it("should correctly use bindings passed into ExtensionBuilder", async () => {
+    const logFactory = vi.fn();
+
+    const createLogExtension: ExtensionBuilder<
+      { log: (msg: string) => void },
+      Record<string, never>,
+      { logKey: string }
+    > = ({ bindings }) => ({
+      name: "LogExtension",
+      factory: async ({ resolver }) => {
+        const logService = await resolver.resolve<(msg: string) => void>(bindings.logKey);
+
+        return {
+          log: (msg: string) => {
+            logFactory(msg);
+            logService?.(msg);
+          },
+        };
+      },
+    });
+
+    const logService = vi.fn();
+
+    const app = await createApp<{ logger: { log: (msg: string) => void } }>({
+      name: "BindingApp",
+      extensions: [
+        {
+          key: "logService",
+          extension: {
+            name: "LogService",
+            factory: () => logService,
+          },
+        },
+        {
+          key: "logger",
+          extension: createLogExtension({
+            bindings: { logKey: "logService" },
+          }),
+        },
+      ],
+      instanceProps: {
+        logger: "logger",
+      },
+    });
+
+    await app.run();
+
+    app.logger.log("Hello world!");
+
+    expect(logFactory).toHaveBeenCalledWith("Hello world!");
+    expect(logService).toHaveBeenCalledWith("Hello world!");
   });
 
   it("should call boot functions", async () => {
     const order: string[] = [];
 
-    const { app } = createApp({
+    const app = await createApp({
       name: "TestApp",
       extensions: [
         {
@@ -70,12 +167,42 @@ describe("createApp", () => {
     expect(order).toEqual(["A", "B"]);
   });
 
+  it("should only execute boots once even if run() is called multiple times", async () => {
+    const bootFn = vi.fn();
+
+    const createBootExtension: ExtensionBuilder<{ name: string }> = () => ({
+      name: "BootExtension",
+      boot: async () => {
+        bootFn();
+      },
+      factory: () => ({ name: "booted-service" }),
+    });
+
+    const app = await createApp({
+      name: "BootTestApp",
+      extensions: [
+        {
+          key: "boot",
+          extension: createBootExtension(),
+        },
+      ],
+    });
+
+    await app.run();
+    await app.run();
+
+    expect(bootFn).toHaveBeenCalledTimes(1);
+
+    const service = await app.resolve<{ name: string }>("boot");
+    expect(service.name).toBe("booted-service");
+  });
+
   it("should call dispose functions", async () => {
     const order: string[] = [];
 
     const A = "A";
 
-    const { app, context } = createApp({
+    const app = await createApp({
       name: "TestApp",
       extensions: [
         {
@@ -96,7 +223,7 @@ describe("createApp", () => {
 
     await app.run();
 
-    await context.resolve<{ log: Mock }>(A);
+    await app.resolve<{ log: Mock }>(A);
 
     await app.dispose();
 
@@ -104,7 +231,7 @@ describe("createApp", () => {
   });
 
   it("should throw when boot fails", async () => {
-    const { app } = createApp({
+    const app = await createApp({
       name: "TestApp",
       debug: true,
       extensions: [

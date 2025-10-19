@@ -4,38 +4,57 @@ import { env } from "node:process";
 export type AppConfig = {
   readonly name: string;
   readonly debug?: boolean;
+  readonly timezone?: string;
 };
 
-export type AppContext = AppConfig & {
+export type AppContext = AppConfig & {};
+
+export type AppRuntime = AppContext & {
   readonly resolve: <T>(key: string) => Promise<T>;
 };
 
-type ExtensionBoot = (app: AppContext) => void | Promise<void>;
+type ExtensionBoot = (runtime: AppRuntime) => void | Promise<void>;
 
-export type Extension<T = unknown, Config extends FactoryConfig = FactoryConfig> = {
+export type Extension<T = unknown> = {
   readonly name: string;
   readonly boot?: ExtensionBoot;
-  readonly factory: (context: { resolver: Resolver; config?: Config; app: AppConfig }) => T | Promise<T>;
+  readonly factory: (options: { resolver: Resolver; context: AppContext }) => T | Promise<T>;
   readonly scope?: Scope;
 };
 
-export type CreateAppOptions = AppConfig & {
-  readonly timezone?: string;
+export type ExtensionBuilder<T = unknown, C extends FactoryConfig = FactoryConfig, P = void> = P extends void
+  ? (options?: { config?: C }) => Extension<T>
+  : (options: { config?: C; bindings: P }) => Extension<T>;
+
+export type CreateAppOptions<Services extends Record<string, unknown>> = AppConfig & {
   readonly extensions: {
     key: string;
     extension: Extension;
-    config?: FactoryConfig;
   }[];
+  readonly instanceProps?: { [K in keyof Services]: string };
 };
 
-export type AppInstance = {
-  readonly app: { run: () => Promise<void>; dispose: () => Promise<void> };
-  readonly context: AppContext;
-};
+export type AppInstance<Services extends Record<string, unknown>> = {
+  run: () => Promise<void>;
+  dispose: () => Promise<void>;
+} & AppRuntime &
+  Services;
 
 // noinspection JSUnusedGlobalSymbols
-export const createApp = ({ name, debug = false, timezone = "UTC", extensions }: CreateAppOptions): AppInstance => {
+export const createApp = async <Services extends Record<string, unknown> = Record<string, never>>({
+  name,
+  debug = false,
+  timezone = "UTC",
+  extensions,
+  instanceProps,
+}: CreateAppOptions<Services>): Promise<AppInstance<Services>> => {
   env.timezone = timezone;
+
+  const context: AppContext = {
+    name,
+    debug,
+    timezone,
+  };
 
   const bindings: BindingDefinition[] = [];
   const boots: ExtensionBoot[] = [];
@@ -43,11 +62,10 @@ export const createApp = ({ name, debug = false, timezone = "UTC", extensions }:
   for (const item of extensions) {
     bindings.push({
       name: item.key,
-      factory: ({ resolver, config }) => {
-        return item.extension.factory({ resolver, config, app: { name, debug } });
+      factory: ({ resolver }) => {
+        return item.extension.factory({ resolver, context });
       },
       scope: item.extension.scope,
-      config: item.config,
     });
 
     if (item.extension.boot) {
@@ -57,23 +75,35 @@ export const createApp = ({ name, debug = false, timezone = "UTC", extensions }:
 
   const container = createContainer(bindings);
 
-  const appContext: AppContext = {
-    name,
-    debug,
+  const runtime = {
+    ...context,
     resolve: container.resolve,
   };
 
+  const services: Partial<Services> = {};
+
+  if (instanceProps) {
+    for (const [propKey, bindingName] of Object.entries(instanceProps)) {
+      services[propKey as keyof Services] = await container.resolve(bindingName);
+    }
+  }
+
+  let running = false;
+
   return {
-    app: {
-      run: async () => {
+    run: async () => {
+      if (!running) {
         for (const boot of boots) {
-          await boot(appContext);
+          await boot(runtime);
         }
-      },
-      dispose: async () => {
-        await container.dispose();
-      },
+
+        running = true;
+      }
     },
-    context: appContext,
-  };
+    dispose: async () => {
+      await container.dispose();
+    },
+    ...runtime,
+    ...services,
+  } as AppInstance<Services>;
 };
