@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.5.0
+
+### Minor Changes
+
+- pref: optimize container performance and reduce microtasks ([`a122de4`](https://github.com/resolid/framework/commit/a122de49c3848daa98904404499e0d6fd3a5e528))
+
 ## 0.4.0
 
 ### Minor Changes
