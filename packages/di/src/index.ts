@@ -1,6 +1,3 @@
-// eslint-disable-next-line n/prefer-global/process
-const DEV = process.env.NODE_ENV === "development";
-
 type Resolve = <T>(name: string) => Promise<T>;
 type LazyResolve = <T = unknown>(name: string) => Readonly<{ value: T }>;
 
@@ -48,35 +45,14 @@ export type Container = {
 } & Disposable;
 
 export const createContainer = (definitions: readonly BindingDefinition[]): Container => {
-  const container = singleton("__R_DI", () => {
-    const container = new DIContainer();
-    container.register(definitions);
-    return container;
-  });
+  const container = new DIContainer();
+
+  container.register(definitions);
 
   return {
     resolve: <T>(name: string) => container.resolve<T>(name),
     dispose: () => container.dispose(),
   };
-};
-
-/* istanbul ignore next -- @preserve */
-const singleton = <T>(key: string, getValue: () => T): T => {
-  if (!DEV) {
-    return getValue();
-  }
-
-  const globalStore = globalThis as Record<string, unknown>;
-
-  if (key in globalStore) {
-    return globalStore[key] as T;
-  }
-
-  const value = getValue();
-
-  globalStore[key] = value;
-
-  return value;
 };
 
 class DIContainer {
