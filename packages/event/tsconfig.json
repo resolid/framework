@@ -4,10 +4,6 @@
   "compilerOptions": {
     "allowJs": false,
     "declaration": true,
-    "isolatedDeclarations": true,
-    "paths": {
-      "@resolid/di": ["../di/src"],
-      "@resolid/event": ["../event/src"]
-    }
+    "isolatedDeclarations": true
   }
 }

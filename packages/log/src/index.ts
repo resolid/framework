@@ -85,7 +85,7 @@ export const createLogExtension: ExtensionBuilder<LogService, LogConfig> = ({ co
 
       const defaultLogger = category(defaultCategory);
 
-      defaultLogger.info("LogExtension initialized successfully.");
+      defaultLogger.info("Log extension initialized.");
 
       return {
         ...defaultLogger,

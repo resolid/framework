@@ -1,17 +1,18 @@
 {
-  "name": "@resolid/core",
+  "name": "@resolid/event",
   "version": "0.0.0",
-  "private": true,
-  "description": "The Resolid Core package.",
+  "private": false,
+  "description": "The Resolid Event emitter package.",
   "keywords": [
     "resolid",
-    "framework"
+    "event",
+    "event emitter"
   ],
   "homepage": "https://www.resolid.tech",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/resolid/framework.git",
-    "directory": "packages/core"
+    "directory": "packages/event"
   },
   "license": "MIT",
   "author": {
@@ -36,10 +37,6 @@
     "lint": "eslint .",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@resolid/di": "workspace:^",
-    "@resolid/event": "workspace:^"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "beta",

@@ -43,11 +43,11 @@ jobs:
           npm install -g npm@latest
           pnpm install --frozen-lockfile --prefer-offline
 
-      - name: Test
-        run: pnpm run test:packages
-
       - name: Build Packages
         run: pnpm run build:packages
+
+      - name: Test Packages
+        run: pnpm run test:packages
 
       - name: Create Release Pull Request or Publish
         id: changesets

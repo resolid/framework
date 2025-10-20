@@ -10,3 +10,7 @@ export const app = await createApp<Record<"logger", LogService>>({
     logger: DI_LOG_KEY,
   },
 });
+
+app.emitter.on("app:ready", function () {
+  app.logger.info("Resolid application started.");
+});

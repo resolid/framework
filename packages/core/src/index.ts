@@ -1,4 +1,5 @@
 import { type BindingDefinition, createContainer, type FactoryConfig, type Resolver, type Scope } from "@resolid/di";
+import { createEmitter, type Emitter } from "@resolid/event";
 import { env } from "node:process";
 
 export type AppConfig = {
@@ -7,7 +8,9 @@ export type AppConfig = {
   readonly timezone?: string;
 };
 
-export type AppContext = AppConfig & {};
+export type AppContext = AppConfig & {
+  emitter: Emitter;
+};
 
 export type AppRuntime = AppContext & {
   readonly resolve: <T>(key: string) => Promise<T>;
@@ -50,10 +53,13 @@ export const createApp = async <Services extends Record<string, unknown> = Recor
 }: CreateAppOptions<Services>): Promise<AppInstance<Services>> => {
   env.timezone = timezone;
 
+  const emitter = createEmitter();
+
   const context: AppContext = {
     name,
     debug,
     timezone,
+    emitter,
   };
 
   const bindings: BindingDefinition[] = [];
@@ -98,10 +104,13 @@ export const createApp = async <Services extends Record<string, unknown> = Recor
         }
 
         running = true;
+
+        emitter.emit("app:ready");
       }
     },
     dispose: async () => {
       await container.dispose();
+      emitter.offAll();
     },
     ...runtime,
     ...services,

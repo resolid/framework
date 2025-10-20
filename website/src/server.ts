@@ -4,8 +4,6 @@ import { app } from "./app";
 
 await app.run();
 
-app.logger.info("Resolid application started successfully.");
-
 // noinspection JSUnusedGlobalSymbols
 export default await createServer((platform) => {
   switch (platform) {

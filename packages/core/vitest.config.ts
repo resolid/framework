@@ -11,6 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@resolid/di": resolve(import.meta.dirname, "../di/src"),
+      "@resolid/event": resolve(import.meta.dirname, "../event/src"),
     },
   },
 }) as ViteUserConfig;
