@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.5.1
+
+### Patch Changes
+
+- refactor: remove globalThis singleton ([`07eb17a`](https://github.com/resolid/framework/commit/07eb17aa6e7f695f98c5b4bd27c047b365917903))
+
 ## 0.5.0
 
 ### Minor Changes
