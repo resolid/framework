@@ -11,6 +11,8 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
+    "build:vercel": "VERCEL=1 react-router build",
+    "build:netlify": "NETLIFY=true react-router build",
     "dev": "react-router dev",
     "lint": "eslint .",
     "start": "NODE_ENV=production SERVER_PORT=3001 node --env-file=.env ./build/server/server.mjs",
@@ -25,15 +27,15 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router": "^7.9.4",
-    "tailwindcss": "^4.1.14"
+    "tailwindcss": "^4.1.15"
   },
   "devDependencies": {
     "@netlify/types": "^2.1.0",
     "@resolid/dev": "workspace:^",
-    "@tailwindcss/vite": "^4.1.14",
+    "@tailwindcss/vite": "^4.1.15",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
-    "vite": "^7.1.10",
+    "vite": "^7.1.11",
     "vite-plugin-inspect": "^11.3.3",
     "vite-tsconfig-paths": "^5.1.4"
   },

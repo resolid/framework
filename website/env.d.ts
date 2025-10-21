@@ -5,14 +5,14 @@ declare namespace NodeJS {
   export interface ProcessEnv {
     readonly SERVER_PORT: number | undefined;
 
+    readonly VERCEL: number;
     readonly NETLIFY: boolean;
-    readonly VERCEL_URL: string;
   }
 }
 
 interface ImportMetaEnv {
+  readonly VITE_VERCEL?: number;
   readonly VITE_NETLIFY?: boolean;
-  readonly VITE_VERCEL_URL?: string;
 }
 
 interface ImportMeta {

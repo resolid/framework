@@ -2,6 +2,9 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/website/.netlify" />
+      <excludeFolder url="file://$MODULE_DIR$/website/.vercel" />
+      <excludeFolder url="file://$MODULE_DIR$/website/runtime" />
       <excludePattern pattern="coverage" />
     </content>
     <orderEntry type="inheritedJdk" />

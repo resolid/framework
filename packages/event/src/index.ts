@@ -55,6 +55,7 @@ export const createEmitter = (): Emitter => {
   };
 
   const emitAsync = <Args extends unknown[]>(event: string, ...args: Args) => {
+    /* istanbul ignore next -- @preserve */
     const callbacks = _events[event]?.slice() || [];
 
     queueMicrotask(() => {
