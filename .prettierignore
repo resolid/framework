@@ -6,4 +6,6 @@ pnpm-workspace.yaml
 .changeset/
 .github/
 .react-router/
+.netlify/
+.vercel/
 build/
