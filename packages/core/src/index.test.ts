@@ -1,5 +1,29 @@
+import { join } from "node:path";
+import { cwd } from "node:process";
 import { describe, expect, it, type Mock, vi } from "vitest";
 import { createApp, type ExtensionBuilder } from "./index";
+
+const testPathMethod = (methodFn: (...paths: string[]) => string, basePath: string) => {
+  it("should return base path when called with no arguments", () => {
+    expect(methodFn()).toBe(basePath);
+  });
+
+  it("should handle single segment", () => {
+    expect(methodFn("config")).toBe(join(basePath, "config"));
+    expect(methodFn("config\\log")).toBe(join(basePath, "config", "log"));
+    expect(methodFn("config/log")).toBe(join(basePath, "config", "log"));
+  });
+
+  it("should handle multiple segments", () => {
+    expect(methodFn("a", "b", "c")).toBe(join(basePath, "a", "b", "c"));
+    expect(methodFn("x\\y", "z")).toBe(join(basePath, "x", "y", "z"));
+    expect(methodFn("nested\\dir/file.txt")).toBe(join(basePath, "nested", "dir", "file.txt"));
+  });
+
+  it("should handle empty string segments", () => {
+    expect(methodFn("")).toBe(join(basePath, ""));
+  });
+};
 
 describe("createApp", () => {
   it("should register extensions and resolve them", async () => {
@@ -249,5 +273,15 @@ describe("createApp", () => {
     });
 
     await expect(app.run()).rejects.toThrow("Boot failed");
+  });
+
+  describe("rootPath and runtimePath should handle simple paths", async () => {
+    const app = await createApp({ name: "test-app", extensions: [] });
+
+    const rootBase = cwd();
+    const runtimeBase = join(rootBase, "runtime");
+
+    testPathMethod(app.rootPath, rootBase);
+    testPathMethod(app.runtimePath, runtimeBase);
   });
 });

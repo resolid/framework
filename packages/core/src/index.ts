@@ -1,6 +1,7 @@
 import { type BindingDefinition, createContainer, type FactoryConfig, type Resolver, type Scope } from "@resolid/di";
 import { createEmitter, type Emitter } from "@resolid/event";
-import { env } from "node:process";
+import { join } from "node:path";
+import { cwd, env } from "node:process";
 
 export type AppConfig = {
   readonly name: string;
@@ -10,6 +11,8 @@ export type AppConfig = {
 
 export type AppContext = AppConfig & {
   emitter: Emitter;
+  rootPath: (...paths: string[]) => string;
+  runtimePath: (...paths: string[]) => string;
 };
 
 export type AppRuntime = AppContext & {
@@ -55,11 +58,16 @@ export const createApp = async <Services extends Record<string, unknown> = Recor
 
   const emitter = createEmitter();
 
+  const root = cwd();
+  const rootPath = (...paths: string[]) => join(root, ...paths.map((p) => p.replace(/\\/g, "/")));
+
   const context: AppContext = {
     name,
     debug,
     timezone,
     emitter,
+    rootPath,
+    runtimePath: (...paths) => rootPath("runtime", ...paths),
   };
 
   const bindings: BindingDefinition[] = [];
@@ -104,7 +112,6 @@ export const createApp = async <Services extends Record<string, unknown> = Recor
         }
 
         running = true;
-
         emitter.emit("app:ready");
       }
     },
