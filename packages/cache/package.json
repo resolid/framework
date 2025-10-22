@@ -1,6 +1,6 @@
 {
   "name": "@resolid/cache",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "description": "The Resolid Cache package.",
   "keywords": [
