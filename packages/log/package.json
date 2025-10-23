@@ -38,13 +38,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@logtape/logtape": "^1.1.1"
+    "@logtape/logtape": "^1.1.2"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "beta",
+    "@vitest/coverage-v8": "^4.0.1",
     "tsdown": "^0.15.9",
     "typescript": "^5.9.3",
-    "vitest": "beta"
+    "vitest": "^4.0.1"
   },
   "peerDependencies": {
     "@resolid/core": "workspace:^"

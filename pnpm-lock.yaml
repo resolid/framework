@@ -43,8 +43,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0
       '@tailwindcss/language-server':
-        specifier: ^0.14.28
-        version: 0.14.28
+        specifier: ^0.14.29
+        version: 0.14.29
       '@types/node':
         specifier: ^22.18.12
         version: 22.18.12
@@ -74,8 +74,8 @@ importers:
         version: 7.3.0
     devDependencies:
       '@vitest/coverage-v8':
-        specifier: beta
-        version: 4.0.0-beta.18(vitest@4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
+        specifier: ^4.0.1
+        version: 4.0.1(vitest@4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
       tsdown:
         specifier: ^0.15.9
         version: 0.15.9(typescript@5.9.3)
@@ -83,8 +83,8 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vitest:
-        specifier: beta
-        version: 4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
+        specifier: ^4.0.1
+        version: 4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
 
   packages/core:
     dependencies:
@@ -96,8 +96,8 @@ importers:
         version: link:../event
     devDependencies:
       '@vitest/coverage-v8':
-        specifier: beta
-        version: 4.0.0-beta.18(vitest@4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
+        specifier: ^4.0.1
+        version: 4.0.1(vitest@4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
       tsdown:
         specifier: ^0.15.9
         version: 0.15.9(typescript@5.9.3)
@@ -105,8 +105,8 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vitest:
-        specifier: beta
-        version: 4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
+        specifier: ^4.0.1
+        version: 4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
 
   packages/dev:
     dependencies:
@@ -124,7 +124,7 @@ importers:
         version: 2.2.0(@netlify/types@2.1.0)(@react-router/dev@7.9.4(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.3)(vite@7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)))(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(rollup@4.52.5)(vite@7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
       hono:
         specifier: ^4.9.12
-        version: 4.10.1
+        version: 4.10.2
       isbot:
         specifier: ^5.1.31
         version: 5.1.31
@@ -139,8 +139,8 @@ importers:
   packages/di:
     devDependencies:
       '@vitest/coverage-v8':
-        specifier: beta
-        version: 4.0.0-beta.18(vitest@4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
+        specifier: ^4.0.1
+        version: 4.0.1(vitest@4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
       tsdown:
         specifier: ^0.15.9
         version: 0.15.9(typescript@5.9.3)
@@ -148,14 +148,14 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vitest:
-        specifier: beta
-        version: 4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
+        specifier: ^4.0.1
+        version: 4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
 
   packages/event:
     devDependencies:
       '@vitest/coverage-v8':
-        specifier: beta
-        version: 4.0.0-beta.18(vitest@4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
+        specifier: ^4.0.1
+        version: 4.0.1(vitest@4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
       tsdown:
         specifier: ^0.15.9
         version: 0.15.9(typescript@5.9.3)
@@ -163,21 +163,21 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vitest:
-        specifier: beta
-        version: 4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
+        specifier: ^4.0.1
+        version: 4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
 
   packages/log:
     dependencies:
       '@logtape/logtape':
-        specifier: ^1.1.1
-        version: 1.1.1
+        specifier: ^1.1.2
+        version: 1.1.2
       '@resolid/core':
         specifier: workspace:^
         version: link:../core
     devDependencies:
       '@vitest/coverage-v8':
-        specifier: beta
-        version: 4.0.0-beta.18(vitest@4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
+        specifier: ^4.0.1
+        version: 4.0.1(vitest@4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
       tsdown:
         specifier: ^0.15.9
         version: 0.15.9(typescript@5.9.3)
@@ -185,8 +185,8 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vitest:
-        specifier: beta
-        version: 4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
+        specifier: ^4.0.1
+        version: 4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
 
   website:
     dependencies:
@@ -677,8 +677,8 @@ packages:
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
 
-  '@eslint-community/regexpp@4.12.1':
-    resolution: {integrity: sha512-CCZCDJuduB9OUkFkY2IgppNZMi2lBQgD2qzwXkEia16cge2pijY/aXi96CJMquDMn3nJdlPV1A5KrJEXwfLNzQ==}
+  '@eslint-community/regexpp@4.12.2':
+    resolution: {integrity: sha512-EriSTlt5OC9/7SXkRSCAhfSxxoSUgBm33OH+IkwbdpgoqsSsUg7y3uh+IICI/Qg4BBWr3U2i39RpmycbxMq4ew==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
 
   '@eslint/config-array@0.21.1':
@@ -772,8 +772,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@logtape/logtape@1.1.1':
-    resolution: {integrity: sha512-/zpMuB2BZnL3LnBsy6PfFJp/4qP/60U9hE5j6eFwk25wBVtLpd7/bF3B1j7cnMD37R02fFyDyyHEmRSOz6+Qfg==}
+  '@logtape/logtape@1.1.2':
+    resolution: {integrity: sha512-4QXa/5cwt3+cx01C1xm8iqvEXxNZMDTTbT5AFGZnwPkn2WDAyA6UP2khWBZ7FctMnvQqW3fnJ96kgBJ4ahorHw==}
 
   '@manypkg/find-root@1.1.0':
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -1173,8 +1173,8 @@ packages:
     resolution: {integrity: sha512-08eKiDAjj4zLug1taXSIJ0kGL5cawjVCyJkBb6EWSg5fEPX6L+Wtr0CH2If4j5KYylz85iaZiFlUItvgJvll5g==}
     engines: {node: ^14.13.1 || ^16.0.0 || >=18}
 
-  '@tailwindcss/language-server@0.14.28':
-    resolution: {integrity: sha512-NnONpgpBo3Hbxaron1XAKGFd1brCTi765A2I0k2IT4Oo70MMzfRdS6hlPfrjXcHcsSyLnYfixUlUajmYejDjhg==}
+  '@tailwindcss/language-server@0.14.29':
+    resolution: {integrity: sha512-aZ3/XyTNmsoIyhs09Fghlw6D6y7o70aIxHmQEYPFiJPe/1k3HqtxXqhn7g7a5UpA1yeGOyKK9HRNJ8ghZqIclg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -1367,20 +1367,20 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@vitest/coverage-v8@4.0.0-beta.18':
-    resolution: {integrity: sha512-k5SiBCeiWiQT/j6sdaWVRMcrTCrnr1Uved1wmhD0apIkUELauOe/LwFsVHoKC0oxZFHz3eufeMlxx7R3xfqfOg==}
+  '@vitest/coverage-v8@4.0.1':
+    resolution: {integrity: sha512-nmB+UVryiWQLC0pfPQ6KmJacew1ecpuKeUyiGbXtp1+KoYtCTAAlLI++8X/wJfzlULil+l/1jiWPreFnB1U5Mg==}
     peerDependencies:
-      '@vitest/browser': 4.0.0-beta.18
-      vitest: 4.0.0-beta.18
+      '@vitest/browser': 4.0.1
+      vitest: 4.0.1
     peerDependenciesMeta:
       '@vitest/browser':
         optional: true
 
-  '@vitest/expect@4.0.0-beta.18':
-    resolution: {integrity: sha512-dP38ctyRhGj4DTz4azK7sKR7BULMdVdgmR4Flzmul9wE3GdKUSr4zNd2RVNHhrb7l0NK0GN5/kRquaQmv9krGQ==}
+  '@vitest/expect@4.0.1':
+    resolution: {integrity: sha512-KtvGLN/IWoZfg68JF2q/zbDEo+UJTWnc7suYJ8RF+ZTBeBcBz4NIOJDxO4Q3bEY9GsOYhgy5cOevcVPFh4+V7g==}
 
-  '@vitest/mocker@4.0.0-beta.18':
-    resolution: {integrity: sha512-vwvvqj4zNaV+uQSBJHhGP72UL4fluU2gLI1Q+hT4e4ruJOF5TWD/UuWnWCpzHjGotfDTNSztypYkZ3ZottPFvA==}
+  '@vitest/mocker@4.0.1':
+    resolution: {integrity: sha512-fwmvg8YvwSAE41Hyhul7dL4UzPhG+k2VaZCcL+aHagLx4qlNQgKYTw7coF4YdjAxSBBt0b408gQFYMX1Qeqweg==}
     peerDependencies:
       msw: ^2.4.9
       vite: ^6.0.0 || ^7.0.0-0
@@ -1390,20 +1390,20 @@ packages:
       vite:
         optional: true
 
-  '@vitest/pretty-format@4.0.0-beta.18':
-    resolution: {integrity: sha512-LzgQxcQ6QxhjDfYGMT/fFH3hdzJaq2KsG0R2CGkhYUNFvAml2nvFAxzQKYtxDDk0olOxk3j29QPvv3j8D4hONg==}
+  '@vitest/pretty-format@4.0.1':
+    resolution: {integrity: sha512-6nq3JY/zQ91+oX1vd4fajiVNyA/HMhaF9cOw5P9cQi6ML7PRi7ilVaQ77PulF+4kvUKr9bcLm9GoAtwlVFbGzw==}
 
-  '@vitest/runner@4.0.0-beta.18':
-    resolution: {integrity: sha512-HpEaHsxNKJYeKApkxbrGT6OZA9Ty+BLXIc4rxo6xzo+f4zlUGluy4RjQs9GQIzEpQSPP5ehUIcUZbOi7thB49g==}
+  '@vitest/runner@4.0.1':
+    resolution: {integrity: sha512-nxUoWmw7ZX2OiSNwolJeSOOzrrR/o79wRTwP7HhiW/lDFwQHtWMj9snMhrdvccFqanvI8897E81eXjgDbrRvqA==}
 
-  '@vitest/snapshot@4.0.0-beta.18':
-    resolution: {integrity: sha512-ruWnM+5xVR5mhiTW5c66JRwxni6riPxupaXNPqdkOHzBuxxz79Cf56yzuYapT/TSRHVwkIyldfKLcZTY18CWig==}
+  '@vitest/snapshot@4.0.1':
+    resolution: {integrity: sha512-CvfsEWutEIN/Z9ScXYup7YwlPeK9JICrV7FN9p3pVytsyh+aCHAH0PUi//YlTiQ7T8qYxJYpUrAwZL9XqmZ5ZA==}
 
-  '@vitest/spy@4.0.0-beta.18':
-    resolution: {integrity: sha512-KHxVrn/e1PhcylP3waDajDZ7o5ut9BnN+QDCgz6uMev1cqVHLE1EBaz8qUcxaRH6qFNKcTm8T4x+FIIYSGS/xw==}
+  '@vitest/spy@4.0.1':
+    resolution: {integrity: sha512-Hj0/TBQ2EN72wDpfKiUf63mRCkE0ZiSGXGeDDvW9T3LBKVVApItd0GyQLDBIe03kWbyK9gOTEbJVVWthcLFzCg==}
 
-  '@vitest/utils@4.0.0-beta.18':
-    resolution: {integrity: sha512-Z7r82xwG8G6J755DqWpoP/XEuKMhxVFlIPVunD609iH8wjLJ6VD+vd9cojalhrW/tqHfdnaBpS+hxDLwSrfw3Q==}
+  '@vitest/utils@4.0.1':
+    resolution: {integrity: sha512-uRrACgpIz5sxuT87ml7xhh7EdKtW8k0N9oSFVBPl8gHB/JfLObLe9dXO6ZrsNN55FzciGIRqIEILgTQvg1eNHw==}
 
   JSONStream@1.3.5:
     resolution: {integrity: sha512-E+iruNOY8VV9s4JEbe1aNEm6MiszPRr/UfcHMz0TQh1BXSxHK+ASV1R6W4HpjBhSeS+54PIsAMCBmwD06LLsqQ==}
@@ -1513,8 +1513,8 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  baseline-browser-mapping@2.8.18:
-    resolution: {integrity: sha512-UYmTpOBwgPScZpS4A+YbapwWuBwasxvO/2IOHArSsAhL/+ZdmATBXTex3t+l2hXwLVYK382ibr/nKoY9GKe86w==}
+  baseline-browser-mapping@2.8.19:
+    resolution: {integrity: sha512-zoKGUdu6vb2jd3YOq0nnhEDQVbPcHhco3UImJrv5dSkvxTc2pl2WjOPsjZXDwPDSl5eghIMuY3R6J9NDKF3KcQ==}
     hasBin: true
 
   better-path-resolve@1.0.0:
@@ -1537,8 +1537,8 @@ packages:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
 
-  browserslist@4.26.3:
-    resolution: {integrity: sha512-lAUU+02RFBuCKQPj/P6NgjlbCnLBMp4UtgTx7vNHd3XSIJF87s9a5rA3aH2yw3GS9DqZAUbOtZdCCiZeVRqt0w==}
+  browserslist@4.27.0:
+    resolution: {integrity: sha512-AXVQwdhot1eqLihwasPElhX2tAZiBjWdJ9i/Zcj2S6QYIjkx62OKSfnobkriB81C3l4w0rVy3Nt4jaTBltYEpw==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
@@ -1741,8 +1741,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  electron-to-chromium@1.5.237:
-    resolution: {integrity: sha512-icUt1NvfhGLar5lSWH3tHNzablaA5js3HVHacQimfP8ViEBOQv+L7DKEuHdbTZ0SKCO1ogTJTIL1Gwk9S6Qvcg==}
+  electron-to-chromium@1.5.239:
+    resolution: {integrity: sha512-1y5w0Zsq39MSPmEjHjbizvhYoTaulVtivpxkp5q5kaPmQtsK6/2nvAzGRxNMS9DoYySp9PkW0MAQDwU1m764mg==}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -1987,8 +1987,8 @@ packages:
     resolution: {integrity: sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==}
     engines: {node: 6.* || 8.* || >= 10.*}
 
-  get-tsconfig@4.12.0:
-    resolution: {integrity: sha512-LScr2aNr2FbjAjZh2C6X6BxRx1/x+aTDExct/xyq2XKbYOiG5c0aK7pMsSuyc0brz3ibr/lbQiHD9jzt4lccJw==}
+  get-tsconfig@4.13.0:
+    resolution: {integrity: sha512-1VKTZJCwBrvbd+Wn3AOgQP/2Av+TfTCOlE4AcRJE72W1ksZXbAx8PPBR9RzgTeSPzlPMHrbANMH3LbltH73wxQ==}
 
   git-raw-commits@4.0.0:
     resolution: {integrity: sha512-ICsMM1Wk8xSGMowkOmPrzo2Fgmfo4bMHLNX6ytHjajRJUqvHOw/TFapQ+QG75c3X/tTDDhOSRPGC52dDbNM8FQ==}
@@ -2046,8 +2046,8 @@ packages:
   hermes-parser@0.25.1:
     resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}
 
-  hono@4.10.1:
-    resolution: {integrity: sha512-rpGNOfacO4WEPClfkEt1yfl8cbu10uB1lNpiI33AKoiAHwOS8lV748JiLx4b5ozO/u4qLjIvfpFsPXdY5Qjkmg==}
+  hono@4.10.2:
+    resolution: {integrity: sha512-p6fyzl+mQo6uhESLxbF5WlBOAJMDh36PljwlKtP5V1v09NxlqGru3ShK+4wKhSuhuYf8qxMmrivHOa/M7q0sMg==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -2998,10 +2998,6 @@ packages:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
     engines: {node: '>=12.0.0'}
 
-  tinypool@2.0.0:
-    resolution: {integrity: sha512-/RX9RzeH2xU5ADE7n2Ykvmi9ED3FBGPAjw9u3zucrNNaEBIO0HPSYgL0NT7+3p147ojeSdaVu08F6hjpv31HJg==}
-    engines: {node: ^20.0.0 || >=22.0.0}
-
   tinyrainbow@3.0.3:
     resolution: {integrity: sha512-PSkbLUoxOFRzJYjjxHJt9xro7D+iilgMX/C9lawzVuYiIdcihh9DXmVibBe8lmcFrRi/VzlPjBxbN7rH24q8/Q==}
     engines: {node: '>=14.0.0'}
@@ -3104,8 +3100,8 @@ packages:
     resolution: {integrity: sha512-5lWVjgi6vuHhJ526bI4nlCOmkCIF3nnfXkCMDeMJrtdvxTs6ZFCM8oNufGTsDbKv/tJ/xj8RpvXjRuPBZJuJog==}
     engines: {node: '>=20.19.0'}
 
-  update-browserslist-db@1.1.3:
-    resolution: {integrity: sha512-UxhIZQ+QInVdunkDAaiazvvT/+fXL5Osr0JZlJulepYu6Jd7qJtDZjlur0emRlT71EN3ScPoE7gvsuIKKNavKw==}
+  update-browserslist-db@1.1.4:
+    resolution: {integrity: sha512-q0SPT4xyU84saUX+tomz1WLkxUbuaJnR1xWt17M7fJtEJigJeWUNGUqrauFXsHnqev9y9JTRGwk13tFBuKby4A==}
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
@@ -3201,18 +3197,18 @@ packages:
       yaml:
         optional: true
 
-  vitest@4.0.0-beta.18:
-    resolution: {integrity: sha512-zWvKMoebACjaOZADoHugNLC2GO8rnY4ERj052BunaJ9u/re6RmdIu4xu3mQ7yz97a1jmpSjeGr2tUz4kF1TrLA==}
+  vitest@4.0.1:
+    resolution: {integrity: sha512-4rwTfUNF0MExMZBiNirkzZpeyUZGOs3JD76N2qHNP9i6w6/bff7MRv2I9yFJKd1ICxzn2igpra+E4t9o2EfQhw==}
     engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@types/debug': ^4.1.12
       '@types/node': ^20.0.0 || ^22.0.0 || >=24.0.0
-      '@vitest/browser-playwright': 4.0.0-beta.18
-      '@vitest/browser-preview': 4.0.0-beta.18
-      '@vitest/browser-webdriverio': 4.0.0-beta.18
-      '@vitest/ui': 4.0.0-beta.18
+      '@vitest/browser-playwright': 4.0.1
+      '@vitest/browser-preview': 4.0.1
+      '@vitest/browser-webdriverio': 4.0.1
+      '@vitest/ui': 4.0.1
       happy-dom: '*'
       jsdom: '*'
     peerDependenciesMeta:
@@ -3354,7 +3350,7 @@ snapshots:
     dependencies:
       '@babel/compat-data': 7.28.4
       '@babel/helper-validator-option': 7.27.1
-      browserslist: 4.26.3
+      browserslist: 4.27.0
       lru-cache: 5.1.1
       semver: 6.3.1
 
@@ -3860,7 +3856,7 @@ snapshots:
       eslint: 9.38.0(jiti@2.6.1)
       eslint-visitor-keys: 3.4.3
 
-  '@eslint-community/regexpp@4.12.1': {}
+  '@eslint-community/regexpp@4.12.2': {}
 
   '@eslint/config-array@0.21.1':
     dependencies:
@@ -3901,9 +3897,9 @@ snapshots:
       '@eslint/core': 0.16.0
       levn: 0.4.1
 
-  '@hono/node-server@1.19.5(hono@4.10.1)':
+  '@hono/node-server@1.19.5(hono@4.10.2)':
     dependencies:
-      hono: 4.10.1
+      hono: 4.10.2
 
   '@humanfs/core@0.19.1': {}
 
@@ -3961,7 +3957,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@logtape/logtape@1.1.1': {}
+  '@logtape/logtape@1.1.2': {}
 
   '@manypkg/find-root@1.1.0':
     dependencies:
@@ -4200,13 +4196,13 @@ snapshots:
 
   '@resolid/react-router-hono@2.2.0(@netlify/types@2.1.0)(@react-router/dev@7.9.4(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.3)(vite@7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)))(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(rollup@4.52.5)(vite@7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))':
     dependencies:
-      '@hono/node-server': 1.19.5(hono@4.10.1)
+      '@hono/node-server': 1.19.5(hono@4.10.2)
       '@netlify/types': 2.1.0
       '@react-router/dev': 7.9.4(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(typescript@5.9.3)(vite@7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
       '@vercel/nft': 0.30.3(rollup@4.52.5)
       esbuild: 0.25.11
       fast-glob: 3.3.3
-      hono: 4.10.1
+      hono: 4.10.2
       minimatch: 10.0.3
       react-router: 7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       vite: 7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
@@ -4344,7 +4340,7 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@tailwindcss/language-server@0.14.28': {}
+  '@tailwindcss/language-server@0.14.29': {}
 
   '@tailwindcss/node@4.1.15':
     dependencies:
@@ -4455,7 +4451,7 @@ snapshots:
 
   '@typescript-eslint/eslint-plugin@8.46.2(@typescript-eslint/parser@8.46.2(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.3))(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
-      '@eslint-community/regexpp': 4.12.1
+      '@eslint-community/regexpp': 4.12.2
       '@typescript-eslint/parser': 8.46.2(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.3)
       '@typescript-eslint/scope-manager': 8.46.2
       '@typescript-eslint/type-utils': 8.46.2(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.3)
@@ -4565,10 +4561,10 @@ snapshots:
       - rollup
       - supports-color
 
-  '@vitest/coverage-v8@4.0.0-beta.18(vitest@4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))':
+  '@vitest/coverage-v8@4.0.1(vitest@4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
-      '@vitest/utils': 4.0.0-beta.18
+      '@vitest/utils': 4.0.1
       ast-v8-to-istanbul: 0.3.7
       debug: 4.4.3
       istanbul-lib-coverage: 3.2.2
@@ -4578,47 +4574,47 @@ snapshots:
       magicast: 0.3.5
       std-env: 3.10.0
       tinyrainbow: 3.0.3
-      vitest: 4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
+      vitest: 4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/expect@4.0.0-beta.18':
+  '@vitest/expect@4.0.1':
     dependencies:
       '@standard-schema/spec': 1.0.0
       '@types/chai': 5.2.3
-      '@vitest/spy': 4.0.0-beta.18
-      '@vitest/utils': 4.0.0-beta.18
+      '@vitest/spy': 4.0.1
+      '@vitest/utils': 4.0.1
       chai: 6.2.0
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.0-beta.18(vite@7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))':
+  '@vitest/mocker@4.0.1(vite@7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))':
     dependencies:
-      '@vitest/spy': 4.0.0-beta.18
+      '@vitest/spy': 4.0.1
       estree-walker: 3.0.3
       magic-string: 0.30.19
     optionalDependencies:
       vite: 7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
 
-  '@vitest/pretty-format@4.0.0-beta.18':
+  '@vitest/pretty-format@4.0.1':
     dependencies:
       tinyrainbow: 3.0.3
 
-  '@vitest/runner@4.0.0-beta.18':
+  '@vitest/runner@4.0.1':
     dependencies:
-      '@vitest/utils': 4.0.0-beta.18
+      '@vitest/utils': 4.0.1
       pathe: 2.0.3
 
-  '@vitest/snapshot@4.0.0-beta.18':
+  '@vitest/snapshot@4.0.1':
     dependencies:
-      '@vitest/pretty-format': 4.0.0-beta.18
+      '@vitest/pretty-format': 4.0.1
       magic-string: 0.30.19
       pathe: 2.0.3
 
-  '@vitest/spy@4.0.0-beta.18': {}
+  '@vitest/spy@4.0.1': {}
 
-  '@vitest/utils@4.0.0-beta.18':
+  '@vitest/utils@4.0.1':
     dependencies:
-      '@vitest/pretty-format': 4.0.0-beta.18
+      '@vitest/pretty-format': 4.0.1
       tinyrainbow: 3.0.3
 
   JSONStream@1.3.5:
@@ -4714,7 +4710,7 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  baseline-browser-mapping@2.8.18: {}
+  baseline-browser-mapping@2.8.19: {}
 
   better-path-resolve@1.0.0:
     dependencies:
@@ -4739,13 +4735,13 @@ snapshots:
     dependencies:
       fill-range: 7.1.1
 
-  browserslist@4.26.3:
+  browserslist@4.27.0:
     dependencies:
-      baseline-browser-mapping: 2.8.18
+      baseline-browser-mapping: 2.8.19
       caniuse-lite: 1.0.30001751
-      electron-to-chromium: 1.5.237
+      electron-to-chromium: 1.5.239
       node-releases: 2.0.26
-      update-browserslist-db: 1.1.3(browserslist@4.26.3)
+      update-browserslist-db: 1.1.4(browserslist@4.27.0)
 
   bundle-name@4.1.0:
     dependencies:
@@ -4893,7 +4889,7 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  electron-to-chromium@1.5.237: {}
+  electron-to-chromium@1.5.239: {}
 
   emoji-regex@8.0.0: {}
 
@@ -4974,7 +4970,7 @@ snapshots:
   eslint-plugin-es-x@7.8.0(eslint@9.38.0(jiti@2.6.1)):
     dependencies:
       '@eslint-community/eslint-utils': 4.9.0(eslint@9.38.0(jiti@2.6.1))
-      '@eslint-community/regexpp': 4.12.1
+      '@eslint-community/regexpp': 4.12.2
       eslint: 9.38.0(jiti@2.6.1)
       eslint-compat-utils: 0.5.1(eslint@9.38.0(jiti@2.6.1))
 
@@ -5003,7 +4999,7 @@ snapshots:
       enhanced-resolve: 5.18.3
       eslint: 9.38.0(jiti@2.6.1)
       eslint-plugin-es-x: 7.8.0(eslint@9.38.0(jiti@2.6.1))
-      get-tsconfig: 4.12.0
+      get-tsconfig: 4.13.0
       globals: 15.15.0
       globrex: 0.1.2
       ignore: 5.3.2
@@ -5061,7 +5057,7 @@ snapshots:
   eslint@9.38.0(jiti@2.6.1):
     dependencies:
       '@eslint-community/eslint-utils': 4.9.0(eslint@9.38.0(jiti@2.6.1))
-      '@eslint-community/regexpp': 4.12.1
+      '@eslint-community/regexpp': 4.12.2
       '@eslint/config-array': 0.21.1
       '@eslint/config-helpers': 0.4.1
       '@eslint/core': 0.16.0
@@ -5212,7 +5208,7 @@ snapshots:
 
   get-caller-file@2.0.5: {}
 
-  get-tsconfig@4.12.0:
+  get-tsconfig@4.13.0:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
@@ -5272,7 +5268,7 @@ snapshots:
     dependencies:
       hermes-estree: 0.25.1
 
-  hono@4.10.1: {}
+  hono@4.10.2: {}
 
   hookable@5.5.3: {}
 
@@ -5867,7 +5863,7 @@ snapshots:
       birpc: 2.6.1
       debug: 4.4.3
       dts-resolver: 2.1.2
-      get-tsconfig: 4.12.0
+      get-tsconfig: 4.13.0
       magic-string: 0.30.19
       rolldown: 1.0.0-beta.44
     optionalDependencies:
@@ -6044,8 +6040,6 @@ snapshots:
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
 
-  tinypool@2.0.0: {}
-
   tinyrainbow@3.0.3: {}
 
   to-regex-range@5.0.1:
@@ -6137,9 +6131,9 @@ snapshots:
       pathe: 2.0.3
       picomatch: 4.0.3
 
-  update-browserslist-db@1.1.3(browserslist@4.26.3):
+  update-browserslist-db@1.1.4(browserslist@4.27.0):
     dependencies:
-      browserslist: 4.26.3
+      browserslist: 4.27.0
       escalade: 3.2.0
       picocolors: 1.1.1
 
@@ -6229,15 +6223,15 @@ snapshots:
       jiti: 2.6.1
       lightningcss: 1.30.2
 
-  vitest@4.0.0-beta.18(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2):
+  vitest@4.0.1(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2):
     dependencies:
-      '@vitest/expect': 4.0.0-beta.18
-      '@vitest/mocker': 4.0.0-beta.18(vite@7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
-      '@vitest/pretty-format': 4.0.0-beta.18
-      '@vitest/runner': 4.0.0-beta.18
-      '@vitest/snapshot': 4.0.0-beta.18
-      '@vitest/spy': 4.0.0-beta.18
-      '@vitest/utils': 4.0.0-beta.18
+      '@vitest/expect': 4.0.1
+      '@vitest/mocker': 4.0.1(vite@7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2))
+      '@vitest/pretty-format': 4.0.1
+      '@vitest/runner': 4.0.1
+      '@vitest/snapshot': 4.0.1
+      '@vitest/spy': 4.0.1
+      '@vitest/utils': 4.0.1
       debug: 4.4.3
       es-module-lexer: 1.7.0
       expect-type: 1.2.2
@@ -6248,7 +6242,6 @@ snapshots:
       tinybench: 2.9.0
       tinyexec: 0.3.2
       tinyglobby: 0.2.15
-      tinypool: 2.0.0
       tinyrainbow: 3.0.3
       vite: 7.1.11(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)
       why-is-node-running: 2.3.0
