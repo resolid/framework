@@ -41,10 +41,10 @@
     "@logtape/logtape": "^1.1.2"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^4.0.1",
-    "tsdown": "^0.15.9",
+    "@vitest/coverage-v8": "^4.0.3",
+    "tsdown": "^0.15.10",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.1"
+    "vitest": "^4.0.3"
   },
   "peerDependencies": {
     "@resolid/core": "workspace:^"

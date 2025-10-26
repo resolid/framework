@@ -27,15 +27,15 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router": "^7.9.4",
-    "tailwindcss": "^4.1.15"
+    "tailwindcss": "^4.1.16"
   },
   "devDependencies": {
     "@netlify/types": "^2.1.0",
     "@resolid/dev": "workspace:^",
-    "@tailwindcss/vite": "^4.1.15",
+    "@tailwindcss/vite": "^4.1.16",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
-    "vite": "^7.1.11",
+    "vite": "^7.1.12",
     "vite-plugin-inspect": "^11.3.3",
     "vite-tsconfig-paths": "^5.1.4"
   },

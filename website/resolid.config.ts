@@ -7,7 +7,6 @@ export const { vitePluginOptions, reactRouterConfig } = defineDevConfig({
   reactRouterConfig: {
     serverBundles: ({ branch }) => {
       return branch.some((route) => {
-        console.info(route.id);
         return route.id.startsWith("portals/admin");
       })
         ? "admin"

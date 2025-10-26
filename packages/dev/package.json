@@ -55,13 +55,13 @@
     "@resolid/react-router-hono": "^2.2.0"
   },
   "devDependencies": {
-    "tsdown": "^0.15.9",
-    "vite": "^7.1.11"
+    "tsdown": "^0.15.10",
+    "vite": "^7.1.12"
   },
   "peerDependencies": {
     "@netlify/types": "^2.1.0",
     "@react-router/node": "^7.9.4",
-    "hono": "^4.9.12",
+    "hono": "^4.10.3",
     "isbot": "^5.1.31"
   },
   "engines": {
