@@ -1,76 +1,86 @@
 type Callback<Args extends unknown[] = unknown[]> = (...args: Args) => void;
 
-export type Emitter = {
-  on: <Args extends unknown[]>(event: string, callback: Callback<Args>) => () => void;
-  off: <Args extends unknown[]>(event: string, callback: Callback<Args>) => void;
-  offAll: (event?: string) => void;
-  once: <Args extends unknown[]>(event: string, callback: Callback<Args>) => void;
-  emit: <Args extends unknown[]>(event: string, ...args: Args) => void;
-  emitAsync: <Args extends unknown[]>(event: string, ...args: Args) => void;
-};
-
-export const createEmitter = (): Emitter => {
+export class Emitter {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const _events: Record<string, Callback<any>[]> = Object.create(null);
+  private readonly _events = new Map<string, Callback<any>[]>();
 
-  const on = <Args extends unknown[]>(event: string, callback: Callback<Args>): (() => void) => {
-    (_events[event] ??= []).push(callback);
+  on<Args extends unknown[]>(event: string, callback: Callback<Args>): () => void {
+    let callbacks = this._events.get(event);
 
-    return () => {
-      off(event, callback);
-    };
-  };
+    if (!callbacks) {
+      callbacks = [];
+      this._events.set(event, callbacks);
+    }
 
-  const off = <Args extends unknown[]>(event: string, callback: Callback<Args>): void => {
-    if (!_events[event]) {
+    callbacks.push(callback);
+
+    return () => this.off(event, callback);
+  }
+
+  off<Args extends unknown[]>(event: string, callback: Callback<Args>): void {
+    const callbacks = this._events.get(event);
+
+    if (!callbacks) {
       return;
     }
 
-    _events[event] = _events[event]?.filter((cb) => callback !== cb);
-  };
-
-  const offAll = (event?: string): void => {
-    if (event) {
-      delete _events[event];
-    } else {
-      for (const key in _events) {
-        delete _events[key];
+    for (let i = callbacks.length - 1; i >= 0; i--) {
+      if (callbacks[i] === callback) {
+        callbacks.splice(i, 1);
+        break;
       }
     }
-  };
 
-  const once = <Args extends unknown[]>(event: string, callback: Callback<Args>): void => {
+    if (callbacks.length === 0) {
+      this._events.delete(event);
+    }
+  }
+
+  offAll(event?: string): void {
+    if (event) {
+      this._events.delete(event);
+    } else {
+      this._events.clear();
+    }
+  }
+
+  once<Args extends unknown[]>(event: string, callback: Callback<Args>): void {
     const wrapper: Callback<Args> = (...args) => {
       callback(...args);
-      off(event, wrapper);
+      this.off(event, wrapper);
     };
 
-    on(event, wrapper);
-  };
+    this.on(event, wrapper);
+  }
 
-  const emit = <Args extends unknown[]>(event: string, ...args: Args): void => {
-    for (let callbacks = _events[event] || [], i = 0, length = callbacks.length; i < length; i++) {
+  emit<Args extends unknown[]>(event: string, ...args: Args): void {
+    const callbacks = this._events.get(event);
+
+    if (!callbacks) {
+      return;
+    }
+
+    const len = callbacks.length;
+
+    for (let i = 0; i < len; i++) {
       callbacks[i](...args);
     }
-  };
+  }
 
-  const emitAsync = <Args extends unknown[]>(event: string, ...args: Args) => {
-    /* istanbul ignore next -- @preserve */
-    const callbacks = _events[event]?.slice() || [];
+  emitAsync<Args extends unknown[]>(event: string, ...args: Args): void {
+    const callbacks = this._events.get(event);
+
+    /* istanbul ignore if -- @preserve */
+    if (!callbacks || callbacks.length === 0) {
+      return;
+    }
 
     queueMicrotask(() => {
-      for (let i = 0, length = callbacks.length; i < length; i++) {
+      const len = callbacks.length;
+
+      for (let i = 0; i < len; i++) {
         callbacks[i](...args);
       }
     });
-  };
-
-  return {
-    on,
-    off,
-    offAll,
-    once,
-    emit,
-    emitAsync,
-  };
-};
+  }
+}

@@ -1,5 +1,5 @@
 import { Container, type Provider, type Token } from "@resolid/di";
-import { createEmitter, type Emitter } from "@resolid/event";
+import { Emitter } from "@resolid/event";
 import { join } from "node:path";
 import { cwd, env } from "node:process";
 
@@ -66,7 +66,7 @@ class App<E extends Record<string, unknown>> {
     this.timezone = timezone;
 
     this.container = new Container();
-    this.emitter = createEmitter();
+    this.emitter = new Emitter();
 
     this.context = {
       name,
