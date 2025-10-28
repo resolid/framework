@@ -35,9 +35,9 @@ bun add @resolid/event
 #### Basic
 
 ```js
-import { createEmitter } from "@resolid/event";
+import { Emitter } from "@resolid/event";
 
-const emitter = createEmitter();
+const emitter = new Emitter();
 
 emitter.on("hello", (name: string) => {
   console.log(`Hello, ${name}!`);
@@ -49,9 +49,9 @@ emitter.emit("hello", "World"); // -> "Hello, World!"
 #### Once Listener
 
 ```js
-import { createEmitter } from "@resolid/event";
+import { Emitter } from "@resolid/event";
 
-const emitter = createEmitter();
+const emitter = Emitter();
 
 emitter.once("ready", (msg: string) => {
   console.log(msg);
@@ -64,9 +64,9 @@ emitter.emit("ready", "Second call"); // won't trigger again
 #### Async Emission
 
 ```js
-import { createEmitter } from "your-package-name";
+import { Emitter } from "your-package-name";
 
-const emitter = createEmitter();
+const emitter = Emitter();
 
 emitter.on("done", () => {
   console.log("Event handled (after all sync code)");

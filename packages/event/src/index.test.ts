@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { createEmitter } from "./index"; // 替换成你的路径
+import { Emitter } from "./index";
 
 describe("createEmitter", () => {
-  let emitter: ReturnType<typeof createEmitter>;
+  let emitter: Emitter;
 
   beforeEach(() => {
-    emitter = createEmitter();
+    emitter = new Emitter();
   });
 
   test("on & emit should call callback", () => {
