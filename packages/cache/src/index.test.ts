@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { type CacheInstance, createCache } from "./index";
+import { Cacher } from "./index";
 import type { CacheStore } from "./types";
 
 describe("createCache with fake store", () => {
-  let cache: CacheInstance;
+  let cache: Cacher;
   let fakeStore: CacheStore;
 
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe("createCache with fake store", () => {
       dispose: vi.fn().mockResolvedValue(undefined),
     };
 
-    cache = createCache({ store: fakeStore, defaultTtl: 1000 });
+    cache = new Cacher({ store: fakeStore, defaultTtl: 1000 });
   });
 
   it("get returns default", async () => {
@@ -78,7 +78,7 @@ describe("createCache with fake store", () => {
 });
 
 describe("createCache with partial fake store", () => {
-  let cache: CacheInstance;
+  let cache: Cacher;
   let partialStore: CacheStore;
 
   beforeEach(() => {
@@ -89,7 +89,7 @@ describe("createCache with partial fake store", () => {
       clear: vi.fn().mockResolvedValue(true),
     };
 
-    cache = createCache({ store: partialStore, defaultTtl: 1000 });
+    cache = new Cacher({ store: partialStore, defaultTtl: 1000 });
   });
 
   it("get returns default if undefined", async () => {

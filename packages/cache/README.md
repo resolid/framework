@@ -36,9 +36,9 @@ bun add @resolid/cache
 ### Usage
 
 ```js
-import { createCache } from "@resolid/cache";
+import { Cacher } from "@resolid/cache";
 
-const cache = createCache({ defaultTtl: 1000 });
+const cache = new Cacher({ defaultTtl: 1000 });
 
 // Single set/get
 await cache.set("foo", { a: 1 });
@@ -65,10 +65,10 @@ await cache.dispose();
 ### Options
 
 ```ts
-export type CreateCacheOptions = {
-  store?: CacheStore; // Custom storage backend
-  defaultTtl?: number; // Default TTL in seconds
-};
+export interface CacheOptions {
+  store?: CacheStore;
+  defaultTtl?: number;
+}
 ```
 
 ### Store Interface

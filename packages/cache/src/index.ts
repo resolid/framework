@@ -1,104 +1,78 @@
 import { destr } from "destr";
-import { nullCache } from "./stores/null-cache";
+import { NullCache } from "./stores/null-cache";
 import type { CacheStore } from "./types";
 import { normalizeKey } from "./utils";
 
-export type CreateCacheOptions = {
+export interface CacheOptions {
   store?: CacheStore;
   defaultTtl?: number;
-};
+}
 
-export type CacheInstance = {
-  get: <T>(key: string, defaultValue?: T) => Promise<T | undefined>;
-  set: <T>(key: string, value: T, ttl?: number) => Promise<boolean>;
-  del: (key: string) => Promise<boolean>;
-  clear: () => Promise<boolean>;
+export class Cacher {
+  private readonly store: CacheStore;
+  private readonly defaultTtl?: number;
 
-  getMultiple: <T>(keys: string[], defaultValue?: T) => Promise<(T | undefined)[]>;
-  setMultiple: <T>(values: Record<string, T>, ttl?: number) => Promise<boolean>;
-  delMultiple: (keys: string[]) => Promise<boolean>;
-  has: (key: string) => Promise<boolean>;
+  constructor({ store = new NullCache(), defaultTtl }: CacheOptions = {}) {
+    this.store = store;
+    this.defaultTtl = defaultTtl;
+  }
 
-  dispose: () => Promise<void> | void;
-};
+  async get<T>(key: string, defaultValue?: T): Promise<T | undefined> {
+    const value = await this.store.get(normalizeKey(key));
 
-export const createCache = (options: CreateCacheOptions = {}): CacheInstance => {
-  const { defaultTtl, store = nullCache } = options;
+    return value === undefined ? defaultValue : destr<T>(value);
+  }
 
-  const get: CacheInstance["get"] = async <T>(key: string, defaultValue: T | undefined) => {
-    const value = await store.get(normalizeKey(key));
+  set<T>(key: string, value: T, ttl?: number): Promise<boolean> {
+    return this.store.set(normalizeKey(key), JSON.stringify(value), ttl ?? this.defaultTtl);
+  }
 
-    if (value === undefined) {
-      return defaultValue;
+  del(key: string): Promise<boolean> {
+    return this.store.del(normalizeKey(key));
+  }
+
+  clear(): Promise<boolean> {
+    return this.store.clear();
+  }
+
+  async getMultiple<T>(keys: string[], defaultValue?: T): Promise<(T | undefined)[]> {
+    if (this.store.getMultiple) {
+      const values = await this.store.getMultiple(keys.map(normalizeKey));
+
+      return values.map((v) => (v === undefined ? defaultValue : destr<T>(v)));
+    }
+    return Promise.all(keys.map((k) => this.get<T>(k, defaultValue)));
+  }
+
+  async setMultiple<T>(values: Record<string, T>, ttl?: number): Promise<boolean> {
+    if (this.store.setMultiple) {
+      const normalized = Object.entries(values).reduce(
+        (acc, [k, v]) => {
+          acc[normalizeKey(k)] = JSON.stringify(v);
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
+
+      return this.store.setMultiple(normalized, ttl);
     }
 
-    return destr<T>(value);
-  };
+    return (await Promise.all(Object.entries(values).map(([k, v]) => this.set(k, v, ttl)))).every(Boolean);
+  }
 
-  const set: CacheInstance["set"] = (key, value, ttl) => {
-    return store.set(normalizeKey(key), JSON.stringify(value), ttl ?? defaultTtl);
-  };
+  async delMultiple(keys: string[]): Promise<boolean> {
+    if (this.store.delMultiple) {
+      return this.store.delMultiple(keys.map(normalizeKey));
+    }
 
-  const del: CacheInstance["del"] = (key) => {
-    return store.del(normalizeKey(key));
-  };
+    return (await Promise.all(keys.map((k) => this.del(k)))).every(Boolean);
+  }
 
-  const clear: CacheInstance["clear"] = () => {
-    return store.clear();
-  };
+  async has(key: string): Promise<boolean> {
+    return this.store.has ? this.store.has(normalizeKey(key)) : (await this.get(key)) !== undefined;
+  }
 
-  const getMultiple: CacheInstance["getMultiple"] = (keys, defaultValue) => {
-    return typeof store.getMultiple === "function"
-      ? store
-          .getMultiple(keys.map((key) => normalizeKey(key)))
-          .then((values) => values.map((value) => (value === undefined ? defaultValue : destr(value))))
-      : Promise.all(keys.map((key) => get(key, defaultValue)));
-  };
-
-  const setMultiple: CacheInstance["setMultiple"] = (values, ttl) => {
-    return typeof store.setMultiple === "function"
-      ? store.setMultiple(
-          Object.entries(values).reduce(
-            (acc, [key, value]) => {
-              acc[normalizeKey(key)] = JSON.stringify(value);
-              return acc;
-            },
-            {} as Record<string, string>,
-          ),
-          ttl,
-        )
-      : Promise.all(Object.entries(values).map(([key, value]) => set(key, value, ttl))).then((results) =>
-          results.every(Boolean),
-        );
-  };
-
-  const delMultiple: CacheInstance["delMultiple"] = (keys) => {
-    return typeof store.delMultiple === "function"
-      ? store.delMultiple(keys.map((key) => normalizeKey(key)))
-      : Promise.all(keys.map(del)).then((results) => results.every(Boolean));
-  };
-
-  const has: CacheInstance["has"] = async (key) => {
-    return typeof store.has === "function"
-      ? store.has(normalizeKey(key))
-      : get(key).then((value) => value !== undefined);
-  };
-
-  return {
-    get,
-    set,
-    del,
-    clear,
-
-    getMultiple,
-    setMultiple,
-    delMultiple,
-
-    has,
-    dispose: async () => {
-      if (store.dispose) {
-        await store.dispose();
-      }
-    },
-  };
-};
+  async dispose(): Promise<void> {
+    await this.store.dispose?.();
+  }
+}

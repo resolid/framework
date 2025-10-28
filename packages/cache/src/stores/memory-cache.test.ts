@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { createMemoryCache } from "./memory-cache";
+import { MemoryCache } from "./memory-cache";
 
 describe("createMemoryCache", () => {
-  let cache: ReturnType<typeof createMemoryCache>;
+  let cache: MemoryCache;
 
   beforeEach(() => {
-    cache = createMemoryCache(100);
+    cache = new MemoryCache(100);
   });
 
   it("should set and get a value without TTL", async () => {
