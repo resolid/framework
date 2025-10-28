@@ -55,7 +55,7 @@
     "@resolid/react-router-hono": "^2.2.0"
   },
   "devDependencies": {
-    "tsdown": "^0.15.10",
+    "tsdown": "^0.15.11",
     "vite": "^7.1.12"
   },
   "peerDependencies": {

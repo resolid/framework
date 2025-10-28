@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { cwd } from "node:process";
-import { describe, expect, it, type Mock, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createApp, type Extension, type ExtensionCreator } from "./index";
 
 const testPathMethod = (methodFn: (...paths: string[]) => string, basePath: string) => {
