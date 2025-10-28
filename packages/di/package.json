@@ -1,6 +1,6 @@
 {
   "name": "@resolid/di",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "private": false,
   "description": "The Resolid DI Container package.",
   "keywords": [
