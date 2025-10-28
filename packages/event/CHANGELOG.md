@@ -1,5 +1,11 @@
 # @resolid/event
 
+## 0.2.0
+
+### Minor Changes
+
+- refactor: rewrite emitter as class with improved performance ([`70c96c7`](https://github.com/resolid/framework/commit/70c96c769f61bad7dd98afedf09ac47958f8ba4b))
+
 ## 0.1.1
 
 ### Patch Changes
