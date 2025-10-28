@@ -1,28 +1,26 @@
 import { createApp } from "@resolid/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createLogExtension, type LogService } from "./index";
+import { createLogExtension, LogService } from "./index";
 
 describe("logExtension", () => {
-  const LOG_DI_KEY = "LOG";
   let log: LogService;
 
   beforeEach(async () => {
-    const app = await createApp({
+    const app = await createApp<{
+      logger: LogService;
+    }>({
       name: "TestApp",
       debug: true,
-      extensions: [
-        {
-          key: LOG_DI_KEY,
-          extension: createLogExtension(),
+      extensions: [createLogExtension()],
+      expose: {
+        logger: {
+          token: LogService,
+          async: true,
         },
-      ],
+      },
     });
 
-    log = await app.resolve(LOG_DI_KEY);
-  });
-
-  it("should have correct symbol name", () => {
-    expect(typeof LOG_DI_KEY).toBe("string");
+    log = app.$.logger;
   });
 
   it("should return an object with 5 methods", () => {
@@ -53,16 +51,13 @@ describe("logExtension", () => {
   });
 
   it("should support object, function, and template string messages", () => {
-    const userLogger = log.category("user");
-
-    expect(() => userLogger.info({ userId: 123 })).not.toThrow();
-    expect(() => userLogger.warn({ userId: 123 })).not.toThrow();
-    expect(() => userLogger.fatal({ userId: 123 })).not.toThrow();
-
-    expect(() => userLogger.error(() => [{ error: "fail" }])).not.toThrow();
+    expect(() => log.info({ userId: 123 })).not.toThrow();
+    expect(() => log.warn({ userId: 123 })).not.toThrow();
+    expect(() => log.fatal({ userId: 123 })).not.toThrow();
+    expect(() => log.error(() => [{ error: "fail" }])).not.toThrow();
 
     const userId = 456;
 
-    expect(() => userLogger.debug`User ${userId} logged in`).not.toThrow();
+    expect(() => log.debug`User ${userId} logged in`).not.toThrow();
   });
 });

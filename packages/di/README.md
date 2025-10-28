@@ -8,17 +8,19 @@
 ## TypeScript Dependency Injection Container
 
 A lightweight, fully-typed Dependency Injection (DI) container for TypeScript.
-Supports singleton & transient scopes, lazy resolution, and disposable resources. Fully functional with async factories
+Supports singleton & transient scopes, lazy resolution, optional dependencies, and disposable resources. Fully functional with async factories
 and avoids circular dependency issues.
 
 ### Features
 
 - Fully typed with TypeScript, no any.
 - Supports singleton and transient scopes.
-- Lazy resolution for async dependencies.
+- Lazy resolution for dependencies.
+- Optional dependency resolution.
 - Detects circular dependencies.
 - Handles disposable instances with dispose() support.
-- Fully async-compatible.
+- Fully async-compatible with inject() and injectAsync() functions.
+- Context-aware injection with InjectionContext.
 
 ### Installation
 
@@ -34,123 +36,233 @@ bun add @resolid/di
 
 ### Basic Usage
 
-```js
-import { createContainer } from "@resolid/di";
+```typescript
+import { Container, inject } from "@resolid/di";
 
-const VALUE = "VALUE";
-const FUNCTION = "FUNCTION";
-const FACTORY = "FACTORY";
-
-const container = createContainer([
-  { name: VALUE, value: "Hello World" },
-  {
-    name: FUNCTION,
-    callable: () => {
-      return "Hello World from callable";
-    },
-  },
-  {
-    name: FACTORY,
-    factory: async ({ resolver, config }) => {
-      const value = await resolver.resolve(VALUE);
-
-      return value + " " + config.message || "from factory!";
-    },
-    /**
-     * Scope of a binding.
-     * singleton (default): Only one instance is created and shared for all resolves.
-     * transient: A new instance is created on each resolve.
-     */
-    scope: "singleton",
-    /**
-     * Optional configuration object passed to a factory.
-     * Type is inferred from the factory definition.
-     * Used to provide parameters for instance creation.
-     */
-    config: { message: " from factory with config" },
-  },
-]);
-
-const valueResult = await container.resolve(VALUE);
-console.log(valueResult); // Output: "Hello World"
-
-const callable = await container.resolve(FUNCTION);
-const callableResult = callable();
-console.log(callableResult); // Output: "Hello World from callable"
-
-const factoryResult = await container.resolve(FACTORY);
-console.log(factoryResult); // Output: "Hello World from factory with config"
-```
-
-### Lazy Resolve
-
-You can create bindings that are resolved lazily, useful for circular dependencies or heavy computations:
-
-```js
-const LAZY_A = "LAZY_A";
-const LAZY_B = "LAZY_B";
-
-const container = createContainer([
-  {
-    name: LAZY_A,
-    factory: ({ resolver }) => {
-      const b = resolver.lazyResolve(LAZY_B);
-      return `A depends on ${b.value}`;
-    },
-  },
-  {
-    name: LAZY_B,
-    factory: ({ resolver }) => {
-      const a = resolver.lazyResolve(LAZY_A);
-      return `B depends on ${a.value}`;
-    },
-  },
-]);
-
-// Accessing value after construction is safe
-await container.resolve(LAZY_A);
-await container.resolve(LAZY_B);
-```
-
-> Note: Access `lazyResolve.value` **only after all bindings are constructed**, otherwise it will throw an error.
-
-### Circular Dependency Detection
-
-```js
-const A = "A";
-const B = "B";
-
-const container = createContainer([
-  {
-    name: A,
-    factory: ({ resolver }) => resolver.resolve(B),
-  },
-  {
-    name: B,
-    factory: ({ resolver }) => resolver.resolve(A),
-  },
-]);
-
-await container.resolve(A);
-// Throws Error: Circular dependency detected: A -> B -> A
-```
-
-### Dispose
-
-```js
-class Resource {
-  async dispose() {
-    console.log("Resource disposed");
+class LogService {
+  log(message: string): void {
+    console.log(`[LOG]: ${message}`);
   }
 }
 
-const RESOURCE = "RESOURCE";
+class UserService {
+  private logger: LogService;
 
-const container = createContainer([{ name: RESOURCE, value: new Resource() }]);
+  constructor(logger: LogService) {
+    this.logger = logger;
+  }
+
+  createUser(name: string): void {
+    this.logger.log(`Creating user: ${name}`);
+  }
+}
+
+const container = new Container();
+
+container.add({
+  token: LogService,
+  factory: () => new LogService(),
+});
+
+container.add({
+  token: UserService,
+  factory: () => new UserService(inject(LogService)),
+});
+
+const userService = container.get(USER_SERVICE);
+
+userService.createUser("John Doe"); // Output: [LOG]: Creating user: John Doe
+```
+
+### Scopes
+
+The container supports two scopes:
+
+- **singleton** (default): Only one instance is created and shared for all resolutions.
+- **transient**: A new instance is created on each resolution.
+
+```typescript
+container.add({
+  token: LogService,
+  factory: () => new LogService(),
+  scope: "singleton", // Default scope
+});
+
+container.add({
+  token: Symbol("REQUEST_ID"),
+  factory: () => Math.random(),
+  scope: "transient", // New instance each time
+});
+```
+
+### Asynchronous Dependencies
+
+```typescript
+import { Container, injectAsync } from "@resolid/di";
+
+class AsyncDatabaseService {
+  async connect(): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    console.log("Database connected");
+  }
+}
+
+class AsyncUserService {
+  private db : AsyncDatabaseService
+
+  constructor(db: AsyncDatabaseService) {
+    this.db = db;
+  }
+
+  async getUser(id: number): Promise<string> {
+    return `User ${id}`;
+  }
+}
+
+const container = new Container();
+
+container.add({
+  token: AsyncDatabaseService,
+  factory: async () => {
+    const db = new AsyncDatabaseService();
+    await db.connect();
+    return db;
+  },
+  async: true,
+});
+
+container.add({
+  token: AsyncUserService,
+  factory: async () => {
+    const db = await injectAsync(AsyncDatabaseService);
+    return new AsyncUserService(db)
+  },
+  async: true,
+});
+
+// Resolve async services
+const userService = await container.getAsync(AsyncUserService);
+const user = await userService.getUser(1);
+
+console.log(user); // Output: User 1
+```
+
+### Optional Dependencies
+
+```typescript
+import { Container, inject } from "@resolid/di";
+
+class AnalyticsService {
+  private logger?: LogService
+
+  constructor(logger?: LogService) {
+    this.logger = logger;
+  }
+
+  track(event: string): void {
+    if (this.logger) {
+      this.logger.log(`Analytics: ${event}`);
+    } else {
+      console.log(`Analytics (no logger): ${event}`);
+    }
+  }
+}
+
+const container = new Container();
+
+// Logger is optional
+container.add({
+  token: AnalyticsService,
+  factory: () => new AnalyticsService(inject(LOG_SERVICE, { optional: true })),
+});
+
+const analytics = container.get(AnalyticsService);
+analytics.track("page_view"); // Output: Analytics (no logger): page_view
+```
+
+### Lazy Resolution
+
+```typescript
+import { Container, inject } from "@resolid/di";
+
+class ReportService {
+  private getLogger : () => LogService;
+
+  constructor(private getLogger: () => LogService) {
+    this.getLogger = getLogger;
+  }
+
+  generateReport(): void {
+    const logger = this.getLogger();
+    logger.log("Report generated");
+  }
+}
+
+const container = new Container();
+
+container.add({
+  token: LogService,
+  factory: () => new LogService(),
+});
+
+container.add({
+  token: ReportService,
+  factory: () => new ReportService(inject(LogService, { lazy: true })),
+});
+
+const reportService = container.get(ReportService);
+reportService.generateReport(); // Output: [LOG]: Report generated
+```
+
+### Circular Dependency Detection
+
+```typescript
+class ApiService {
+  constructor(private auth: AuthService) {}
+}
+
+class AuthService {
+  constructor(private api: ApiService) {}
+}
+
+const container = new Container();
+
+container.add({
+  token: ApiService,
+  factory: () => new ApiService(inject(AuthService)),
+});
+
+container.add({
+  token: AuthService,
+  factory: () => new AuthService(inject(ApiService)),
+});
+
+container.get(ApiService); // Throws: Circular dependency detected ApiService -> AuthService -> ApiService
+```
+
+### Disposable Resources
+
+```typescript
+import { Container } from "@resolid/di";
+
+class DatabaseConnection {
+  async dispose(): Promise<void> {
+    console.log("Database connection closed");
+  }
+}
+
+const container = new Container();
+
+container.add({
+  token: DatabaseConnection,
+  factory: async () => new DatabaseConnection(),
+  async: true,
+});
+
+const db = await container.getAsync(DatabaseConnection);
 
 // Dispose all singleton instances
-await container.dispose();
-// Output: "Resource disposed"
+await container.dispose(); // Output: Database connection closed
 ```
 
 ## License

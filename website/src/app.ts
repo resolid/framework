@@ -1,16 +1,19 @@
 import { createApp } from "@resolid/core";
-import { createLogExtension, type LogService } from "@resolid/log";
+import { createLogExtension, LogService } from "@resolid/log";
 
-export const DI_LOG_KEY = "LOG";
-
-export const app = await createApp<Record<"logger", LogService>>({
+export const app = await createApp<{
+  logger: LogService;
+}>({
   name: "resolid",
-  extensions: [{ key: DI_LOG_KEY, extension: createLogExtension({ config: {} }) }],
-  instanceProps: {
-    logger: DI_LOG_KEY,
+  extensions: [createLogExtension()],
+  expose: {
+    logger: {
+      token: LogService,
+      async: true,
+    },
   },
 });
 
 app.emitter.on("app:ready", function () {
-  app.logger.info("Resolid application started.");
+  app.$.logger.info("Resolid application started.");
 });

@@ -11,7 +11,7 @@ import {
   withContext,
   withFilter,
 } from "@logtape/logtape";
-import type { ExtensionBuilder } from "@resolid/core";
+import type { ExtensionCreator } from "@resolid/core";
 
 export type LogConfig = { defaultSink?: Sink; defaultCategory?: string } & Omit<
   Partial<Config<string, string>>,
@@ -22,79 +22,98 @@ export type LogConfig = { defaultSink?: Sink; defaultCategory?: string } & Omit<
 
 type LogCategory = Pick<Logger, "debug" | "info" | "warn" | "error" | "fatal">;
 
-export type LogService = LogCategory & {
-  category: (name: string) => LogCategory;
-  getLogger: (category?: string) => Logger;
-  withContext: typeof withContext;
-  withFilter: typeof withFilter;
-  dispose: () => Promise<void>;
-};
+export class LogService {
+  private readonly config?: LogConfig;
+  private readonly defaultCategory: string;
 
-export const createLogExtension: ExtensionBuilder<LogService, LogConfig> = ({ config } = {}) => {
-  return {
-    name: "resolid-log-extension",
-    factory: async ({ context }) => {
-      const defaultCategory = config?.defaultCategory ?? context.name;
+  constructor(config?: LogConfig) {
+    this.config = config;
 
-      await configure({
-        reset: true,
-        sinks: {
-          default:
-            config?.defaultSink ??
-            getConsoleSink({
-              formatter: getAnsiColorFormatter({
-                timestamp: (t) => {
-                  /* istanbul ignore next -- @preserve */
-                  return new Date(t).toLocaleString("zh-CN", { hour12: false }).replace(/\//g, "-");
-                },
-              }),
+    /* istanbul ignore next -- @preserve */
+    this.defaultCategory = config?.defaultCategory ?? "app";
+  }
+
+  async configure(): Promise<void> {
+    await configure({
+      reset: true,
+      sinks: {
+        default:
+          this.config?.defaultSink ??
+          getConsoleSink({
+            formatter: getAnsiColorFormatter({
+              timestamp: (t) => {
+                /* istanbul ignore next -- @preserve */
+                return new Date(t).toLocaleString("zh-CN", { hour12: false }).replace(/\//g, "-");
+              },
             }),
-          ...config?.sinks,
+          }),
+        ...this.config?.sinks,
+      },
+      filters: {
+        ...this.config?.filters,
+      },
+      loggers: [
+        { category: ["logtape", "meta"], sinks: [] },
+        { category: this.defaultCategory, sinks: ["default"] },
+        ...(this.config?.loggers ?? []),
+      ],
+    });
+  }
+
+  debug = ((...args: Parameters<Logger["debug"]>) => {
+    return this.getLogger().debug(...args);
+  }) as Logger["debug"];
+
+  info = ((...args: Parameters<Logger["info"]>) => {
+    return this.getLogger().info(...args);
+  }) as Logger["info"];
+
+  warn = ((...args: Parameters<Logger["warn"]>) => {
+    return this.getLogger().warn(...args);
+  }) as Logger["warn"];
+
+  error = ((...args: Parameters<Logger["error"]>) => {
+    return this.getLogger().error(...args);
+  }) as Logger["error"];
+
+  fatal = ((...args: Parameters<Logger["fatal"]>) => {
+    return this.getLogger().fatal(...args);
+  }) as Logger["fatal"];
+
+  category(name: string): LogCategory {
+    return getLogger(name);
+  }
+
+  getLogger(category: string = this.defaultCategory): Logger {
+    return getLogger(category);
+  }
+
+  withContext: typeof withContext = withContext;
+  withFilter: typeof withFilter = withFilter;
+
+  async dispose(): Promise<void> {
+    /* istanbul ignore next -- @preserve */
+    await dispose();
+  }
+}
+
+export const createLogExtension = (config?: LogConfig): ExtensionCreator => {
+  return (context) => {
+    return {
+      name: "resolid-log-extension",
+      providers: [
+        {
+          token: LogService,
+          async factory() {
+            const logService = new LogService({ ...config, defaultCategory: config?.defaultCategory ?? context.name });
+
+            await logService.configure();
+
+            return logService;
+          },
+          async: true,
         },
-        filters: {
-          ...config?.filters,
-        },
-        loggers: [
-          { category: ["logtape", "meta"], sinks: [] },
-          { category: defaultCategory, sinks: ["default"] },
-          ...(config?.loggers ?? []),
-        ],
-      });
-
-      const categoryCache = new Map<string, LogCategory>();
-
-      const category = (name: string): LogCategory => {
-        let category = categoryCache.get(name);
-
-        if (!category) {
-          const logger = getLogger(name);
-
-          category = {
-            debug: ((...args: Parameters<Logger["debug"]>) => logger.debug(...args)) as Logger["debug"],
-            info: ((...args: Parameters<Logger["info"]>) => logger.info(...args)) as Logger["info"],
-            warn: ((...args: Parameters<Logger["warn"]>) => logger.warn(...args)) as Logger["warn"],
-            error: ((...args: Parameters<Logger["error"]>) => logger.error(...args)) as Logger["error"],
-            fatal: ((...args: Parameters<Logger["fatal"]>) => logger.fatal(...args)) as Logger["fatal"],
-          };
-
-          categoryCache.set(name, category);
-        }
-
-        return category;
-      };
-
-      const defaultLogger = category(defaultCategory);
-
-      defaultLogger.info("Log extension initialized.");
-
-      return {
-        ...defaultLogger,
-        category,
-        getLogger: (category = defaultCategory) => getLogger(category),
-        withContext,
-        withFilter,
-        dispose,
-      };
-    },
+      ],
+    };
   };
 };
