@@ -97,10 +97,10 @@ export class LogService {
   }
 }
 
-export const createLogExtension = (config?: LogConfig): ExtensionCreator => {
+export function createLogExtension(config?: LogConfig): ExtensionCreator {
   return (context) => {
     return {
-      name: "resolid-log-extension",
+      name: "resolid-log-module",
       providers: [
         {
           token: LogService,
@@ -116,4 +116,4 @@ export const createLogExtension = (config?: LogConfig): ExtensionCreator => {
       ],
     };
   };
-};
+}
