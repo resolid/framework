@@ -1,16 +1,14 @@
-# Resolid: Event Package
+# Lightweight, Typed Event System for TypeScript
 
 ![GitHub License](https://img.shields.io/github/license/resolid/framework)
 ![NPM Version](https://img.shields.io/npm/v/%40resolid/event)
 
 <b>[Documentation](https://www.resolid.tech/docs/event)</b> | [Framework Bundle](https://github.com/resolid/framework)
 
-## Lightweight, Typed Event System for TypeScript
-
 A lightweight, fully typed event emitter for modern TypeScript projects.
 Provides a clean API, async emission, and zero dependencies — perfect for libraries and frameworks.
 
-### Feature
+## Feature
 
 - Fully typed with TypeScript, no any.
 - Provides simple `on`, `off`, `once`, and `emit` APIs.
@@ -18,7 +16,7 @@ Provides a clean API, async emission, and zero dependencies — perfect for libr
 - Removes listeners automatically for `once` handlers.
 - Zero dependencies and minimal footprint.
 
-### Installation
+## Installation
 
 ```shell
 pnpm add @resolid/event
@@ -30,9 +28,9 @@ yarn add @resolid/event
 bun add @resolid/event
 ```
 
-### Usage
+## Usage
 
-#### Basic
+### Basic
 
 ```js
 import { Emitter } from "@resolid/event";
@@ -46,7 +44,7 @@ emitter.on("hello", (name: string) => {
 emitter.emit("hello", "World"); // -> "Hello, World!"
 ```
 
-#### Once Listener
+### Once Listener
 
 ```js
 import { Emitter } from "@resolid/event";
@@ -61,7 +59,7 @@ emitter.emit("ready", "First call");  // -> "First call"
 emitter.emit("ready", "Second call"); // won't trigger again
 ```
 
-#### Async Emission
+### Async Emission
 
 ```js
 import { Emitter } from "your-package-name";

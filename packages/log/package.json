@@ -2,10 +2,12 @@
   "name": "@resolid/log",
   "version": "0.0.0",
   "private": true,
-  "description": "The Resolid Log package.",
+  "description": "Logging module for Resolid applications",
   "keywords": [
     "resolid",
-    "log"
+    "log",
+    "logger",
+    "logging"
   ],
   "homepage": "https://www.resolid.tech",
   "repository": {

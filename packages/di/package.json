@@ -2,7 +2,7 @@
   "name": "@resolid/di",
   "version": "0.6.0",
   "private": false,
-  "description": "The Resolid DI Container package.",
+  "description": "TypeScript Dependency Injection Container",
   "keywords": [
     "resolid",
     "container",

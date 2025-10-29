@@ -1,17 +1,15 @@
-# Resolid: Cache Package
+# Type-safe Async Cache for TypeScript
 
 ![GitHub License](https://img.shields.io/github/license/resolid/framework)
 ![NPM Version](https://img.shields.io/npm/v/%40resolid/cache)
 
 <b>[Documentation](https://www.resolid.tech/docs/cache)</b> | [Framework Bundle](https://github.com/resolid/framework)
 
-## Type-safe Async Cache for TypeScript
-
 A fully-typed, flexible cache system for modern TypeScript projects.
 Supports single and batch operations, optional TTL, and pluggable storage backends.
 Designed for libraries, frameworks, and applications needing predictable async caching.
 
-### Feature
+## Feature
 
 - Fully typed with TypeScript — no `any`.
 - Supports get/set/del/clear operations.
@@ -21,7 +19,7 @@ Designed for libraries, frameworks, and applications needing predictable async c
 - Detects existence of keys via `has`.
 - Handles disposal of resources via `dispose`.
 
-### Installation
+## Installation
 
 ```shell
 pnpm add @resolid/cache
@@ -33,7 +31,7 @@ yarn add @resolid/cache
 bun add @resolid/cache
 ```
 
-### Usage
+## Usage
 
 ```js
 import { Cacher } from "@resolid/cache";
@@ -62,7 +60,7 @@ await cache.clear();
 await cache.dispose();
 ```
 
-### Options
+## Options
 
 ```ts
 export interface CacheOptions {
@@ -71,7 +69,7 @@ export interface CacheOptions {
 }
 ```
 
-### Store Interface
+## Store Interface
 
 Your custom store should implement `CacheStore`:
 

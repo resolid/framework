@@ -1,4 +1,4 @@
-# Resolid: Core Package
+# Core runtime for Resolid applications
 
 ![GitHub License](https://img.shields.io/github/license/resolid/framework)
 ![NPM Version](https://img.shields.io/npm/v/%40resolid/core)

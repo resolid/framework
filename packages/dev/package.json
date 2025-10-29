@@ -2,11 +2,12 @@
   "name": "@resolid/dev",
   "version": "0.0.0",
   "private": true,
-  "description": "The Resolid Dev package.",
+  "description": "Development utils for Resolid applications",
   "keywords": [
     "resolid",
     "react-router",
     "vite",
+    "nodejs",
     "vercel",
     "netlify"
   ],

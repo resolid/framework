@@ -2,7 +2,7 @@
   "name": "@resolid/cache",
   "version": "0.2.0",
   "private": false,
-  "description": "The Resolid Cache package.",
+  "description": "Type-safe Async Cache for TypeScript",
   "keywords": [
     "resolid",
     "cache",

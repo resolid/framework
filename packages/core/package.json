@@ -2,7 +2,7 @@
   "name": "@resolid/core",
   "version": "0.0.0",
   "private": true,
-  "description": "The Resolid Core package.",
+  "description": "Core runtime for Resolid applications",
   "keywords": [
     "resolid",
     "framework"

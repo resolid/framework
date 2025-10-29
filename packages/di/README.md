@@ -1,17 +1,15 @@
-# Resolid: DI Container Package
+# TypeScript Dependency Injection Container
 
 ![GitHub License](https://img.shields.io/github/license/resolid/framework)
 ![NPM Version](https://img.shields.io/npm/v/%40resolid/di)
 
 <b>[Documentation](https://www.resolid.tech/docs/di)</b> | [Framework Bundle](https://github.com/resolid/framework)
 
-## TypeScript Dependency Injection Container
-
 A lightweight, fully-typed Dependency Injection (DI) container for TypeScript.
 Supports singleton & transient scopes, lazy resolution, optional dependencies, and disposable resources. Fully functional with async factories
 and avoids circular dependency issues.
 
-### Features
+## Features
 
 - Fully typed with TypeScript, no any.
 - Supports singleton and transient scopes.
@@ -22,7 +20,7 @@ and avoids circular dependency issues.
 - Fully async-compatible with inject() and injectAsync() functions.
 - Context-aware injection with InjectionContext.
 
-### Installation
+## Installation
 
 ```shell
 pnpm add @resolid/di
@@ -34,7 +32,9 @@ yarn add @resolid/di
 bun add @resolid/di
 ```
 
-### Basic Usage
+## Usage
+
+### Basic
 
 ```typescript
 import { Container, inject } from "@resolid/di";
@@ -102,13 +102,13 @@ import { Container, injectAsync } from "@resolid/di";
 
 class AsyncDatabaseService {
   async connect(): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     console.log("Database connected");
   }
 }
 
 class AsyncUserService {
-  private db : AsyncDatabaseService
+  private db: AsyncDatabaseService;
 
   constructor(db: AsyncDatabaseService) {
     this.db = db;
@@ -135,7 +135,7 @@ container.add({
   token: AsyncUserService,
   factory: async () => {
     const db = await injectAsync(AsyncDatabaseService);
-    return new AsyncUserService(db)
+    return new AsyncUserService(db);
   },
   async: true,
 });
@@ -153,7 +153,7 @@ console.log(user); // Output: User 1
 import { Container, inject } from "@resolid/di";
 
 class AnalyticsService {
-  private logger?: LogService
+  private logger?: LogService;
 
   constructor(logger?: LogService) {
     this.logger = logger;
@@ -186,7 +186,7 @@ analytics.track("page_view"); // Output: Analytics (no logger): page_view
 import { Container, inject } from "@resolid/di";
 
 class ReportService {
-  private getLogger : () => LogService;
+  private getLogger: () => LogService;
 
   constructor(private getLogger: () => LogService) {
     this.getLogger = getLogger;

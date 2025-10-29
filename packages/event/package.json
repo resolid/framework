@@ -2,7 +2,7 @@
   "name": "@resolid/event",
   "version": "0.2.0",
   "private": false,
-  "description": "The Resolid Event emitter package.",
+  "description": "Lightweight, Typed Event System for TypeScript",
   "keywords": [
     "resolid",
     "event",
