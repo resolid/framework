@@ -12,7 +12,7 @@
     "rootDirs": [".", "./.react-router/types"],
     "paths": {
       "@resolid/core": ["../packages/core/src"],
-      "@resolid/log": ["../packages/log/src"]
+      "@resolid/app-log": ["../packages/app-log/src"]
     }
   }
 }

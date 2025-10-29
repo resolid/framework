@@ -1,5 +1,5 @@
+import { createLogExtension, LogService } from "@resolid/app-log";
 import { createApp } from "@resolid/core";
-import { createLogExtension, LogService } from "@resolid/log";
 
 export const app = await createApp<{
   logger: LogService;

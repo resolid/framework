@@ -1,27 +1,27 @@
 # Logging module for Resolid applications
 
 ![GitHub License](https://img.shields.io/github/license/resolid/framework)
-![NPM Version](https://img.shields.io/npm/v/%40resolid/log)
+![NPM Version](https://img.shields.io/npm/v/%40resolid/app-log)
 
 <b>[Documentation](https://www.resolid.tech/docs/log)</b> | [Framework Bundle](https://github.com/resolid/framework)
 
 ## Installation
 
 ```shell
-pnpm add @resolid/log
+pnpm add @resolid/app-log
 # or
-npm install @resolid/log
+npm install @resolid/app-log
 # or
-yarn add @resolid/log
+yarn add @resolid/app-log
 # or
-bun add @resolid/log
+bun add @resolid/app-log
 ```
 
-### Usage
+## Usage
 
 ```ts
 import { createApp } from "@resolid/core";
-import { type LogConfig, createLogExtension, LogService } from "@resolid/log";
+import { createLogExtension, type LogConfig, LogService } from "@resolid/app-log";
 
 const logConfig: LogConfig = {};
 

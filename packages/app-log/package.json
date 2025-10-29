@@ -1,5 +1,5 @@
 {
-  "name": "@resolid/log",
+  "name": "@resolid/app-log",
   "version": "0.0.0",
   "private": true,
   "description": "Logging module for Resolid applications",
@@ -13,7 +13,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/resolid/framework.git",
-    "directory": "packages/log"
+    "directory": "packages/app-log"
   },
   "license": "MIT",
   "author": {

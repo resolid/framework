@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@react-router/node": "^7.9.4",
+    "@resolid/app-log": "workspace:^",
     "@resolid/core": "workspace:^",
-    "@resolid/log": "workspace:^",
     "isbot": "^5.1.31",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
