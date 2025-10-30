@@ -1,7 +1,11 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Class<T> = new (...args: any[]) => T;
-
-export type Token<T = unknown> = symbol | Class<T>;
+export type Token<T = unknown> =
+  | symbol
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  | (new (...args: any[]) => T)
+  | {
+      prototype: T;
+      name: string;
+    };
 
 export function toString<T>(token: Token<T>): string {
   if (typeof token === "symbol") {
