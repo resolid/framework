@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.6.1
+
+### Patch Changes
+
+- feat: support abstract class tokens in Token type ([`a82a0dd`](https://github.com/resolid/framework/commit/a82a0dd45477baacc81c7e32c39bdd11d57914f7))
+
 ## 0.6.0
 
 ### Minor Changes
