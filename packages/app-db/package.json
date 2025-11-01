@@ -1,21 +1,20 @@
 {
-  "name": "@resolid/di",
-  "version": "0.6.1",
-  "private": false,
-  "description": "TypeScript Dependency Injection Container",
+  "name": "@resolid/app-db",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Database module for Resolid applications",
   "keywords": [
     "resolid",
-    "container",
-    "ioc",
-    "inversion of control",
-    "di",
-    "dependency injection"
+    "db",
+    "database",
+    "orm",
+    "drizzle-orm"
   ],
   "homepage": "https://www.resolid.tech",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/resolid/framework.git",
-    "directory": "packages/di"
+    "directory": "packages/app-db"
   },
   "license": "MIT",
   "author": {
@@ -38,12 +37,18 @@
   "scripts": {
     "build": "tsdown",
     "lint": "eslint .",
-    "test": "vitest run",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.7"
   },
   "devDependencies": {
     "tsdown": "^0.15.12",
     "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "@resolid/app-log": "workspace:^",
+    "@resolid/core": "workspace:^"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"

@@ -1,5 +1,5 @@
 import { relativeFactory } from "@resolid/dev/routes";
 
-const { index, layout } = relativeFactory(import.meta.dirname);
+const { index, layout, route } = relativeFactory(import.meta.dirname);
 
-export default [layout("./layout.tsx", [index("./home/index.tsx")])];
+export default [layout("./layout.tsx", [index("./home/index.tsx"), route("status", "./home/status.tsx")])];

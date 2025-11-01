@@ -45,7 +45,6 @@ describe("createApp", () => {
     };
 
     const app = await createApp<{
-      mail: { from: string };
       logger: { log: () => void };
     }>({
       name: "TestApp",
@@ -53,10 +52,6 @@ describe("createApp", () => {
       expose: {
         logger: {
           token: LOG,
-        },
-        mail: {
-          token: MAIL,
-          async: true,
         },
       },
     });
@@ -66,7 +61,7 @@ describe("createApp", () => {
     expect(log).toHaveProperty("log");
     expect(typeof log.log).toBe("function");
 
-    const mail = app.$.mail;
+    const mail = await app.getAsync<{ from: string }>(MAIL);
     expect(mail.from).toBe("1");
   });
 
@@ -101,7 +96,7 @@ describe("createApp", () => {
     const BOOT = Symbol("BOOT");
     const bootFn = vi.fn();
 
-    const app = await createApp<{ boot: { name: string } }>({
+    const app = await createApp({
       name: "BootTestApp",
       extensions: [
         {
@@ -119,11 +114,6 @@ describe("createApp", () => {
           ],
         },
       ],
-      expose: {
-        boot: {
-          token: BOOT,
-        },
-      },
     });
 
     await app.run();
@@ -131,7 +121,7 @@ describe("createApp", () => {
 
     expect(bootFn).toHaveBeenCalledTimes(1);
 
-    const service = app.$.boot;
+    const service = app.get<{ name: "booted-service" }>(BOOT);
 
     expect(service.name).toBe("booted-service");
   });
@@ -149,7 +139,7 @@ describe("createApp", () => {
           providers: [
             {
               token: A,
-              factory: () => {
+              factory: async () => {
                 return {
                   dispose: () => {
                     order.push("dispose");
@@ -163,6 +153,7 @@ describe("createApp", () => {
       expose: {
         a: {
           token: A,
+          async: true,
         },
       },
     });

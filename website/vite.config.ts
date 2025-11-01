@@ -42,5 +42,8 @@ export default defineConfig(({ command }) => {
       },
     },
     esbuild: { legalComments: "none" },
+    ssr: {
+      external: ["mysql2"],
+    },
   } satisfies UserConfig;
 });

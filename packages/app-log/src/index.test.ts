@@ -1,3 +1,4 @@
+import { getConsoleSink } from "@logtape/logtape";
 import { createApp } from "@resolid/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createLogExtension, LogService } from "./index";
@@ -11,7 +12,7 @@ describe("logExtension", () => {
     }>({
       name: "TestApp",
       debug: true,
-      extensions: [createLogExtension()],
+      extensions: [createLogExtension([{ name: "console", sink: getConsoleSink() }])],
       expose: {
         logger: {
           token: LogService,
@@ -19,6 +20,8 @@ describe("logExtension", () => {
         },
       },
     });
+
+    await app.run();
 
     log = app.$.logger;
   });

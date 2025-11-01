@@ -15,18 +15,20 @@
     "build:netlify": "NETLIFY=true react-router build",
     "dev": "react-router dev",
     "lint": "eslint .",
-    "start": "NODE_ENV=production SERVER_PORT=3001 node --env-file=.env ./build/server/server.mjs",
+    "start": "NODE_ENV=production SERVER_PORT=3001 node --env-file=.env ./build/server/site/server.mjs",
     "typecheck": "react-router typegen && tsc --noEmit",
     "typegen": "react-router typegen"
   },
   "dependencies": {
-    "@react-router/node": "^7.9.4",
+    "@react-router/node": "^7.9.5",
+    "@resolid/app-db-mysql": "workspace:^",
     "@resolid/app-log": "workspace:^",
     "@resolid/core": "workspace:^",
+    "@tailwindcss/typography": "^0.5.19",
     "isbot": "^5.1.31",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router": "^7.9.4",
+    "react-router": "^7.9.5",
     "tailwindcss": "^4.1.16"
   },
   "devDependencies": {

@@ -11,7 +11,10 @@
   "compilerOptions": {
     "rootDirs": [".", "./.react-router/types"],
     "paths": {
+      "~/*": ["./src/*"],
       "@resolid/core": ["../packages/core/src"],
+      "@resolid/app-db": ["../packages/app-db/src"],
+      "@resolid/app-db-mysql": ["../packages/app-db-mysql/src"],
       "@resolid/app-log": ["../packages/app-log/src"]
     }
   }

@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { cwd, env } from "node:process";
 
 export { inject, injectAsync } from "@resolid/di";
+export type { Emitter } from "@resolid/event";
 
 export type AppConfig = {
   readonly name: string;
@@ -13,6 +14,7 @@ export type AppConfig = {
 
 export type AppContext = AppConfig & {
   emitter: Emitter;
+  container: Container;
   rootPath: (...paths: string[]) => string;
   runtimePath: (...paths: string[]) => string;
 };
@@ -45,6 +47,7 @@ class App<E extends Record<string, unknown>> {
   private readonly context: AppContext;
 
   private readonly boots: BootFunction[] = [];
+
   private booted: boolean = false;
 
   private readonly expose?: Expose<E>;
@@ -73,6 +76,7 @@ class App<E extends Record<string, unknown>> {
       debug,
       timezone,
       emitter: this.emitter,
+      container: this.container,
       rootPath: this.rootPath,
       runtimePath: this.runtimePath,
     };
@@ -110,6 +114,14 @@ class App<E extends Record<string, unknown>> {
 
   runtimePath(...paths: string[]): string {
     return this.rootPath("runtime", ...paths);
+  }
+
+  get<T>(token: Token<T>): T {
+    return this.container.get(token);
+  }
+
+  getAsync<T>(token: Token<T>): Promise<T> {
+    return this.container.getAsync(token);
   }
 
   async run(): Promise<void> {

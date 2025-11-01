@@ -42,10 +42,8 @@
     "@resolid/event": "workspace:^"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^4.0.4",
-    "tsdown": "^0.15.11",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.4"
+    "tsdown": "^0.15.12",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"

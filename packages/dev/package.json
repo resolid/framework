@@ -52,16 +52,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-router/dev": "^7.9.4",
+    "@react-router/dev": "^7.9.5",
     "@resolid/react-router-hono": "^2.2.0"
   },
   "devDependencies": {
-    "tsdown": "^0.15.11",
+    "tsdown": "^0.15.12",
     "vite": "^7.1.12"
   },
   "peerDependencies": {
     "@netlify/types": "^2.1.0",
-    "@react-router/node": "^7.9.4",
+    "@react-router/node": "^7.9.5",
     "hono": "^4.10.3",
     "isbot": "^5.1.31"
   },

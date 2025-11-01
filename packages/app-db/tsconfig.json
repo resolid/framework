@@ -1,0 +1,13 @@
+{
+  "extends": "@resolid/config/tsconfig/base",
+  "include": ["src/**/*", "tsdown.config.ts", "vitest.config.ts"],
+  "compilerOptions": {
+    "allowJs": false,
+    "declaration": true,
+    "isolatedDeclarations": true,
+    "paths": {
+      "@resolid/core": ["../core/src"],
+      "@resolid/app-log": ["../app-log/src"]
+    }
+  }
+}
