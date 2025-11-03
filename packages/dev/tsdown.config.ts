@@ -6,6 +6,7 @@ export default defineConfig({
     index: "src/index.ts",
     routes: "src/routes/index.ts",
     server: "src/server/index.ts",
+    vite: "src/vite/index.ts",
   },
   format: "esm",
   target: "es2022",
@@ -13,4 +14,5 @@ export default defineConfig({
   treeshake: true,
   clean: true,
   minify: true,
+  external: ["virtual:react-router/server-build"],
 }) as UserConfig;

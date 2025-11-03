@@ -1,21 +1,8 @@
 import { reactRouter } from "@react-router/dev/vite";
-import { reactRouterHonoServer } from "@resolid/react-router-hono/dev";
-import type { Plugin, UserConfig } from "vite";
+import type { Plugin } from "vite";
 import type { VitePluginOptions } from "../config";
+import { resolidDevVitePlugin } from "./plugin";
 
-export const resolidVitePlugin = ({ platform, devExclude }: VitePluginOptions): Plugin[] => {
-  return [
-    {
-      name: "@resolid/dev",
-      enforce: "post",
-      config() {
-        return { define: { "import.meta.env.RESOLID_PLATFORM": JSON.stringify(platform) } } satisfies UserConfig;
-      },
-    },
-    reactRouterHonoServer({
-      entryFile: "server.ts",
-      exclude: devExclude,
-    }),
-    ...reactRouter(),
-  ];
-};
+export function resolidVitePlugin(options: VitePluginOptions): Plugin[] {
+  return [resolidDevVitePlugin(options), ...reactRouter()];
+}

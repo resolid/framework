@@ -1,15 +1,11 @@
-import type { HonoContext, NodeEnv } from "@resolid/react-router-hono";
-import {
-  createHonoNetlifyServer,
-  type HonoNetlifyServerOptions,
-  type NetlifyContext,
-} from "@resolid/react-router-hono/netlify-server";
-import { createHonoNodeServer, type HonoNodeServerOptions } from "@resolid/react-router-hono/node-server";
-import { createHonoVercelServer, type HonoVercelServerOptions } from "@resolid/react-router-hono/vercel-server";
-import type { Hono } from "hono";
+import type { Hono, Context as HonoContext } from "hono";
 import type { IncomingMessage, ServerResponse } from "http";
 import type { Http2ServerRequest, Http2ServerResponse } from "http2";
 import type { Platform } from "../types";
+import { createHonoNetlifyServer, type HonoNetlifyServerOptions, type NetlifyContext } from "./platforms/netlify";
+import { createHonoNodeServer, type HonoNodeServerOptions } from "./platforms/node";
+import { createHonoVercelServer, type HonoVercelServerOptions } from "./platforms/vercel";
+import type { NodeEnv } from "./utils";
 
 export type { Hono, HonoContext, NetlifyContext, NodeEnv };
 

@@ -1,4 +1,4 @@
-import { resolidVitePlugin } from "@resolid/dev";
+import { resolidVitePlugin } from "@resolid/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, type UserConfig } from "vite";
 import viteInspect from "vite-plugin-inspect";
@@ -15,10 +15,8 @@ export default defineConfig(({ command }) => {
     environments: {
       ssr: {
         build: {
-          target: "node22",
           rollupOptions: {
             output: {
-              hoistTransitiveImports: false,
               manualChunks: undefined,
             },
           },
@@ -41,7 +39,6 @@ export default defineConfig(({ command }) => {
         },
       },
     },
-    esbuild: { legalComments: "none" },
     ssr: {
       external: ["mysql2"],
     },

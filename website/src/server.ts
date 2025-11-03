@@ -1,5 +1,8 @@
 import { createServer, netlifyConfig, nodeConfig, vercelConfig } from "@resolid/dev/server";
 import { env } from "node:process";
+import { app } from "~/app";
+
+await app.run();
 
 // noinspection JSUnusedGlobalSymbols
 export default await createServer((platform) => {

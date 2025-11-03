@@ -36,6 +36,10 @@
     "./server": {
       "types": "./dist/server.d.ts",
       "import": "./dist/server.js"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "import": "./dist/vite.js"
     }
   },
   "main": "./dist/index.js",
@@ -52,18 +56,23 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.6",
     "@react-router/dev": "^7.9.5",
-    "@resolid/react-router-hono": "^2.2.0"
+    "@vercel/nft": "^0.30.3",
+    "fast-glob": "^3.3.3",
+    "hono": "^4.10.4",
+    "minimatch": "^10.1.1",
+    "rolldown": "latest"
   },
   "devDependencies": {
-    "tsdown": "^0.15.12",
-    "vite": "^7.1.12"
+    "@netlify/types": "^2.1.0",
+    "tsdown": "^0.15.12"
   },
   "peerDependencies": {
-    "@netlify/types": "^2.1.0",
     "@react-router/node": "^7.9.5",
-    "hono": "^4.10.3",
-    "isbot": "^5.1.31"
+    "isbot": "^5.1.31",
+    "react-router": "^7.9.5",
+    "vite": "^7.1.12"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"

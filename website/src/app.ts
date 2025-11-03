@@ -41,5 +41,3 @@ export const app = await createApp<{
 app.emitter.on("app:ready", function () {
   app.$.logger.info("Resolid application started.");
 });
-
-await app.run();

@@ -46,15 +46,15 @@
   },
   "dependencies": {
     "@resolid/app-db": "workspace:^",
-    "drizzle-orm": "^0.44.7",
-    "mysql2": "^3.15.3"
+    "drizzle-orm": "^0.44.7"
   },
   "devDependencies": {
     "tsdown": "^0.15.12",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "@resolid/core": "workspace:^"
+    "@resolid/core": "workspace:^",
+    "mysql2": "^3.15.3"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"

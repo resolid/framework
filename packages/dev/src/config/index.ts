@@ -1,21 +1,24 @@
 import type { Config } from "@react-router/dev/config";
-import { netlifyPreset } from "@resolid/react-router-hono/netlify-preset";
-import { nodePreset } from "@resolid/react-router-hono/node-preset";
-import { vercelPreset } from "@resolid/react-router-hono/vercel-preset";
 import type { NodeVersions, Platform } from "../types";
+import { netlifyPreset } from "./presets/netlify";
+import { nodePreset } from "./presets/node";
+import { vercelPreset } from "./presets/vercel";
 
 export type VitePluginOptions = {
   platform: Platform["platform"];
+  nodeVersion: NodeVersions["node"];
+  entryFile: string;
   devExclude?: (string | RegExp)[];
 };
 
 export type ReactRouterConfig = Omit<Config, "appDirectory" | "ssr">;
 
 export type DevConfigOptions = Platform & {
-  devExclude?: (string | RegExp)[];
+  entryFile?: string;
   appDirectory?: string;
   includeFiles?: string[];
   reactRouterConfig?: ReactRouterConfig;
+  devExclude?: (string | RegExp)[];
 };
 
 export type DevConfig = {
@@ -26,35 +29,33 @@ export type DevConfig = {
 export const defineDevConfig = ({
   platform = "node",
   nodeVersion = 22,
-  devExclude,
+  entryFile = "server.ts",
   appDirectory = "src",
   includeFiles = [],
   reactRouterConfig,
+  devExclude,
 }: DevConfigOptions): DevConfig => {
-  const entryFile = "server.ts";
-
   const preset =
     platform == "netlify"
       ? netlifyPreset({
-          entryFile,
-          includeFiles,
           nodeVersion: nodeVersion as NodeVersions["netlify"],
+          includeFiles,
         })
       : platform == "vercel"
         ? vercelPreset({
-            entryFile,
-            includeFiles,
             nodeVersion: nodeVersion as NodeVersions["vercel"],
+            includeFiles,
           })
         : nodePreset({
-            entryFile,
-            includeFiles,
             nodeVersion: nodeVersion,
+            includeFiles,
           });
 
   return {
     vitePluginOptions: {
       platform,
+      nodeVersion,
+      entryFile,
       devExclude,
     },
     reactRouterConfig: {
