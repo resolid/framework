@@ -1,0 +1,27 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "globalPassThroughEnv": ["RX_*"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "build/**", ".vercel/**", ".netlify/**"],
+      "env": ["NETLIFY", "VERCEL"]
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
+    "dev": {
+      "dependsOn": ["@resolid/dev#build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "persistent": true,
+      "cache": false
+    }
+  }
+}

@@ -40,6 +40,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@resolid/core": "workspace:^",
     "drizzle-orm": "^0.44.7"
   },
   "devDependencies": {
@@ -47,8 +48,7 @@
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "@resolid/app-log": "workspace:^",
-    "@resolid/core": "workspace:^"
+    "@resolid/app-log": "workspace:^"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"

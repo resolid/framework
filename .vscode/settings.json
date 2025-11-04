@@ -30,5 +30,6 @@
     "tx",
     "tv"
   ],
-  "tailwindCSS.experimental.configFile": "website/src/root.css"
+  "tailwindCSS.experimental.configFile": "website/src/root.css",
+  "vitest.maximumConfigs": 15
 }

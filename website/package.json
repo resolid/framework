@@ -11,8 +11,6 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
-    "build:vercel": "VERCEL=1 react-router build",
-    "build:netlify": "NETLIFY=true react-router build",
     "dev": "react-router dev",
     "lint": "eslint .",
     "start": "NODE_ENV=production SERVER_PORT=3001 node --env-file=.env ./build/server/site/server.mjs",
@@ -25,7 +23,7 @@
     "@resolid/app-log": "workspace:^",
     "@resolid/core": "workspace:^",
     "@tailwindcss/typography": "^0.5.19",
-    "isbot": "^5.1.31",
+    "isbot": "^5.1.32",
     "mysql2": "^3.15.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

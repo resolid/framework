@@ -1,6 +1,7 @@
 import { resolidVitePlugin } from "@resolid/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig, type UserConfig } from "vite";
+import { join } from "node:path";
+import { type AliasOptions, defineConfig, type UserConfig } from "vite";
 import viteInspect from "vite-plugin-inspect";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { vitePluginOptions } from "./resolid.config";
@@ -9,9 +10,12 @@ export default defineConfig(({ command }) => {
   const isBuild = command == "build";
 
   return {
-    plugins: [resolidVitePlugin(vitePluginOptions), tailwindcss(), tsconfigPaths(), !isBuild && viteInspect()].filter(
-      Boolean,
-    ),
+    plugins: [
+      resolidVitePlugin(vitePluginOptions),
+      tailwindcss(),
+      !isBuild && tsconfigPaths(),
+      !isBuild && viteInspect(),
+    ].filter(Boolean),
     environments: {
       ssr: {
         build: {
@@ -41,6 +45,9 @@ export default defineConfig(({ command }) => {
     },
     ssr: {
       external: ["mysql2"],
+    },
+    resolve: {
+      alias: [isBuild && { find: "~", replacement: join(__dirname, "./src") }].filter(Boolean) as AliasOptions,
     },
   } satisfies UserConfig;
 });

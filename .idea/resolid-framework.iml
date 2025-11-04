@@ -6,6 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/website/.vercel" />
       <excludeFolder url="file://$MODULE_DIR$/website/runtime" />
       <excludePattern pattern="coverage" />
+      <excludePattern pattern=".turbo" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
