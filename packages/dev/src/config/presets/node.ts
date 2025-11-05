@@ -9,7 +9,6 @@ export type NodePresetOptions = PresetBaseOptions & {
 export const nodePreset = (options?: NodePresetOptions): Preset => {
   const nodeVersion = options?.nodeVersion ?? 22;
 
-  // noinspection JSUnusedGlobalSymbols
   return {
     name: "@resolid/react-router-hono-node-preset",
     reactRouterConfig: () => {

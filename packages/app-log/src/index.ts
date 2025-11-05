@@ -28,27 +28,25 @@ export type Target = {
 };
 
 export class LogService {
-  private readonly config: LogConfig;
-
-  private readonly defaultSink?: Sink;
-  private readonly defaultCategory: string;
-
-  private readonly sinks: Record<string, Sink> = {};
+  private readonly _config: LogConfig;
+  private readonly _defaultSink?: Sink;
+  private readonly _defaultCategory: string;
+  private readonly _sinks: Record<string, Sink> = {};
 
   constructor(targets: Target[], config: LogConfig = {}) {
-    this.config = config;
+    this._config = config;
 
     for (const target of targets) {
-      this.sinks[target.name] = target.sink;
+      this._sinks[target.name] = target.sink;
     }
 
     /* istanbul ignore next -- @preserve */
     if (config.defaultTarget) {
-      this.defaultSink = this.sinks[config.defaultTarget];
+      this._defaultSink = this._sinks[config.defaultTarget];
     }
 
     /* istanbul ignore next -- @preserve */
-    this.defaultCategory = config.defaultCategory ?? "app";
+    this._defaultCategory = config.defaultCategory ?? "app";
   }
 
   async configure(): Promise<void> {
@@ -56,7 +54,7 @@ export class LogService {
       reset: true,
       sinks: {
         default:
-          this.defaultSink ??
+          this._defaultSink ??
           getConsoleSink({
             formatter: getAnsiColorFormatter({
               timestamp: (t) => {
@@ -65,15 +63,15 @@ export class LogService {
               },
             }),
           }),
-        ...this.sinks,
+        ...this._sinks,
       },
       filters: {
-        ...this.config.filters,
+        ...this._config.filters,
       },
       loggers: [
         { category: ["logtape", "meta"], sinks: [] },
-        { category: this.defaultCategory, sinks: ["default"] },
-        ...(this.config.loggers ?? []),
+        { category: this._defaultCategory, sinks: ["default"] },
+        ...(this._config.loggers ?? []),
       ],
     });
   }
@@ -102,7 +100,7 @@ export class LogService {
     return getLogger(name);
   }
 
-  getLogger(category: string = this.defaultCategory): Logger {
+  getLogger(category: string = this._defaultCategory): Logger {
     return getLogger(category);
   }
 

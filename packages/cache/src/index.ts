@@ -9,35 +9,35 @@ export interface CacheOptions {
 }
 
 export class Cacher {
-  private readonly store: CacheStore;
-  private readonly defaultTtl?: number;
+  private readonly _store: CacheStore;
+  private readonly _defaultTtl?: number;
 
   constructor({ store = new NullCache(), defaultTtl }: CacheOptions = {}) {
-    this.store = store;
-    this.defaultTtl = defaultTtl;
+    this._store = store;
+    this._defaultTtl = defaultTtl;
   }
 
   async get<T>(key: string, defaultValue?: T): Promise<T | undefined> {
-    const value = await this.store.get(normalizeKey(key));
+    const value = await this._store.get(normalizeKey(key));
 
     return value === undefined ? defaultValue : destr<T>(value);
   }
 
   set<T>(key: string, value: T, ttl?: number): Promise<boolean> {
-    return this.store.set(normalizeKey(key), JSON.stringify(value), ttl ?? this.defaultTtl);
+    return this._store.set(normalizeKey(key), JSON.stringify(value), ttl ?? this._defaultTtl);
   }
 
   del(key: string): Promise<boolean> {
-    return this.store.del(normalizeKey(key));
+    return this._store.del(normalizeKey(key));
   }
 
   clear(): Promise<boolean> {
-    return this.store.clear();
+    return this._store.clear();
   }
 
   async getMultiple<T>(keys: string[], defaultValue?: T): Promise<(T | undefined)[]> {
-    if (this.store.getMultiple) {
-      const values = await this.store.getMultiple(keys.map(normalizeKey));
+    if (this._store.getMultiple) {
+      const values = await this._store.getMultiple(keys.map(normalizeKey));
 
       return values.map((v) => (v === undefined ? defaultValue : destr<T>(v)));
     }
@@ -45,7 +45,7 @@ export class Cacher {
   }
 
   async setMultiple<T>(values: Record<string, T>, ttl?: number): Promise<boolean> {
-    if (this.store.setMultiple) {
+    if (this._store.setMultiple) {
       const normalized = Object.entries(values).reduce(
         (acc, [k, v]) => {
           acc[normalizeKey(k)] = JSON.stringify(v);
@@ -54,25 +54,25 @@ export class Cacher {
         {} as Record<string, string>,
       );
 
-      return this.store.setMultiple(normalized, ttl);
+      return this._store.setMultiple(normalized, ttl);
     }
 
     return (await Promise.all(Object.entries(values).map(([k, v]) => this.set(k, v, ttl)))).every(Boolean);
   }
 
   async delMultiple(keys: string[]): Promise<boolean> {
-    if (this.store.delMultiple) {
-      return this.store.delMultiple(keys.map(normalizeKey));
+    if (this._store.delMultiple) {
+      return this._store.delMultiple(keys.map(normalizeKey));
     }
 
     return (await Promise.all(keys.map((k) => this.del(k)))).every(Boolean);
   }
 
   async has(key: string): Promise<boolean> {
-    return this.store.has ? this.store.has(normalizeKey(key)) : (await this.get(key)) !== undefined;
+    return this._store.has ? this._store.has(normalizeKey(key)) : (await this.get(key)) !== undefined;
   }
 
   async dispose(): Promise<void> {
-    await this.store.dispose?.();
+    await this._store.dispose?.();
   }
 }

@@ -19,7 +19,8 @@ bun add @resolid/app-db-mysql
 
 ## Acknowledgment
 
-[drizzle-orm](https://github.com/drizzle-team/drizzle-orm)
+- [drizzle-orm](https://github.com/drizzle-team/drizzle-orm)
+- [mysql2](https://github.com/sidorares/node-mysql2)
 
 ## License
 

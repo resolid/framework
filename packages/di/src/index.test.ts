@@ -387,7 +387,6 @@ describe("DI Container", () => {
         this.auth = auth;
       }
 
-      // noinspection JSUnusedGlobalSymbols
       getAuth(): AuthService {
         return this.auth;
       }
@@ -400,7 +399,6 @@ describe("DI Container", () => {
         this.api = api;
       }
 
-      // noinspection JSUnusedGlobalSymbols
       getApi(): ApiService {
         return this.api;
       }

@@ -1,6 +1,7 @@
 import { type Context, type Env, Hono } from "hono";
 import type { HonoOptions } from "hono/hono-base";
 import type { BlankEnv } from "hono/types";
+import process from "node:process";
 import {
   type AppLoadContext,
   createRequestHandler,
@@ -26,6 +27,7 @@ export type HonoServerOptions<E extends Env = BlankEnv> = {
       mode?: string;
     },
   ) => Promise<ReactRouterAppLoadContext> | ReactRouterAppLoadContext;
+  onShutdown?: () => Promise<void> | void;
   honoOptions?: HonoOptions<E>;
 };
 
@@ -51,6 +53,18 @@ export async function createHonoServer<E extends Env = BlankEnv>(
       return requestHandler(c.req.raw, loadContext instanceof Promise ? await loadContext : loadContext);
     })(c);
   });
+
+  async function shutdown() {
+    options.onShutdown?.();
+
+    process.removeListener("SIGINT", shutdown);
+    process.removeListener("SIGTERM", shutdown);
+
+    process.exit(0);
+  }
+
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 
   return server;
 }

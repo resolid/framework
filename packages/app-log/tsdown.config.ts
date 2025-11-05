@@ -1,6 +1,5 @@
 import { defineConfig, type UserConfig } from "tsdown";
 
-// noinspection JSUnusedGlobalSymbols
 export default defineConfig({
   entry: "src/index.ts",
   format: "esm",

@@ -29,8 +29,10 @@ export type MySQLDatabaseConfig<S extends Record<string, unknown> = Record<strin
   >
 >;
 
+export type MySQLDatabase<S extends Record<string, unknown>> = MySql2Database<S> & { $client: Pool };
+
 class MySQLDatabaseService<S extends Record<string, unknown> = Record<string, never>> extends DatabaseService<
-  MySql2Database<S>,
+  MySQLDatabase<S>,
   S,
   MySQLDatabaseConfig<S>
 > {
@@ -56,9 +58,15 @@ class MySQLDatabaseService<S extends Record<string, unknown> = Record<string, ne
         drizzle(pool, {
           mode: this.config.mode,
           ...this.config.drizzle,
-        } as MySql2DrizzleConfig<S>) as MySql2Database<S>,
+        } as MySql2DrizzleConfig<S>) as MySQLDatabase<S>,
         connection.name,
       );
+    }
+  }
+
+  override close(): Promise<void> | void {
+    for (const conn of this.connections.values()) {
+      conn.$client.end();
     }
   }
 }

@@ -19,7 +19,7 @@ bun add @resolid/app-db
 
 ## Acknowledgment
 
-[drizzle-orm](https://github.com/drizzle-team/drizzle-orm)
+- [drizzle-orm](https://github.com/drizzle-team/drizzle-orm)
 
 ## License
 

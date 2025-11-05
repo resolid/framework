@@ -45,7 +45,7 @@ app.$.logger.category("user").info("message");
 
 ## Acknowledgment
 
-[logtape](https://github.com/dahlia/logtape)
+- [logtape](https://github.com/dahlia/logtape)
 
 ## License
 

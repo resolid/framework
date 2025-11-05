@@ -8,11 +8,9 @@ export type VercelPresetOptions = PresetBaseOptions & {
   nodeVersion?: NodeVersions["vercel"];
 };
 
-// noinspection JSUnusedGlobalSymbols
 export const vercelPreset = (options?: VercelPresetOptions): Preset => {
   const nodeVersion = options?.nodeVersion ?? 22;
 
-  // noinspection JSUnusedGlobalSymbols
   return {
     name: "@resolid/react-router-hono-vercel-preset",
     reactRouterConfig: () => {
@@ -36,7 +34,7 @@ export const vercelPreset = (options?: VercelPresetOptions): Preset => {
 
               return { vercelOutput, nftCache: {} };
             },
-            buildBundleEnd: async (context, buildPath, bundleId, bundleFile) => {
+            buildBundleEnd: async (context, _buildPath, bundleId, bundleFile) => {
               console.log(`Coping Vercel function files for ${bundleId}...`);
 
               const vercelFunctionDir = await createDir([context.vercelOutput, "functions", `_${bundleId}.func`], true);

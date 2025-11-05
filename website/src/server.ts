@@ -4,16 +4,19 @@ import { app } from "~/app";
 
 await app.run();
 
-// noinspection JSUnusedGlobalSymbols
 export default await createServer((platform) => {
+  const onShutdown = async () => {
+    await app.dispose();
+  };
+
   switch (platform) {
     case "vercel":
-      return vercelConfig(undefined);
+      return vercelConfig({ onShutdown });
 
     case "netlify":
-      return netlifyConfig(undefined);
+      return netlifyConfig({ onShutdown });
 
     default:
-      return nodeConfig({ port: env.SERVER_PORT });
+      return nodeConfig({ port: env.SERVER_PORT, onShutdown });
   }
 });

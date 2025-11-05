@@ -42,15 +42,13 @@ export type AppOptions<E> = AppConfig & {
 };
 
 class App<E extends Record<string, unknown>> {
-  private readonly root: string;
-  private readonly container: Container;
-  private readonly context: AppContext;
+  private readonly _root: string;
+  private readonly _container: Container;
+  private readonly _context: AppContext;
+  private readonly _boots: BootFunction[] = [];
+  private readonly _expose?: Expose<E>;
 
-  private readonly boots: BootFunction[] = [];
-
-  private booted: boolean = false;
-
-  private readonly expose?: Expose<E>;
+  private _booted: boolean = false;
 
   public readonly name: string;
   public readonly debug: boolean;
@@ -62,54 +60,54 @@ class App<E extends Record<string, unknown>> {
   constructor({ name, debug = false, timezone = "UTC", extensions = [], expose }: AppOptions<Expose<E>>) {
     env.timezone = timezone;
 
-    this.root = cwd();
+    this._root = cwd();
 
     this.name = name;
     this.debug = debug;
     this.timezone = timezone;
 
-    this.container = new Container();
+    this._container = new Container();
     this.emitter = new Emitter();
 
-    this.context = {
+    this._context = {
       name,
       debug,
       timezone,
       emitter: this.emitter,
-      container: this.container,
+      container: this._container,
       rootPath: this.rootPath,
       runtimePath: this.runtimePath,
     };
 
     for (const item of extensions) {
-      const extension = typeof item === "function" ? item(this.context) : item;
+      const extension = typeof item === "function" ? item(this._context) : item;
 
       if (extension.providers) {
         for (const provider of extension.providers) {
-          this.container.add(provider);
+          this._container.add(provider);
         }
       }
 
       if (extension.boot) {
-        this.boots.push(extension.boot);
+        this._boots.push(extension.boot);
       }
     }
 
-    this.expose = expose;
+    this._expose = expose;
   }
 
   async init(): Promise<void> {
-    if (this.expose) {
-      for (const [key, value] of Object.entries(this.expose)) {
+    if (this._expose) {
+      for (const [key, value] of Object.entries(this._expose)) {
         this.$[key as keyof E] = (
-          value.async ? await this.container.getAsync(value.token) : this.container.get(value.token)
+          value.async ? await this._container.getAsync(value.token) : this._container.get(value.token)
         ) as E[typeof key];
       }
     }
   }
 
   rootPath(...paths: string[]): string {
-    return join(this.root, ...paths.map((p) => p.replace(/\\/g, "/")));
+    return join(this._root, ...paths.map((p) => p.replace(/\\/g, "/")));
   }
 
   runtimePath(...paths: string[]): string {
@@ -117,27 +115,28 @@ class App<E extends Record<string, unknown>> {
   }
 
   get<T>(token: Token<T>): T {
-    return this.container.get(token);
+    return this._container.get(token);
   }
 
   getAsync<T>(token: Token<T>): Promise<T> {
-    return this.container.getAsync(token);
+    return this._container.getAsync(token);
   }
 
   async run(): Promise<void> {
-    if (!this.booted) {
-      for (const boot of this.boots) {
-        await boot(this.context);
-      }
-
-      this.emitter.emit("app:ready");
+    if (this._booted) {
+      return;
     }
 
-    this.booted = true;
+    for (const boot of this._boots) {
+      await boot(this._context);
+    }
+
+    this.emitter.emit("app:ready");
+    this._booted = true;
   }
 
   async dispose(): Promise<void> {
-    await this.container.dispose();
+    await this._container.dispose();
 
     this.emitter.offAll();
   }

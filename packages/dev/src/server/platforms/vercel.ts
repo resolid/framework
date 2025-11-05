@@ -6,7 +6,6 @@ import { createHonoServer, type HonoServerOptions, type NodeEnv } from "../utils
 
 export type HonoVercelServerOptions = HonoServerOptions<NodeEnv>;
 
-// noinspection JSUnusedGlobalSymbols
 export const createHonoVercelServer = async (
   options: HonoVercelServerOptions = {},
 ): Promise<
@@ -14,11 +13,7 @@ export const createHonoVercelServer = async (
 > => {
   const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
 
-  const server = await createHonoServer<NodeEnv>(mode, {
-    configure: options.configure,
-    getLoadContext: options.getLoadContext,
-    honoOptions: options.honoOptions,
-  });
+  const server = await createHonoServer<NodeEnv>(mode, options);
 
   return handle(server);
 };

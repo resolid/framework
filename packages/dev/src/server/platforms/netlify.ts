@@ -18,11 +18,7 @@ export async function createHonoNetlifyServer(
 ): Promise<(req: Request, context: NetlifyContext) => Response | Promise<Response>> {
   const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
 
-  const server = await createHonoServer<NetlifyEnv>(mode, {
-    configure: options.configure,
-    getLoadContext: options.getLoadContext,
-    honoOptions: options.honoOptions,
-  });
+  const server = await createHonoServer<NetlifyEnv>(mode, options);
 
   return handle(server);
 }

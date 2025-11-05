@@ -4,13 +4,13 @@ import { DatabaseService } from "../service";
 export abstract class BaseRepository<T> {
   protected readonly source?: string;
 
-  private readonly database: DatabaseService<T>;
+  private readonly _database: DatabaseService<T>;
 
-  constructor(database: DatabaseService<T> = inject(DatabaseService)) {
-    this.database = database;
+  protected constructor(database: DatabaseService<T> = inject(DatabaseService)) {
+    this._database = database;
   }
 
   protected get db(): T {
-    return this.database.get(this.source);
+    return this._database.get(this.source);
   }
 }

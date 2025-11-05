@@ -9,7 +9,6 @@ export type NetlifyPresetOptions = PresetBaseOptions & {
   nodeVersion?: NodeVersions["netlify"];
 };
 
-// noinspection JSUnusedGlobalSymbols
 export const netlifyPreset = (options?: NetlifyPresetOptions): Preset => {
   const nodeVersion = options?.nodeVersion ?? 22;
 

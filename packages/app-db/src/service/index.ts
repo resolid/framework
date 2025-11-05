@@ -17,9 +17,9 @@ export abstract class DatabaseService<
   protected readonly config: C;
   protected readonly emitter: Emitter;
   protected readonly logger?: LogService;
+  protected readonly connections: Map<string, T> = new Map();
 
-  private readonly source = "main";
-  private readonly connections = new Map<string, T>();
+  private readonly _source = "main";
 
   protected constructor(
     config: C,
@@ -33,11 +33,19 @@ export abstract class DatabaseService<
 
   abstract connect(): Promise<void> | void;
 
-  protected set(connection: T, name: string = this.source): void {
+  abstract close(): Promise<void> | void;
+
+  async dispose(): Promise<Promise<void> | void> {
+    await this.close();
+
+    this.connections.clear();
+  }
+
+  protected set(connection: T, name: string = this._source): void {
     this.connections.set(name, connection);
   }
 
-  get(name: string = this.source): T {
+  get(name: string = this._source): T {
     const db = this.connections.get(name);
 
     if (!db) {

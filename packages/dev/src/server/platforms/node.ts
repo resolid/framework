@@ -1,4 +1,4 @@
-import { serve } from "@hono/node-server";
+import { serve, type ServerType } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import type { Hono, MiddlewareHandler } from "hono";
 import { logger } from "hono/logger";
@@ -46,13 +46,15 @@ export async function createHonoNodeServer(options: HonoNodeServerOptions = {}):
         const servePath = env.SERVE_PATH ? env.SERVE_PATH : "";
 
         console.log(
-          `[resolid-hono-server] http://localhost:${info.port}${servePath}${address && ` (http://${address}:${info.port})`}`,
+          `[resolid-server] http://localhost:${info.port}${servePath}${address && ` (http://${address}:${info.port})`}`,
         );
       },
     },
     ...options,
     defaultLogger: options.defaultLogger ?? !isProduction,
   };
+
+  let nodeServer: ServerType | null = null;
 
   const server = await createHonoServer(mode, {
     configure: async (server) => {
@@ -75,13 +77,16 @@ export async function createHonoNodeServer(options: HonoNodeServerOptions = {}):
 
       await mergedOptions.configure?.(server);
     },
-
     getLoadContext: mergedOptions.getLoadContext,
     honoOptions: mergedOptions.honoOptions,
+    onShutdown: async () => {
+      nodeServer?.close();
+      mergedOptions.onShutdown?.();
+    },
   });
 
   if (isProduction) {
-    serve(
+    nodeServer = serve(
       {
         ...server,
         port: mergedOptions.port,
