@@ -3,7 +3,6 @@ pnpm-workspace.yaml
 
 .idea/
 .vscode/
-.changeset/
 .github/
 .react-router/
 .netlify/

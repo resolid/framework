@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { cwd } from "node:process";
 import { describe, expect, it, vi } from "vitest";
-import { createApp, type Extension, type ExtensionCreator } from "./index";
+import { createApp, type Extension, type ExtensionCreator, type Token } from "./index";
 
 const testPathMethod = (methodFn: (...paths: string[]) => string, basePath: string) => {
   it("should return base path when called with no arguments", () => {
@@ -27,7 +27,7 @@ const testPathMethod = (methodFn: (...paths: string[]) => string, basePath: stri
 
 describe("createApp", () => {
   it("should register extensions and resolve them", async () => {
-    const LOG = Symbol("LOG");
+    const LOG = Symbol("LOG") as Token<{ log: () => void }>;
     const MAIL = Symbol("MAIL");
 
     const createMailExtension = (config: { from?: string } = {}): ExtensionCreator => {
@@ -44,9 +44,7 @@ describe("createApp", () => {
       };
     };
 
-    const app = await createApp<{
-      logger: { log: () => void };
-    }>({
+    const app = await createApp({
       name: "TestApp",
       extensions: [createLogExtension(), createMailExtension({ from: "1" })],
       expose: {
@@ -131,7 +129,7 @@ describe("createApp", () => {
 
     const A = Symbol("A");
 
-    const app = await createApp<{ a: string }>({
+    const app = await createApp({
       name: "TestApp",
       extensions: [
         {

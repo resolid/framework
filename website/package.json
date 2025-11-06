@@ -21,6 +21,7 @@
     "@react-router/node": "^7.9.5",
     "@resolid/app-db-mysql": "workspace:^",
     "@resolid/app-log": "workspace:^",
+    "@resolid/app-log-file": "workspace:^",
     "@resolid/core": "workspace:^",
     "@tailwindcss/typography": "^0.5.19",
     "isbot": "^5.1.32",
@@ -31,12 +32,12 @@
     "tailwindcss": "^4.1.16"
   },
   "devDependencies": {
-    "@netlify/types": "^2.1.0",
+    "@netlify/types": "^2.2.0",
     "@resolid/dev": "workspace:^",
     "@tailwindcss/vite": "^4.1.16",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
-    "vite": "^7.1.12",
+    "vite": "^7.2.1",
     "vite-plugin-inspect": "^11.3.3",
     "vite-tsconfig-paths": "^5.1.4"
   },

@@ -1,4 +1,3 @@
-import { getConsoleSink } from "@logtape/logtape";
 import { createApp } from "@resolid/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createLogExtension, LogService } from "./index";
@@ -7,12 +6,10 @@ describe("logExtension", () => {
   let log: LogService;
 
   beforeEach(async () => {
-    const app = await createApp<{
-      logger: LogService;
-    }>({
+    const app = await createApp({
       name: "TestApp",
       debug: true,
-      extensions: [createLogExtension([{ name: "console", sink: getConsoleSink() }])],
+      extensions: [createLogExtension([])],
       expose: {
         logger: {
           token: LogService,

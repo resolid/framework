@@ -1,18 +1,20 @@
 {
-  "name": "@resolid/event",
-  "version": "0.2.0",
-  "private": false,
-  "description": "Lightweight, Typed Event System for TypeScript",
+  "name": "@resolid/app-log-file",
+  "version": "0.0.0",
+  "private": true,
+  "description": "File logging target for Resolid applications",
   "keywords": [
     "resolid",
-    "event",
-    "event emitter"
+    "log",
+    "logger",
+    "logging",
+    "file"
   ],
   "homepage": "https://www.resolid.tech",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/resolid/framework.git",
-    "directory": "packages/event"
+    "directory": "packages/app-log-file"
   },
   "license": "MIT",
   "author": {
@@ -35,12 +37,18 @@
   "scripts": {
     "build": "tsdown",
     "lint": "eslint .",
-    "test": "vitest run",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@resolid/app-log": "workspace:^",
+    "@logtape/file": "^1.1.2"
   },
   "devDependencies": {
     "tsdown": "^0.16.0",
     "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "@resolid/core": "workspace:^"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"

@@ -15,7 +15,8 @@
       "@resolid/core": ["../packages/core/src"],
       "@resolid/app-db": ["../packages/app-db/src"],
       "@resolid/app-db-mysql": ["../packages/app-db-mysql/src"],
-      "@resolid/app-log": ["../packages/app-log/src"]
+      "@resolid/app-log": ["../packages/app-log/src"],
+      "@resolid/app-log-file": ["../packages/app-log-file/src"]
     }
   }
 }

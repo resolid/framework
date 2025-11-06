@@ -2,7 +2,6 @@ import {
   type Config,
   configure,
   dispose,
-  getAnsiColorFormatter,
   getConsoleSink,
   getLogger,
   type Logger,
@@ -11,39 +10,28 @@ import {
   withContext,
   withFilter,
 } from "@logtape/logtape";
-import type { ExtensionCreator } from "@resolid/core";
+import type { ExtensionCreator, Token } from "@resolid/core";
+
+export type LoggerEntity = { category: string } & Omit<LoggerConfig<string, string>, "category">;
 
 export type LogConfig = { defaultTarget?: string; defaultCategory?: string } & Omit<
   Partial<Config<string, string>>,
-  "reset" | "loggers" | "sinks"
+  "reset" | "loggers"
 > & {
-    loggers?: ({ category: string } & Omit<LoggerConfig<string, string>, "category">)[];
+    loggers?: LoggerEntity[];
   };
 
-type LogCategory = Pick<Logger, "debug" | "info" | "warn" | "error" | "fatal">;
+export type { Sink };
 
-export type Target = {
-  name: string;
-  sink: Sink | (Sink & Disposable);
-};
+type LogCategory = Pick<Logger, "debug" | "info" | "warn" | "error" | "fatal">;
 
 export class LogService {
   private readonly _config: LogConfig;
   private readonly _defaultSink?: Sink;
   private readonly _defaultCategory: string;
-  private readonly _sinks: Record<string, Sink> = {};
 
-  constructor(targets: Target[], config: LogConfig = {}) {
+  constructor(config: LogConfig = {}) {
     this._config = config;
-
-    for (const target of targets) {
-      this._sinks[target.name] = target.sink;
-    }
-
-    /* istanbul ignore next -- @preserve */
-    if (config.defaultTarget) {
-      this._defaultSink = this._sinks[config.defaultTarget];
-    }
 
     /* istanbul ignore next -- @preserve */
     this._defaultCategory = config.defaultCategory ?? "app";
@@ -53,17 +41,8 @@ export class LogService {
     await configure({
       reset: true,
       sinks: {
-        default:
-          this._defaultSink ??
-          getConsoleSink({
-            formatter: getAnsiColorFormatter({
-              timestamp: (t) => {
-                /* istanbul ignore next -- @preserve */
-                return new Date(t).toLocaleString("zh-CN", { hour12: false }).replace(/\//g, "-");
-              },
-            }),
-          }),
-        ...this._sinks,
+        default: this._defaultSink ?? getConsoleSink(),
+        ...this._config.sinks,
       },
       filters: {
         ...this._config.filters,
@@ -113,15 +92,38 @@ export class LogService {
   }
 }
 
-export function createLogExtension(targets: Target[] = [], config: LogConfig = {}): ExtensionCreator {
+type LogTarget = {
+  ref: Token<unknown>;
+  sinks: (service: unknown) => Record<string, Sink>;
+};
+
+/* istanbul ignore next -- @preserve */
+export function createLogTarget<T>(target: { ref: Token<T>; sinks: (service: T) => Record<string, Sink> }): LogTarget {
+  return {
+    ref: target.ref as Token<unknown>,
+    sinks: target.sinks as (service: unknown) => Record<string, Sink>,
+  };
+}
+
+export function createLogExtension(targets: readonly LogTarget[] = [], config: LogConfig = {}): ExtensionCreator {
   return (context) => {
     return {
       name: "resolid-log-module",
       providers: [
         {
           token: LogService,
-          factory() {
-            return new LogService(targets, { ...config, defaultCategory: config?.defaultCategory ?? context.name });
+          factory(resolver) {
+            /* istanbul ignore next -- @preserve */
+            const sinks = targets.reduce<Record<string, Sink>>((acc, target) => {
+              const service = resolver.get(target.ref);
+              return { ...acc, ...target.sinks(service) };
+            }, {});
+
+            return new LogService({
+              ...config,
+              sinks,
+              defaultCategory: config?.defaultCategory ?? context.name,
+            });
           },
         },
       ],

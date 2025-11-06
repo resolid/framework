@@ -15,8 +15,7 @@ declare namespace NodeJS {
 }
 
 interface ImportMetaEnv {
-  readonly VITE_VERCEL?: number;
-  readonly VITE_NETLIFY?: boolean;
+  readonly RESOLID_PLATFORM: "node" | "vercel" | "netlify";
 }
 
 interface ImportMeta {

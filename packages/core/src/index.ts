@@ -1,10 +1,9 @@
-import { Container, type Provider, type Token } from "@resolid/di";
+import { Container, inject, injectAsync, type Provider, type Token } from "@resolid/di";
 import { Emitter } from "@resolid/event";
 import { join } from "node:path";
 import { cwd, env } from "node:process";
 
-export { inject, injectAsync } from "@resolid/di";
-export type { Emitter } from "@resolid/event";
+export { inject, injectAsync, type Emitter, type Token };
 
 export type AppConfig = {
   readonly name: string;
@@ -29,14 +28,22 @@ export type Extension = {
 
 export type ExtensionCreator = (context: AppContext) => Extension;
 
-type Expose<E> = {
-  [K in keyof E]: {
-    token: Token;
-    async?: boolean;
-  };
+type ExposeEntry<T> = {
+  token: Token<T>;
+  async?: boolean;
 };
 
-export type AppOptions<E> = AppConfig & {
+type ExposeSchema = Record<string, ExposeEntry<unknown>>;
+
+type InferExpose<E extends ExposeSchema> = {
+  [K in keyof E]: E[K] extends { async: true; token: Token<infer T> }
+    ? T
+    : E[K] extends { token: Token<infer T> }
+      ? T
+      : never;
+};
+
+export type AppOptions<E extends ExposeSchema = Record<string, never>> = AppConfig & {
   readonly extensions?: (Extension | ExtensionCreator)[];
   readonly expose?: E;
 };
@@ -46,7 +53,7 @@ class App<E extends Record<string, unknown>> {
   private readonly _container: Container;
   private readonly _context: AppContext;
   private readonly _boots: BootFunction[] = [];
-  private readonly _expose?: Expose<E>;
+  private readonly _expose?: ExposeSchema;
 
   private _booted: boolean = false;
 
@@ -57,7 +64,7 @@ class App<E extends Record<string, unknown>> {
 
   public readonly $: E = Object.create(null);
 
-  constructor({ name, debug = false, timezone = "UTC", extensions = [], expose }: AppOptions<Expose<E>>) {
+  constructor({ name, debug = false, timezone = "UTC", extensions = [], expose }: AppOptions) {
     env.timezone = timezone;
 
     this._root = cwd();
@@ -75,8 +82,8 @@ class App<E extends Record<string, unknown>> {
       timezone,
       emitter: this.emitter,
       container: this._container,
-      rootPath: this.rootPath,
-      runtimePath: this.runtimePath,
+      rootPath: (...paths: string[]) => this.rootPath(...paths),
+      runtimePath: (...paths: string[]) => this.runtimePath(...paths),
     };
 
     for (const item of extensions) {
@@ -142,8 +149,10 @@ class App<E extends Record<string, unknown>> {
   }
 }
 
-export async function createApp<E extends Record<string, unknown>>(options: AppOptions<Expose<E>>): Promise<App<E>> {
-  const app = new App<E>(options);
+export async function createApp<E extends ExposeSchema = Record<string, never>>(
+  options: AppOptions<E>,
+): Promise<App<InferExpose<E>>> {
+  const app = new App<InferExpose<E>>(options as unknown as AppOptions);
 
   await app.init();
 

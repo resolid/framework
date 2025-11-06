@@ -26,24 +26,24 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
     },
     "./routes": {
-      "types": "./dist/routes.d.ts",
-      "import": "./dist/routes.js"
+      "types": "./dist/routes.d.mts",
+      "import": "./dist/routes.mjs"
     },
     "./server": {
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.js"
+      "types": "./dist/server.d.mts",
+      "import": "./dist/server.mjs"
     },
     "./vite": {
-      "types": "./dist/vite.d.ts",
-      "import": "./dist/vite.js"
+      "types": "./dist/vite.d.mts",
+      "import": "./dist/vite.mjs"
     }
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "bin": {
     "react-router": "./cli/react-router.js"
   },
@@ -65,14 +65,14 @@
     "rolldown": "latest"
   },
   "devDependencies": {
-    "@netlify/types": "^2.1.0",
-    "tsdown": "^0.15.12"
+    "@netlify/types": "^2.2.0",
+    "tsdown": "^0.16.0"
   },
   "peerDependencies": {
     "@react-router/node": "^7.9.5",
-    "isbot": "^5.1.31",
+    "isbot": "^5.1.32",
     "react-router": "^7.9.5",
-    "vite": "^7.1.12"
+    "vite": "^7.2.0"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"

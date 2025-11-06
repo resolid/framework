@@ -6,7 +6,8 @@ export abstract class BaseRepository<T> {
 
   private readonly _database: DatabaseService<T>;
 
-  protected constructor(database: DatabaseService<T> = inject(DatabaseService)) {
+  // noinspection TypeScriptAbstractClassConstructorCanBeMadeProtected
+  constructor(database: DatabaseService<T> = inject(DatabaseService)) {
     this._database = database;
   }
 

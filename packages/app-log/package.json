@@ -24,12 +24,12 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
     }
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "files": [
     "dist"
   ],
@@ -44,7 +44,7 @@
     "@resolid/core": "workspace:^"
   },
   "devDependencies": {
-    "tsdown": "^0.15.12",
+    "tsdown": "^0.16.0",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {},

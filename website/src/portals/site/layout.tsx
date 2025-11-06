@@ -17,10 +17,16 @@ export default function SiteLayout() {
         <div className="mx-auto flex max-w-6xl flex-col gap-1 p-4 text-center text-sm text-neutral-700">
           <p>Released under the MIT License</p>
           <p>Copyright Ⓒ 2022-present Resolid Tech</p>
-          <p>
+          <p className="inline-flex items-center justify-center gap-2">
             <Link className="rounded bg-green-800 px-2 py-1 text-white" to={"status"}>
               运行状态
             </Link>
+            {import.meta.env.RESOLID_PLATFORM == "vercel" && (
+              <span className="pointer-events-none rounded bg-neutral-800 px-2 py-1 text-white">部署于 Vercel</span>
+            )}
+            {import.meta.env.RESOLID_PLATFORM == "netlify" && (
+              <span className="pointer-events-none rounded bg-cyan-800 px-2 py-1 text-white">部署于 Netlify</span>
+            )}
           </p>
         </div>
       </footer>
