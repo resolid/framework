@@ -1,5 +1,7 @@
+import { ResolidProvider } from "@resolid/react-ui";
 import type { PropsWithChildren } from "react";
 import { Outlet, Scripts, ScrollRestoration } from "react-router";
+import { RouteProcessBar } from "~/components/route-process-bar";
 
 import style from "./root.css?url";
 
@@ -17,7 +19,8 @@ export const Layout = ({ children }: PropsWithChildren) => {
         <link href={style} rel="stylesheet" />
       </head>
       <body className={"min-h-screen overflow-y-scroll"}>
-        {children}
+        <RouteProcessBar />
+        <ResolidProvider>{children}</ResolidProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

@@ -3,7 +3,7 @@ import { Emitter } from "@resolid/event";
 import { join } from "node:path";
 import { cwd, env } from "node:process";
 
-export { inject, injectAsync, type Emitter, type Token };
+export { inject, injectAsync, type Emitter, type Provider as ServiceProvider, type Token };
 
 export type AppConfig = {
   readonly name: string;
@@ -45,6 +45,7 @@ type InferExpose<E extends ExposeSchema> = {
 
 export type AppOptions<E extends ExposeSchema = Record<string, never>> = AppConfig & {
   readonly extensions?: (Extension | ExtensionCreator)[];
+  readonly providers?: Provider[];
   readonly expose?: E;
 };
 
@@ -64,16 +65,15 @@ class App<E extends Record<string, unknown>> {
 
   public readonly $: E = Object.create(null);
 
-  constructor({ name, debug = false, timezone = "UTC", extensions = [], expose }: AppOptions) {
+  constructor({ name, debug = false, timezone = "UTC", extensions = [], providers = [], expose }: AppOptions) {
     env.timezone = timezone;
 
     this._root = cwd();
+    this._container = new Container();
 
     this.name = name;
     this.debug = debug;
     this.timezone = timezone;
-
-    this._container = new Container();
     this.emitter = new Emitter();
 
     this._context = {
@@ -98,6 +98,10 @@ class App<E extends Record<string, unknown>> {
       if (extension.boot) {
         this._boots.push(extension.boot);
       }
+    }
+
+    for (const provider of providers) {
+      this._container.add(provider);
     }
 
     this._expose = expose;

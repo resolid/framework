@@ -1,31 +1,65 @@
+import { Badge, Button, Tooltip, TooltipArrow, TooltipContent, TooltipTrigger } from "@resolid/react-ui";
 import { Link, Outlet } from "react-router";
+import { HistoryLink } from "~/components/history-link";
+import { ResolidLogo } from "~/components/resolid-logo";
+import { SpriteIcon } from "~/components/sprite-icon";
 
 export default function SiteLayout() {
   return (
     <>
-      <header className="sticky top-0 z-20 w-full border-b border-b-neutral-300">
-        <nav className="mx-auto flex h-16 items-center justify-between gap-4 px-4 xl:max-w-6xl">
+      <header className="sticky top-0 z-20 w-full border-b border-bd-normal bg-bg-normal">
+        <nav className="mx-auto flex h-16 items-center justify-between gap-4 px-4 xl:max-w-288">
           <Link to={"/"} aria-label={"Resolid"}>
-            <img alt={"Resolid"} src="/images/resolid.png" className="h-6" />
+            <ResolidLogo />
           </Link>
+          <div className={"inline-flex items-center gap-1 text-fg-muted"}>
+            <Tooltip placement={"bottom"}>
+              <TooltipTrigger
+                render={(props) => (
+                  <Button
+                    {...props}
+                    aria-label={"Github 上的 Resolid Framework"}
+                    color={"neutral"}
+                    variant={"ghost"}
+                    size={"sm"}
+                    iconOnly
+                    render={(props) => (
+                      <a {...props} href={"https://github.com/resolid/framework"} target={"_blank"} rel={"noreferrer"}>
+                        <SpriteIcon size={"1.5em"} name={"github"} />
+                      </a>
+                    )}
+                  />
+                )}
+              />
+              <TooltipContent>
+                <TooltipArrow />
+                Github 上的 Resolid Framework
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </nav>
       </header>
-      <div className={"min-h-[calc(100vh-var(--spacing)*16-102px)]"}>
+      <div className={"min-h-[calc(100vh-var(--spacing)*16-108px)]"}>
         <Outlet />
       </div>
-      <footer className="border-t border-t-neutral-300">
-        <div className="mx-auto flex max-w-6xl flex-col gap-1 p-4 text-center text-sm text-neutral-700">
+      <footer className="border-t border-bd-normal">
+        <div className="mx-auto flex max-w-288 flex-col gap-1 p-4 text-center text-sm text-fg-muted">
           <p>Released under the MIT License</p>
           <p>Copyright Ⓒ 2022-present Resolid Tech</p>
           <p className="inline-flex items-center justify-center gap-2">
-            <Link className="rounded bg-green-800 px-2 py-1 text-white" to={"status"}>
+            <Badge color={"success"} render={(props) => <HistoryLink {...props} to={"status"} />}>
+              <SpriteIcon className={"me-1"} name={"status"} />
               运行状态
-            </Link>
+            </Badge>
             {import.meta.env.RESOLID_PLATFORM == "vercel" && (
-              <span className="pointer-events-none rounded bg-neutral-800 px-2 py-1 text-white">部署于 Vercel</span>
+              <Badge className="pointer-events-none" color={"neutral"}>
+                部署于 Vercel
+              </Badge>
             )}
             {import.meta.env.RESOLID_PLATFORM == "netlify" && (
-              <span className="pointer-events-none rounded bg-cyan-800 px-2 py-1 text-white">部署于 Netlify</span>
+              <Badge className="pointer-events-none" color={"secondary"}>
+                部署于 Netlify
+              </Badge>
             )}
           </p>
         </div>

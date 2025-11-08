@@ -1,9 +1,10 @@
 import { createMySQLDatabaseExtension } from "@resolid/app-db-mysql";
-import { createLogExtension, createLogTarget, type LoggerEntity, LogService } from "@resolid/app-log";
+import { createLogExtension, createLogTarget, type LoggerEntity, LogService, type LogTarget } from "@resolid/app-log";
 import { createFileLogExtension, FileLogService } from "@resolid/app-log-file";
-import { createApp } from "@resolid/core";
+import { createApp, type Extension } from "@resolid/core";
+import { attachDatabasePool } from "@vercel/functions";
 import { env } from "node:process";
-import { SystemRepository } from "~/modules/system/repository.server";
+import { moduleProviders } from "~/modules/providers";
 
 const inNode = import.meta.env.RESOLID_PLATFORM == "node";
 
@@ -12,17 +13,16 @@ export const app = await createApp({
   extensions: [
     createLogExtension(
       [
-        inNode
-          ? createLogTarget({
-              ref: FileLogService,
-              sinks(service) {
-                return {
-                  app: service.rotatingFileSink("app"),
-                };
-              },
-            })
-          : undefined,
-      ].filter((v) => v != undefined),
+        inNode &&
+          createLogTarget({
+            ref: FileLogService,
+            sinks(service) {
+              return {
+                app: service.rotatingFileSink("app"),
+              };
+            },
+          }),
+      ].filter(Boolean) as LogTarget[],
       {
         loggers: [
           inNode
@@ -35,7 +35,7 @@ export const app = await createApp({
         ].filter((v) => v != undefined),
       },
     ),
-    inNode ? createFileLogExtension() : undefined,
+    inNode && createFileLogExtension(),
     createMySQLDatabaseExtension({
       connection: {
         uri: env.RX_DB_URI,
@@ -44,19 +44,14 @@ export const app = await createApp({
           ca: env.RX_DB_SSL_CA.replace(/\\n/gm, "\n"),
         },
       },
+      enhancer: (pool) => {
+        if (import.meta.env.RESOLID_PLATFORM == "vercel") {
+          attachDatabasePool(pool);
+        }
+      },
     }),
-    {
-      name: "app-repository",
-      providers: [
-        {
-          token: SystemRepository,
-          factory() {
-            return new SystemRepository();
-          },
-        },
-      ],
-    },
-  ].filter((v) => v !== undefined),
+  ].filter(Boolean) as Extension[],
+  providers: [...moduleProviders],
   expose: {
     logger: {
       token: LogService,

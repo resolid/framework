@@ -1,5 +1,6 @@
+import { Alert, AlertTitle } from "@resolid/react-ui";
 import { Suspense } from "react";
-import { systemRepository } from "~/modules/system/system.server";
+import { systemRepository } from "~/modules/system/repository.server";
 import type { Route } from "./+types/status";
 
 export async function loader() {
@@ -23,20 +24,23 @@ export default function Status({ loaderData }: Route.ComponentProps) {
   return (
     <div className="mx-auto prose px-4 py-8 dark:prose-invert">
       <h1 className={"text-center"}>运行状态</h1>
-      <div className={"my-5 rounded bg-green-100 p-4 font-medium text-green-800"}>静态页面访问正常</div>
-      <div className={"my-5 rounded bg-green-100 p-4 font-medium text-green-800"}>{ssr.message}</div>
+      <Alert className="my-5" color={"success"}>
+        <AlertTitle>静态页面访问正常</AlertTitle>
+      </Alert>
+      <Alert className="my-5" color={"success"}>
+        <AlertTitle>{ssr.message}</AlertTitle>
+      </Alert>
       <Suspense
-        fallback={<div className="my-5 rounded bg-yellow-100 p-4 font-medium text-yellow-800">正在查询数据库</div>}
+        fallback={
+          <Alert color={"warning"} className="my-5">
+            <AlertTitle>正在查询数据库</AlertTitle>
+          </Alert>
+        }
       >
         {db.then((data) => (
-          <div
-            className={
-              "my-5 rounded p-4 font-medium " +
-              (data.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")
-            }
-          >
-            {data.message}
-          </div>
+          <Alert color={data.success ? "success" : "danger"} className="my-5">
+            <AlertTitle>{data.message}</AlertTitle>
+          </Alert>
         ))}
       </Suspense>
     </div>

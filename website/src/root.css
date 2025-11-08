@@ -1,3 +1,4 @@
 @import "tailwindcss";
+@import "@resolid/react-ui/tailwindcss";
 
 @plugin "@tailwindcss/typography";

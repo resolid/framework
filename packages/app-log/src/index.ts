@@ -92,7 +92,7 @@ export class LogService {
   }
 }
 
-type LogTarget = {
+export type LogTarget = {
   ref: Token<unknown>;
   sinks: (service: unknown) => Record<string, Sink>;
 };

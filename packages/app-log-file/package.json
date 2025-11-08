@@ -40,11 +40,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@resolid/app-log": "workspace:^",
-    "@logtape/file": "^1.1.2"
+    "@logtape/file": "^1.1.2",
+    "@resolid/app-log": "workspace:^"
   },
   "devDependencies": {
-    "tsdown": "^0.16.0",
+    "tsdown": "^0.16.1",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
