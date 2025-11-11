@@ -12,7 +12,7 @@
       "outputs": ["coverage/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": []
     },
     "typecheck": {
       "dependsOn": ["^typecheck"]

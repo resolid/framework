@@ -13,7 +13,8 @@
     "build": "turbo run build",
     "build:vercel": "VERCEL=1 turbo run build",
     "build:netlify": "NETLIFY=true turbo run build",
-    "start": "pnpm run --filter ./website start",
+    "start:site": "pnpm run --filter ./website start:site",
+    "start:admin": "pnpm run --filter ./website start:admin",
     "test:packages": "turbo run test --filter=./packages/*",
     "build:packages": "turbo run build --filter=./packages/*",
     "typecheck": "turbo run typecheck",
@@ -38,7 +39,7 @@
     "typescript": "^5.9.3",
     "vitest": "^4.0.8"
   },
-  "packageManager": "pnpm@10.20.0",
+  "packageManager": "pnpm@10.21.0",
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24",
     "pnpm": "10.x"

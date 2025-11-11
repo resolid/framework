@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import { cp, mkdir, readdir, readFile, realpath, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative } from "node:path";
 import { build } from "rolldown";
-import { esmExternalRequirePlugin } from "rolldown/experimental";
+import { esmExternalRequirePlugin } from "rolldown/plugins";
 import { type ResolvedConfig, searchForWorkspaceRoot } from "vite";
 import type { NodeVersions } from "../types";
 
