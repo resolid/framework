@@ -1,6 +1,6 @@
 {
   "name": "@resolid/cache-file",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "description": "File Cache store for @resolid/cache",
   "keywords": [
