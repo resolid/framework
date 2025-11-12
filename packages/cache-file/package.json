@@ -1,17 +1,19 @@
 {
-  "name": "@resolid/core",
-  "version": "0.0.0",
-  "private": true,
-  "description": "Core runtime for Resolid applications",
+  "name": "@resolid/cache-file",
+  "version": "0.1.0",
+  "private": false,
+  "description": "File Cache store for @resolid/cache",
   "keywords": [
     "resolid",
-    "framework"
+    "cache",
+    "cache manager",
+    "file"
   ],
   "homepage": "https://www.resolid.tech",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/resolid/framework.git",
-    "directory": "packages/core"
+    "directory": "packages/cache-file"
   },
   "license": "MIT",
   "author": {
@@ -37,13 +39,13 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "@resolid/di": "workspace:^",
-    "@resolid/event": "workspace:^"
-  },
+  "dependencies": {},
   "devDependencies": {
     "tsdown": "^0.16.3",
     "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "@resolid/cache": "workspace:^"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
