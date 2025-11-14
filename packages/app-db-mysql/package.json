@@ -49,7 +49,7 @@
     "drizzle-orm": "^0.44.7"
   },
   "devDependencies": {
-    "tsdown": "^0.16.3",
+    "tsdown": "^0.16.4",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {

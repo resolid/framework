@@ -1,4 +1,4 @@
-import { resolidVitePlugin } from "@resolid/dev/vite";
+import { resolidVite } from "@resolid/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { join } from "node:path";
 import { type AliasOptions, defineConfig, type UserConfig } from "vite";
@@ -11,7 +11,7 @@ export default defineConfig(({ command }) => {
 
   return {
     plugins: [
-      resolidVitePlugin(vitePluginOptions),
+      resolidVite(vitePluginOptions),
       tailwindcss(),
       !isBuild && tsconfigPaths(),
       !isBuild && viteInspect(),

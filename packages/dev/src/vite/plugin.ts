@@ -11,12 +11,12 @@ import {
   shouldExcludeUrl,
 } from "./utils";
 
-export function resolidDevVitePlugin(options: VitePluginOptions): VitePlugin {
+export function resolidViteDev(options: VitePluginOptions): VitePlugin {
   let publicDirPath = "";
   let reactRouterConfig: ReactRouterPluginConfig | undefined;
 
   return {
-    name: "@resolid/dev-vite-plugin",
+    name: "@resolid/vite-dev-plugin",
     enforce: "post",
     config(config) {
       reactRouterConfig = resolveReactRouterPluginConfig(config, options);
