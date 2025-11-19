@@ -30,6 +30,7 @@ export class FileCache implements CacheStore {
   }
 
   private async _lockedRun<T>(key: string, fn: () => Promise<T>): Promise<T> {
+    // noinspection ES6MissingAwait
     const prev = this._locks.get(key) ?? Promise.resolve();
 
     let release!: () => void;

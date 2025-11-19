@@ -16,7 +16,9 @@ import type { Context as HonoContext } from "hono";
 export type NodeEnv = { Bindings: HttpBindings | Http2Bindings };
 export type { HonoContext };
 
-type ReactRouterAppLoadContext = UNSAFE_MiddlewareEnabled extends true ? RouterContextProvider : AppLoadContext;
+type ReactRouterAppLoadContext = UNSAFE_MiddlewareEnabled extends true
+  ? RouterContextProvider
+  : AppLoadContext;
 
 export type HonoServerOptions<E extends Env = BlankEnv> = {
   configure?: <E extends Env = BlankEnv>(app: Hono<E>) => Promise<void> | void;
@@ -50,7 +52,10 @@ export async function createHonoServer<E extends Env = BlankEnv>(
     return (async (c) => {
       const requestHandler = createRequestHandler(build, mode);
       const loadContext = options.getLoadContext?.(c, { build, mode });
-      return requestHandler(c.req.raw, loadContext instanceof Promise ? await loadContext : loadContext);
+      return requestHandler(
+        c.req.raw,
+        loadContext instanceof Promise ? await loadContext : loadContext,
+      );
     })(c);
   });
 

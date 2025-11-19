@@ -29,19 +29,21 @@ export type MySQLDatabaseConfig<S extends Record<string, unknown> = Record<strin
   >
 >;
 
-export type MySQLDatabase<S extends Record<string, unknown>> = MySql2Database<S> & { $client: Pool };
+export type MySQLDatabase<S extends Record<string, unknown>> = MySql2Database<S> & {
+  $client: Pool;
+};
 
-class MySQLDatabaseService<S extends Record<string, unknown> = Record<string, never>> extends DatabaseService<
-  MySQLDatabase<S>,
-  S,
-  MySQLDatabaseConfig<S>
-> {
+class MySQLDatabaseService<
+  S extends Record<string, unknown> = Record<string, never>,
+> extends DatabaseService<MySQLDatabase<S>, S, MySQLDatabaseConfig<S>> {
   constructor(config: MySQLDatabaseConfig<S>, emitter: Emitter) {
     super(config, emitter);
   }
 
   override connect(): void {
-    const connections = this.config.connections ?? [{ config: this.config.connection, name: undefined }];
+    const connections = this.config.connections ?? [
+      { config: this.config.connection, name: undefined },
+    ];
 
     for (const connection of connections) {
       let pool = mysql.createPool(connection.config);
@@ -73,9 +75,9 @@ class MySQLDatabaseService<S extends Record<string, unknown> = Record<string, ne
 
 export abstract class Repository extends BaseRepository<MySql2Database> {}
 
-export function createMySQLDatabaseExtension<S extends Record<string, unknown> = Record<string, never>>(
-  config: MySQLDatabaseConfig<S>,
-): ExtensionCreator {
+export function createMySQLDatabaseExtension<
+  S extends Record<string, unknown> = Record<string, never>,
+>(config: MySQLDatabaseConfig<S>): ExtensionCreator {
   return (context) => {
     return {
       name: "resolid-mysql-db-module",

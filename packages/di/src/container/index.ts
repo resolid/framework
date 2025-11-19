@@ -28,7 +28,9 @@ export class Container implements Resolver, Disposable {
 
   private _checkCircularDependency(token: Token) {
     if (this._constructing.includes(token)) {
-      throw new Error(`Circular dependency detected ${[...this._constructing, token].map(toString).join(" -> ")}`);
+      throw new Error(
+        `Circular dependency detected ${[...this._constructing, token].map(toString).join(" -> ")}`,
+      );
     }
   }
 
@@ -120,7 +122,10 @@ export class Container implements Resolver, Disposable {
   get<T>(token: Token<T>, options: { lazy: true }): () => T;
   get<T>(token: Token<T>, options: { lazy: true; optional: true }): () => T | undefined;
   get<T>(token: Token<T>, options: { lazy?: false; optional?: boolean }): T | undefined;
-  get<T>(token: Token<T>, options?: { lazy?: boolean; optional?: boolean }): T | undefined | (() => T | undefined) {
+  get<T>(
+    token: Token<T>,
+    options?: { lazy?: boolean; optional?: boolean },
+  ): T | undefined | (() => T | undefined) {
     const lazy = options?.lazy ?? false;
 
     if (lazy) {
@@ -133,8 +138,14 @@ export class Container implements Resolver, Disposable {
   getAsync<T>(token: Token<T>): Promise<T>;
   getAsync<T>(token: Token<T>, options: { optional: true }): Promise<T | undefined>;
   getAsync<T>(token: Token<T>, options: { lazy: true }): () => Promise<T>;
-  getAsync<T>(token: Token<T>, options: { lazy: true; optional: true }): () => Promise<T | undefined>;
-  getAsync<T>(token: Token<T>, options: { lazy?: false; optional?: boolean }): Promise<T | undefined>;
+  getAsync<T>(
+    token: Token<T>,
+    options: { lazy: true; optional: true },
+  ): () => Promise<T | undefined>;
+  getAsync<T>(
+    token: Token<T>,
+    options: { lazy?: false; optional?: boolean },
+  ): Promise<T | undefined>;
   getAsync<T>(
     token: Token<T>,
     options?: { lazy?: boolean; optional?: boolean },

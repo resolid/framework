@@ -2,7 +2,13 @@ import type { BuildManifest, Preset } from "@react-router/dev/config";
 import { cp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { NodeVersions } from "../../types";
-import { buildPreset, copyFilesToFunction, createDir, getServerRoutes, type PresetBaseOptions } from "../utils";
+import {
+  buildPreset,
+  copyFilesToFunction,
+  createDir,
+  getServerRoutes,
+  type PresetBaseOptions,
+} from "../utils";
 
 export type VercelPresetOptions = PresetBaseOptions & {
   nodeVersion?: NodeVersions["vercel"];
@@ -37,9 +43,16 @@ export const vercelPreset = (options?: VercelPresetOptions): Preset => {
             buildBundleEnd: async (context, _buildPath, bundleId, bundleFile) => {
               console.log(`Coping Vercel function files for ${bundleId}...`);
 
-              const vercelFunctionDir = await createDir([context.vercelOutput, "functions", `_${bundleId}.func`], true);
+              const vercelFunctionDir = await createDir(
+                [context.vercelOutput, "functions", `_${bundleId}.func`],
+                true,
+              );
 
-              const handleFile = await copyFilesToFunction(bundleFile, vercelFunctionDir, context.nftCache);
+              const handleFile = await copyFilesToFunction(
+                bundleFile,
+                vercelFunctionDir,
+                context.nftCache,
+              );
 
               await writeFile(
                 join(vercelFunctionDir, ".vc-config.json"),

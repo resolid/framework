@@ -1,7 +1,17 @@
 import type { BuildManifest } from "@react-router/dev/config";
 import fg from "fast-glob";
 import { existsSync } from "node:fs";
-import { cp, mkdir, readdir, readFile, realpath, rm, stat, symlink, writeFile } from "node:fs/promises";
+import {
+  cp,
+  mkdir,
+  readdir,
+  readFile,
+  realpath,
+  rm,
+  stat,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
 import { basename, dirname, join, relative } from "node:path";
 import { build } from "rolldown";
 import { esmExternalRequirePlugin } from "rolldown/plugins";
@@ -54,8 +64,13 @@ export async function buildPreset<BuildContext>({
 }: BuildPresetOptions<BuildContext>): Promise<void> {
   const rootPath = viteConfig.root;
   const assetsDir = viteConfig.build.assetsDir ?? "assets";
-  const packageJson = JSON.parse(await readFile(join(rootPath, "package.json"), "utf8")) as PackageJson;
-  const packageDeps = getPackageDependencies(packageJson.dependencies ?? {}, viteConfig.ssr.external);
+  const packageJson = JSON.parse(
+    await readFile(join(rootPath, "package.json"), "utf8"),
+  ) as PackageJson;
+  const packageDeps = getPackageDependencies(
+    packageJson.dependencies ?? {},
+    viteConfig.ssr.external,
+  );
   const serverBuildPath = join(reactRouterConfig.buildDirectory, "server");
 
   const serverBundles = buildManifest?.serverBundles ?? {
@@ -196,7 +211,10 @@ export function getServerRoutes(buildManifest: BuildManifest | undefined): {
     const routes: { id: string; path: string }[] = Object.values(buildManifest.routes)
       .filter((route) => route.id != "root")
       .map((route) => {
-        const path = [...getRoutePathsFromParentId(buildManifest.routes, route.parentId), route.path].join("/");
+        const path = [
+          ...getRoutePathsFromParentId(buildManifest.routes, route.parentId),
+          route.path,
+        ].join("/");
 
         return {
           id: route.id,
@@ -231,7 +249,9 @@ export function getServerRoutes(buildManifest: BuildManifest | undefined): {
         if (
           !bundleRoutes[path] &&
           !Object.keys(bundleRoutes).find((key) => {
-            return bundleRoutes[key].bundleId == bundleId && path.startsWith(bundleRoutes[key].path);
+            return (
+              bundleRoutes[key].bundleId == bundleId && path.startsWith(bundleRoutes[key].path)
+            );
           })
         ) {
           bundleRoutes[path] = { path: path, bundleId: bundleId };
@@ -240,7 +260,10 @@ export function getServerRoutes(buildManifest: BuildManifest | undefined): {
     }
 
     const result = Object.values(bundleRoutes).map((route) => {
-      return { path: route.path.endsWith("/") ? route.path.slice(0, -1) : route.path, bundleId: route.bundleId };
+      return {
+        path: route.path.endsWith("/") ? route.path.slice(0, -1) : route.path,
+        bundleId: route.bundleId,
+      };
     });
 
     result.sort((a, b) => (a.path.length > b.path.length ? -1 : 1));
@@ -276,7 +299,11 @@ function getRoutePathsFromParentId(routes: BuildManifest["routes"], parentId: st
 }
 
 // from: https://github.com/sveltejs/kit/blob/main/packages/adapter-vercel/index.js
-export async function copyFilesToFunction(bundleFile: string, destPath: string, nftCache: object): Promise<string> {
+export async function copyFilesToFunction(
+  bundleFile: string,
+  destPath: string,
+  nftCache: object,
+): Promise<string> {
   const base = searchForWorkspaceRoot(bundleFile);
 
   const { nodeFileTrace } = await import("@vercel/nft");
@@ -309,7 +336,9 @@ export async function copyFilesToFunction(bundleFile: string, destPath: string, 
       const sourceDir = dirname(bundleFile);
       const destDir = dirname(dest);
 
-      for (const file of (await readdir(sourceDir)).filter((file) => file != basename(bundleFile))) {
+      for (const file of (await readdir(sourceDir)).filter(
+        (file) => file != basename(bundleFile),
+      )) {
         await cp(join(sourceDir, file), join(destDir, file), { recursive: true });
       }
     }

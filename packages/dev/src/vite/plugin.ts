@@ -70,7 +70,8 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
       if (reactRouterConfig?.buildManifest?.serverBundles) {
         for (const key of Object.keys(reactRouterConfig.buildManifest.serverBundles)) {
           if (config.environments[`ssrBundle_${key}`]) {
-            config.environments[`ssrBundle_${key}`].build.rollupOptions.input = reactRouterConfig.entryFile;
+            config.environments[`ssrBundle_${key}`].build.rollupOptions.input =
+              reactRouterConfig.entryFile;
           }
         }
       }
@@ -85,7 +86,11 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
 
       const createMiddleware =
         async (server: ViteDevServer): Promise<Connect.HandleFunction> =>
-        async (req: http.IncomingMessage, res: http.ServerResponse, next: Connect.NextFunction): Promise<void> => {
+        async (
+          req: http.IncomingMessage,
+          res: http.ServerResponse,
+          next: Connect.NextFunction,
+        ): Promise<void> => {
           if (req.url) {
             const filePath = join(publicDirPath, req.url);
 
@@ -105,7 +110,9 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
           const entry = reactRouterConfig!.entryFile;
 
           const app = reactRouterConfig!.future?.unstable_viteEnvironmentApi
-            ? (await (server.environments.ssr as RunnableDevEnvironment).runner.import(entry))["default"]
+            ? (await (server.environments.ssr as RunnableDevEnvironment).runner.import(entry))[
+                "default"
+              ]
             : (await server.ssrLoadModule(entry))["default"];
 
           if (!app) {

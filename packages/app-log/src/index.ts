@@ -98,14 +98,20 @@ export type LogTarget = {
 };
 
 /* istanbul ignore next -- @preserve */
-export function createLogTarget<T>(target: { ref: Token<T>; sinks: (service: T) => Record<string, Sink> }): LogTarget {
+export function createLogTarget<T>(target: {
+  ref: Token<T>;
+  sinks: (service: T) => Record<string, Sink>;
+}): LogTarget {
   return {
     ref: target.ref as Token<unknown>,
     sinks: target.sinks as (service: unknown) => Record<string, Sink>,
   };
 }
 
-export function createLogExtension(targets: readonly LogTarget[] = [], config: LogConfig = {}): ExtensionCreator {
+export function createLogExtension(
+  targets: readonly LogTarget[] = [],
+  config: LogConfig = {},
+): ExtensionCreator {
   return (context) => {
     return {
       name: "resolid-log-module",

@@ -1,4 +1,10 @@
-import { getAppDirectory, index, layout, route, type RouteConfigEntry } from "@react-router/dev/routes";
+import {
+  getAppDirectory,
+  index,
+  layout,
+  route,
+  type RouteConfigEntry,
+} from "@react-router/dev/routes";
 import { relative, resolve } from "node:path";
 
 export { prefix, type RouteConfig } from "@react-router/dev/routes";

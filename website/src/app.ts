@@ -1,5 +1,11 @@
 import { createMySQLDatabaseExtension } from "@resolid/app-db-mysql";
-import { createLogExtension, createLogTarget, type LoggerEntity, LogService, type LogTarget } from "@resolid/app-log";
+import {
+  createLogExtension,
+  createLogTarget,
+  type LoggerEntity,
+  LogService,
+  type LogTarget,
+} from "@resolid/app-log";
 import { createFileLogExtension, FileLogService } from "@resolid/app-log-file";
 import { createApp, type Extension } from "@resolid/core";
 import { attachDatabasePool } from "@vercel/functions";

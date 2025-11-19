@@ -47,7 +47,9 @@ export default defineConfig(({ command }) => {
       external: ["mysql2"],
     },
     resolve: {
-      alias: [isBuild && { find: "~", replacement: join(__dirname, "./src") }].filter(Boolean) as AliasOptions,
+      alias: [isBuild && { find: "~", replacement: join(__dirname, "./src") }].filter(
+        Boolean,
+      ) as AliasOptions,
     },
   } satisfies UserConfig;
 });

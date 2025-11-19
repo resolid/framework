@@ -42,7 +42,7 @@
     "@resolid/event": "workspace:^"
   },
   "devDependencies": {
-    "tsdown": "^0.16.4",
+    "tsdown": "^0.16.5",
     "typescript": "^5.9.3"
   },
   "engines": {

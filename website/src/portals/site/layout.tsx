@@ -1,4 +1,11 @@
-import { Badge, Button, Tooltip, TooltipArrow, TooltipContent, TooltipTrigger } from "@resolid/react-ui";
+import {
+  Badge,
+  Button,
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipTrigger,
+} from "@resolid/react-ui";
 import { Link, Outlet } from "react-router";
 import { HistoryLink } from "~/components/history-link";
 import { ResolidLogo } from "~/components/resolid-logo";
@@ -24,7 +31,12 @@ export default function SiteLayout() {
                     size={"sm"}
                     iconOnly
                     render={(props) => (
-                      <a {...props} href={"https://github.com/resolid/framework"} target={"_blank"} rel={"noreferrer"}>
+                      <a
+                        {...props}
+                        href={"https://github.com/resolid/framework"}
+                        target={"_blank"}
+                        rel={"noreferrer"}
+                      >
                         <SpriteIcon size={"1.5em"} name={"github"} />
                       </a>
                     )}

@@ -25,11 +25,16 @@ export function cache(seconds: number, immutable = false): MiddlewareHandler {
       return;
     }
 
-    c.res.headers.set("Cache-Control", `public, max-age=${seconds}${immutable ? ", immutable" : ""}`);
+    c.res.headers.set(
+      "Cache-Control",
+      `public, max-age=${seconds}${immutable ? ", immutable" : ""}`,
+    );
   };
 }
 
-export async function createHonoNodeServer(options: HonoNodeServerOptions = {}): Promise<Hono<NodeEnv>> {
+export async function createHonoNodeServer(
+  options: HonoNodeServerOptions = {},
+): Promise<Hono<NodeEnv>> {
   const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
   const isProduction = mode == "production";
 

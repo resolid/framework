@@ -114,7 +114,9 @@ describe("DI Container", () => {
     });
 
     it("inject should throw an error when called without context", () => {
-      expect(() => inject(TEST_TOKEN)).toThrow("inject() / injectAsync() must be called within a injection context");
+      expect(() => inject(TEST_TOKEN)).toThrow(
+        "inject() / injectAsync() must be called within a injection context",
+      );
     });
   });
 

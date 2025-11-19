@@ -65,7 +65,14 @@ class App<E extends Record<string, unknown>> {
 
   public readonly $: E = Object.create(null);
 
-  constructor({ name, debug = false, timezone = "UTC", extensions = [], providers = [], expose }: AppOptions) {
+  constructor({
+    name,
+    debug = false,
+    timezone = "UTC",
+    extensions = [],
+    providers = [],
+    expose,
+  }: AppOptions) {
     env.timezone = timezone;
 
     this._root = cwd();
@@ -111,7 +118,9 @@ class App<E extends Record<string, unknown>> {
     if (this._expose) {
       for (const [key, value] of Object.entries(this._expose)) {
         this.$[key as keyof E] = (
-          value.async ? await this._container.getAsync(value.token) : this._container.get(value.token)
+          value.async
+            ? await this._container.getAsync(value.token)
+            : this._container.get(value.token)
         ) as E[typeof key];
       }
     }

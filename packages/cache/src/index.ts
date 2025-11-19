@@ -57,7 +57,9 @@ export class Cacher {
       return this._store.setMultiple(normalized, ttl);
     }
 
-    return (await Promise.all(Object.entries(values).map(([k, v]) => this.set(k, v, ttl)))).every(Boolean);
+    return (await Promise.all(Object.entries(values).map(([k, v]) => this.set(k, v, ttl)))).every(
+      Boolean,
+    );
   }
 
   async delMultiple(keys: string[]): Promise<boolean> {
@@ -69,7 +71,9 @@ export class Cacher {
   }
 
   async has(key: string): Promise<boolean> {
-    return this._store.has ? this._store.has(normalizeKey(key)) : (await this.get(key)) !== undefined;
+    return this._store.has
+      ? this._store.has(normalizeKey(key))
+      : (await this.get(key)) !== undefined;
   }
 
   async dispose(): Promise<void> {

@@ -2,7 +2,11 @@ import type { Hono, Context as HonoContext } from "hono";
 import type { IncomingMessage, ServerResponse } from "http";
 import type { Http2ServerRequest, Http2ServerResponse } from "http2";
 import type { Platform } from "../types";
-import { createHonoNetlifyServer, type HonoNetlifyServerOptions, type NetlifyContext } from "./platforms/netlify";
+import {
+  createHonoNetlifyServer,
+  type HonoNetlifyServerOptions,
+  type NetlifyContext,
+} from "./platforms/netlify";
 import { createHonoNodeServer, type HonoNodeServerOptions } from "./platforms/node";
 import { createHonoVercelServer, type HonoVercelServerOptions } from "./platforms/vercel";
 import type { NodeEnv } from "./utils";
@@ -23,7 +27,10 @@ export const createServer = async (
   ) => HonoNodeServerOptions | HonoNetlifyServerOptions | HonoVercelServerOptions | undefined,
 ): Promise<
   | ((req: Request, context: NetlifyContext) => Response | Promise<Response>)
-  | ((incoming: IncomingMessage | Http2ServerRequest, outgoing: ServerResponse | Http2ServerResponse) => Promise<void>)
+  | ((
+      incoming: IncomingMessage | Http2ServerRequest,
+      outgoing: ServerResponse | Http2ServerResponse,
+    ) => Promise<void>)
   | Hono<NodeEnv>
 > => {
   const platform = import.meta.env.RESOLID_PLATFORM as Platform["platform"];

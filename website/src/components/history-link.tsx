@@ -1,5 +1,13 @@
 import { Button, type ButtonProps, type PrimitiveProps } from "@resolid/react-ui";
-import { Link, type LinkProps, NavLink, type NavLinkProps, type Path, useLocation, useNavigate } from "react-router";
+import {
+  Link,
+  type LinkProps,
+  NavLink,
+  type NavLinkProps,
+  type Path,
+  useLocation,
+  useNavigate,
+} from "react-router";
 
 export const HistoryLink = (props: LinkProps) => {
   const { state, to, ...rest } = props;

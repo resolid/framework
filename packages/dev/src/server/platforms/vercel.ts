@@ -9,7 +9,10 @@ export type HonoVercelServerOptions = HonoServerOptions<NodeEnv>;
 export const createHonoVercelServer = async (
   options: HonoVercelServerOptions = {},
 ): Promise<
-  (incoming: IncomingMessage | Http2ServerRequest, outgoing: ServerResponse | Http2ServerResponse) => Promise<void>
+  (
+    incoming: IncomingMessage | Http2ServerRequest,
+    outgoing: ServerResponse | Http2ServerResponse,
+  ) => Promise<void>
 > => {
   const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
 
