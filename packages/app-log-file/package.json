@@ -44,7 +44,7 @@
     "@resolid/app-log": "workspace:^"
   },
   "devDependencies": {
-    "tsdown": "^0.16.5",
+    "tsdown": "^0.16.6",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
