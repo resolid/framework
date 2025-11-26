@@ -1,24 +1,22 @@
 import type { Config } from "@react-router/dev/config";
-import type { NodeVersions, Platform } from "../types";
+import type { NodeVersion, Platform } from "../types";
 import { netlifyPreset } from "./presets/netlify";
 import { nodePreset } from "./presets/node";
 import { vercelPreset } from "./presets/vercel";
 
 export type VitePluginOptions = {
-  platform: Platform["platform"];
-  nodeVersion: NodeVersions["node"];
+  platform: Platform;
+  nodeVersion: NodeVersion;
   entryFile: string;
   devExclude?: (string | RegExp)[];
 };
 
 export type ReactRouterConfig = Omit<Config, "appDirectory" | "ssr">;
 
-export type DevConfigOptions = Platform & {
-  entryFile?: string;
+export type DevConfigOptions = Partial<VitePluginOptions> & {
   appDirectory?: string;
   includeFiles?: string[];
   reactRouterConfig?: ReactRouterConfig;
-  devExclude?: (string | RegExp)[];
 };
 
 export type DevConfig = {
@@ -35,21 +33,10 @@ export const defineDevConfig = ({
   reactRouterConfig,
   devExclude,
 }: DevConfigOptions): DevConfig => {
-  const preset =
-    platform == "netlify"
-      ? netlifyPreset({
-          nodeVersion: nodeVersion as NodeVersions["netlify"],
-          includeFiles,
-        })
-      : platform == "vercel"
-        ? vercelPreset({
-            nodeVersion: nodeVersion as NodeVersions["vercel"],
-            includeFiles,
-          })
-        : nodePreset({
-            nodeVersion: nodeVersion,
-            includeFiles,
-          });
+  const presetDefine =
+    platform == "netlify" ? netlifyPreset : platform == "vercel" ? vercelPreset : nodePreset;
+
+  const preset = presetDefine({ nodeVersion, includeFiles });
 
   return {
     vitePluginOptions: {

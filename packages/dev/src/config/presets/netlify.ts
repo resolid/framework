@@ -2,7 +2,6 @@ import type { Preset } from "@react-router/dev/config";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { name, version } from "../../../package.json";
-import type { NodeVersions } from "../../types";
 import {
   buildPreset,
   copyFilesToFunction,
@@ -11,12 +10,10 @@ import {
   type PresetBaseOptions,
 } from "../utils";
 
-export type NetlifyPresetOptions = PresetBaseOptions & {
-  nodeVersion?: NodeVersions["netlify"];
-};
+export type NetlifyPresetOptions = PresetBaseOptions;
 
-export const netlifyPreset = (options?: NetlifyPresetOptions): Preset => {
-  const nodeVersion = options?.nodeVersion ?? 22;
+export const netlifyPreset = (options: NetlifyPresetOptions): Preset => {
+  const nodeVersion = options.nodeVersion;
 
   return {
     name: "@resolid/react-router-hono-netlify-preset",
@@ -29,7 +26,7 @@ export const netlifyPreset = (options?: NetlifyPresetOptions): Preset => {
             serverRoutes: { path: string; bundleId: string }[];
             nftCache: object;
           }>({
-            includeFiles: options?.includeFiles,
+            includeFiles: options.includeFiles,
             nodeVersion,
             buildManifest: buildManifest,
             reactRouterConfig: reactRouterConfig,

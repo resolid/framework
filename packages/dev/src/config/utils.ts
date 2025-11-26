@@ -16,7 +16,7 @@ import { basename, dirname, join, relative } from "node:path";
 import { build } from "rolldown";
 import { esmExternalRequirePlugin } from "rolldown/plugins";
 import { type ResolvedConfig, searchForWorkspaceRoot } from "vite";
-import type { NodeVersions } from "../types";
+import type { NodeVersion } from "../types";
 
 type OptionalToUndefined<T> = {
   [K in keyof T]: T[K] | undefined;
@@ -30,12 +30,10 @@ type PackageJson = {
   dependencies?: Record<string, string>;
 };
 
-export type PresetBaseOptions = {
-  includeFiles?: string[];
-};
+export type PresetBaseOptions = { nodeVersion: NodeVersion; includeFiles?: string[] };
 
 type BuildPresetOptions<BuildContext> = OptionalToUndefined<PresetBaseOptions> & {
-  nodeVersion: NodeVersions["node"];
+  nodeVersion: NodeVersion;
   buildManifest: BuildManifest | undefined;
   reactRouterConfig: Readonly<{
     appDirectory: string;
@@ -173,7 +171,7 @@ async function writePackageJson(
   outputFile: string,
   packageJson: PackageJson,
   packageDeps: unknown,
-  nodeVersion: NodeVersions["node"],
+  nodeVersion: NodeVersion,
 ): Promise<void> {
   const distPkg = {
     name: packageJson.name,

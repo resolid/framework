@@ -23,7 +23,7 @@ export const vercelConfig: PlatformConfig<HonoVercelServerOptions> = (config) =>
 
 export const createServer = async (
   factory: (
-    platform: Platform["platform"],
+    platform: Platform,
   ) => HonoNodeServerOptions | HonoNetlifyServerOptions | HonoVercelServerOptions | undefined,
 ): Promise<
   | ((req: Request, context: NetlifyContext) => Response | Promise<Response>)
@@ -33,7 +33,7 @@ export const createServer = async (
     ) => Promise<void>)
   | Hono<NodeEnv>
 > => {
-  const platform = import.meta.env.RESOLID_PLATFORM as Platform["platform"];
+  const platform = import.meta.env.RESOLID_PLATFORM;
 
   switch (platform) {
     case "netlify": {

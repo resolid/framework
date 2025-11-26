@@ -1,7 +1,6 @@
 import type { BuildManifest, Preset } from "@react-router/dev/config";
 import { cp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { NodeVersions } from "../../types";
 import {
   buildPreset,
   copyFilesToFunction,
@@ -10,12 +9,10 @@ import {
   type PresetBaseOptions,
 } from "../utils";
 
-export type VercelPresetOptions = PresetBaseOptions & {
-  nodeVersion?: NodeVersions["vercel"];
-};
+export type VercelPresetOptions = PresetBaseOptions;
 
-export const vercelPreset = (options?: VercelPresetOptions): Preset => {
-  const nodeVersion = options?.nodeVersion ?? 22;
+export const vercelPreset = (options: VercelPresetOptions): Preset => {
+  const nodeVersion = options.nodeVersion;
 
   return {
     name: "@resolid/react-router-hono-vercel-preset",
@@ -23,7 +20,7 @@ export const vercelPreset = (options?: VercelPresetOptions): Preset => {
       return {
         buildEnd: async ({ buildManifest, reactRouterConfig, viteConfig }) => {
           await buildPreset<{ vercelOutput: string; nftCache: object }>({
-            includeFiles: options?.includeFiles,
+            includeFiles: options.includeFiles,
             nodeVersion,
             buildManifest,
             reactRouterConfig,
