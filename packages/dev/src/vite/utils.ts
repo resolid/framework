@@ -1,15 +1,9 @@
 import type { BuildManifest, Config as ReactRouterConfig } from "@react-router/dev/config";
 import { makeRe } from "minimatch";
-import type http from "node:http";
 import { join, relative } from "node:path";
 import type { UserConfig } from "vite";
 import { normalizePath } from "vite";
 import type { VitePluginOptions } from "../config";
-
-export type Fetch = (
-  request: Request,
-  env: { incoming: http.IncomingMessage; outgoing: http.ServerResponse },
-) => Promise<Response>;
 
 export type ReactRouterPluginContext = {
   rootDirectory: string;

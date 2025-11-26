@@ -37,8 +37,8 @@ importers:
         specifier: ^20.0.0
         version: 20.0.0
       '@resolid/config':
-        specifier: ^3.10.2
-        version: 3.10.2(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2)(typescript@5.9.3)
+        specifier: ^3.10.3
+        version: 3.10.3(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2)(typescript@5.9.3)
       '@svitejs/changesets-changelog-github-compact':
         specifier: ^1.2.0
         version: 1.2.0
@@ -1059,11 +1059,11 @@ packages:
   '@remix-run/node-fetch-server@0.9.0':
     resolution: {integrity: sha512-SoLMv7dbH+njWzXnOY6fI08dFMI5+/dQ+vY3n8RnnbdG7MdJEgiP28Xj/xWlnRnED/aB6SFw56Zop+LbmaaKqA==}
 
-  '@resolid/config@3.10.2':
-    resolution: {integrity: sha512-TEQ3MU3l72AzPH1iuKDNKlBCbTJJCAzmH7e1Btd6YgxRoDRMliH9lpvHcQsejvEPkac7UQVzG7IqqN2c4Ps5vA==}
+  '@resolid/config@3.10.3':
+    resolution: {integrity: sha512-3SjSGC75sAQQal/rX0Qh/lDioj7ECTqCIkvo6FQvjYAyXEg0D1anithi0ihITW1GGPFktLOI+izVKcLQAoIcXQ==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
     peerDependencies:
-      eslint: ^9.37.0
+      eslint: ^9.39.1
       prettier: ^3.6.2
       typescript: ^5.9.3
     peerDependenciesMeta:
@@ -2135,8 +2135,8 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
-  eslint-plugin-erasable-syntax-only@0.3.1:
-    resolution: {integrity: sha512-f4Eo1LEZJfUP7/2PwNdFUcIUJlYAoCoie9BSoThQ4y4eO8bW+Sq38qC4IskYTu4+FW887mPW0wYuI9HU0nQnlg==}
+  eslint-plugin-erasable-syntax-only@0.4.0:
+    resolution: {integrity: sha512-7dx2gpfVn0FFEGukLqsF/izW4hGvSaySNOkcuSCO4q6Khh0ecOGYlRhW9hhDUtNryuKc+cXd1WFiQdpae3xzaQ==}
     engines: {node: '>=20.18.0'}
     peerDependencies:
       '@typescript-eslint/parser': '>=8'
@@ -4650,11 +4650,11 @@ snapshots:
 
   '@remix-run/node-fetch-server@0.9.0': {}
 
-  '@resolid/config@3.10.2(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2)(typescript@5.9.3)':
+  '@resolid/config@3.10.3(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(prettier@3.6.2)(typescript@5.9.3)':
     dependencies:
       '@eslint/js': 9.39.1
       eslint: 9.39.1(jiti@2.6.1)
-      eslint-plugin-erasable-syntax-only: 0.3.1(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+      eslint-plugin-erasable-syntax-only: 0.4.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-n: 17.23.1(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       eslint-plugin-react: 7.37.5(eslint@9.39.1(jiti@2.6.1))
@@ -5501,7 +5501,7 @@ snapshots:
       eslint: 9.39.1(jiti@2.6.1)
       semver: 7.7.3
 
-  eslint-plugin-erasable-syntax-only@0.3.1(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
+  eslint-plugin-erasable-syntax-only@0.4.0(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
       '@typescript-eslint/parser': 8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       '@typescript-eslint/utils': 8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
