@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.7.0
+
+### Minor Changes
+
+- refactor: remove async support and simplify container ([`04c0057`](https://github.com/resolid/framework/commit/04c0057178017dc05c6b04d67afbcef9acb87666))
+
 ## 0.6.1
 
 ### Patch Changes
