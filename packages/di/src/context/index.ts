@@ -2,7 +2,7 @@ import type { Resolver } from "../shared";
 
 export class InjectionContextError extends Error {
   constructor() {
-    super("inject() / injectAsync() must be called within a injection context");
+    super("inject() must be called within a injection context");
   }
 }
 
@@ -28,15 +28,6 @@ export class InjectionContext {
     InjectionContext.contextStack.push(this);
     try {
       return block(this.resolver);
-    } finally {
-      InjectionContext.contextStack.pop();
-    }
-  }
-
-  async runAsync<T>(block: (resolver: Resolver) => Promise<T>): Promise<T> {
-    InjectionContext.contextStack.push(this);
-    try {
-      return await block(this.resolver);
     } finally {
       InjectionContext.contextStack.pop();
     }

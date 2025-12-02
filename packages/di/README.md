@@ -17,7 +17,6 @@ and avoids circular dependency issues.
 - Optional dependency resolution.
 - Detects circular dependencies.
 - Handles disposable instances with dispose() support.
-- Fully async-compatible with inject() and injectAsync() functions.
 - Context-aware injection with InjectionContext.
 
 ## Installation
@@ -93,58 +92,6 @@ container.add({
   factory: () => Math.random(),
   scope: "transient", // New instance each time
 });
-```
-
-### Asynchronous Dependencies
-
-```typescript
-import { Container, injectAsync } from "@resolid/di";
-
-class AsyncDatabaseService {
-  async connect(): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    console.log("Database connected");
-  }
-}
-
-class AsyncUserService {
-  private db: AsyncDatabaseService;
-
-  constructor(db: AsyncDatabaseService) {
-    this.db = db;
-  }
-
-  async getUser(id: number): Promise<string> {
-    return `User ${id}`;
-  }
-}
-
-const container = new Container();
-
-container.add({
-  token: AsyncDatabaseService,
-  factory: async () => {
-    const db = new AsyncDatabaseService();
-    await db.connect();
-    return db;
-  },
-  async: true,
-});
-
-container.add({
-  token: AsyncUserService,
-  factory: async () => {
-    const db = await injectAsync(AsyncDatabaseService);
-    return new AsyncUserService(db);
-  },
-  async: true,
-});
-
-// Resolve async services
-const userService = await container.getAsync(AsyncUserService);
-const user = await userService.getUser(1);
-
-console.log(user); // Output: User 1
 ```
 
 ### Optional Dependencies
@@ -255,11 +202,10 @@ const container = new Container();
 
 container.add({
   token: DatabaseConnection,
-  factory: async () => new DatabaseConnection(),
-  async: true,
+  factory: () => new DatabaseConnection(),
 });
 
-const db = await container.getAsync(DatabaseConnection);
+const db = container.get(DatabaseConnection);
 
 // Dispose all singleton instances
 await container.dispose(); // Output: Database connection closed

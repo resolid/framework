@@ -29,20 +29,4 @@ export interface Resolver {
       token: Token<T>,
       options?: { lazy?: boolean; optional?: boolean },
     ) => T | undefined | (() => T | undefined));
-
-  getAsync: (<T>(token: Token<T>) => Promise<T>) &
-    (<T>(token: Token<T>, options: { optional: true }) => Promise<T | undefined>) &
-    (<T>(token: Token<T>, options: { lazy: true }) => () => Promise<T>) &
-    (<T>(
-      token: Token<T>,
-      options: { lazy: true; optional: true },
-    ) => () => Promise<T | undefined>) &
-    (<T>(
-      token: Token<T>,
-      options: { lazy?: false; optional?: boolean },
-    ) => Promise<T | undefined>) &
-    (<T>(
-      token: Token<T>,
-      options?: { lazy?: boolean; optional?: boolean },
-    ) => Promise<T | undefined> | (() => Promise<T | undefined>));
 }

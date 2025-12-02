@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { Container, inject, injectAsync } from "./index";
+import { Container, inject } from "./index";
 import { toString } from "./shared";
 
 describe("DI Container", () => {
@@ -113,9 +113,14 @@ describe("DI Container", () => {
       expect(() => container.get(LogService)).toThrow("No provider found");
     });
 
+    it("inject should return undefined when called without context but optional", () => {
+      const result = inject(TEST_TOKEN, { optional: true });
+      expect(result).toBeUndefined();
+    });
+
     it("inject should throw an error when called without context", () => {
       expect(() => inject(TEST_TOKEN)).toThrow(
-        "inject() / injectAsync() must be called within a injection context",
+        "inject() must be called within a injection context",
       );
     });
   });
@@ -167,87 +172,6 @@ describe("DI Container", () => {
     });
   });
 
-  describe("Asynchronous dependencies", () => {
-    it("should be able to resolve asynchronous dependencies", async () => {
-      container.add({
-        token: LogService,
-        factory: async () => new LogService(),
-        async: true,
-      });
-
-      const log = await container.getAsync(LogService);
-
-      expect(log).toBeInstanceOf(LogService);
-    });
-
-    it("asynchronous dependencies should also follow singleton", async () => {
-      container.add({
-        token: LogService,
-        factory: async () => new LogService(),
-        async: true,
-      });
-
-      const log1 = await container.getAsync(LogService);
-      const log2 = await container.getAsync(LogService);
-
-      expect(log1).toBe(log2);
-      expect(log1.instanceId).toBe(log2.instanceId);
-    });
-
-    it("should be able to inject asynchronous dependencies in asynchronous factories", async () => {
-      container.add({
-        token: LogService,
-        factory: async () => new LogService(),
-        async: true,
-      });
-
-      container.add({
-        token: UserService,
-        factory: async () => {
-          const logger = await injectAsync(LogService);
-
-          return new UserService(logger);
-        },
-        async: true,
-      });
-
-      const user = await container.getAsync(UserService);
-
-      expect(user).toBeInstanceOf(UserService);
-      expect(user.getLogger().instanceId).toBeTypeOf("number");
-    });
-
-    it("when using asynchronous factory providers, you cannot use inject() / injectAsync() functions", async () => {
-      container.add({
-        token: LogService,
-        factory: () => new LogService(),
-      });
-
-      container.add({
-        token: UserService,
-        factory: async () => {
-          return new UserService(inject(LogService));
-        },
-        async: true,
-      });
-
-      const user = await container.getAsync(UserService);
-
-      expect(user).toBeInstanceOf(UserService);
-      expect(user.getLogger().instanceId).toBeTypeOf("number");
-    });
-
-    it("attempting to synchronously get asynchronous dependencies should throw an error", () => {
-      container.add({
-        token: LogService,
-        factory: async () => new LogService(),
-        async: true,
-      });
-
-      expect(() => container.get(LogService)).toThrow("is async, please use injectAsync()");
-    });
-  });
-
   describe("Optional dependencies", () => {
     it("when optional is true, non-existent dependencies should return undefined", () => {
       const result = container.get(LogService, { optional: true });
@@ -282,30 +206,23 @@ describe("DI Container", () => {
       expect(analytics.hasLogger()).toBe(true);
     });
 
-    it("asynchronous optional dependencies should return undefined when not exist", async () => {
-      const result = await container.getAsync(LogService, { optional: true });
-
-      expect(result).toBeUndefined();
-    });
-
-    it("lazy + optional combination should return a function", async () => {
+    it("lazy + optional combination should return a function", () => {
       container.add({
         token: UserService,
-        factory: async () => {
-          const getDb = injectAsync(DatabaseService, { lazy: true, optional: true });
+        factory: () => {
+          const getDb = inject(DatabaseService, { lazy: true, optional: true });
 
           expect(typeof getDb).toBe("function");
 
-          const db = await getDb();
+          const db = getDb();
 
           expect(db).toBeUndefined();
 
           return {};
         },
-        async: true,
       });
 
-      await container.getAsync(UserService);
+      container.get(UserService);
     });
   });
 
@@ -347,22 +264,6 @@ describe("DI Container", () => {
       const getLogger = container.get(LogService, { lazy: true, optional: true });
       expect(typeof getLogger).toBe("function");
       expect(getLogger()).toBeUndefined();
-    });
-
-    it("asynchronous lazy should return a function that returns a Promise", async () => {
-      container.add({
-        token: LogService,
-        factory: async () => new LogService(),
-        async: true,
-      });
-
-      const getLogger = container.getAsync(LogService, { lazy: true });
-
-      expect(typeof getLogger).toBe("function");
-
-      const logger = await getLogger();
-
-      expect(logger).toBeInstanceOf(LogService);
     });
 
     it("lazy nested calls should work normally", () => {
@@ -442,19 +343,18 @@ describe("DI Container", () => {
     });
   });
 
-  describe("Resource disposal", () => {
+  describe("Resource disposal", async () => {
     it("should be able to dispose all singleton resources", async () => {
       container.add({
         token: DatabaseService,
-        factory: async () => {
-          const db = new DatabaseService();
-          await db.connect();
-          return db;
+        factory: () => {
+          return new DatabaseService();
         },
-        async: true,
       });
 
-      const db = await container.getAsync(DatabaseService);
+      const db = container.get(DatabaseService);
+
+      await db.connect();
 
       expect(db.isConnected()).toBe(true);
 
@@ -477,12 +377,11 @@ describe("DI Container", () => {
 
       container.add({
         token: DatabaseService,
-        factory: async () => new DatabaseService(),
-        async: true,
+        factory: () => new DatabaseService(),
       });
 
       container.get(badToken);
-      await container.getAsync(DatabaseService);
+      container.get(DatabaseService);
 
       await expect(container.dispose()).rejects.toThrow("Failed to dispose 1 provider(s)");
     });
@@ -501,12 +400,11 @@ describe("DI Container", () => {
 
       container.add({
         token: DatabaseService,
-        factory: async () => new DatabaseService(),
-        async: true,
+        factory: () => new DatabaseService(),
       });
 
       container.get(badToken);
-      const db = await container.getAsync(DatabaseService);
+      const db = container.get(DatabaseService);
 
       try {
         await container.dispose();
@@ -515,30 +413,6 @@ describe("DI Container", () => {
       }
 
       expect(db.isConnected()).toBe(false);
-    });
-  });
-
-  describe("Injection context tests", () => {
-    it("injectAsync should throw an error when called without context", async () => {
-      await expect(injectAsync(TEST_TOKEN)).rejects.toThrow(
-        "inject() / injectAsync() must be called within a injection context",
-      );
-    });
-
-    it("inject should return undefined when called without context but optional", () => {
-      const result = inject(TEST_TOKEN, { optional: true });
-      expect(result).toBeUndefined();
-    });
-
-    it("injectAsync should return Promise<undefined> when called without context but optional", async () => {
-      const result = await injectAsync(TEST_TOKEN, { optional: true });
-      expect(result).toBeUndefined();
-    });
-
-    it("injectAsync should support lazy optional combination", async () => {
-      const getValue = injectAsync(TEST_TOKEN, { lazy: true, optional: true });
-      expect(typeof getValue).toBe("function");
-      await expect(getValue()).resolves.toBeUndefined();
     });
   });
 

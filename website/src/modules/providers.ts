@@ -1,6 +1,6 @@
-import type { ServiceProvider } from "@resolid/core";
+import type { Provider } from "@resolid/core";
 
-const modules = import.meta.glob<ServiceProvider>("./**/repository.server.ts", {
+const modules = import.meta.glob<Provider>("./**/repository.server.ts", {
   import: "serviceProvider",
   eager: true,
 });

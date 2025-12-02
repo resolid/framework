@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { cwd } from "node:process";
 import { describe, expect, it, vi } from "vitest";
-import { createApp, type Extension, type ExtensionCreator, type Token } from "./index";
+import { createApp, type ExtensionCreator, type Token } from "./index";
 
 const testPathMethod = (methodFn: (...paths: string[]) => string, basePath: string) => {
   it("should return base path when called with no arguments", () => {
@@ -33,26 +33,16 @@ describe("createApp", () => {
     const createMailExtension = (config: { from?: string } = {}): ExtensionCreator => {
       return () => ({
         name: "mail-extension",
-        providers: [
-          { token: MAIL, factory: async () => ({ from: config?.from ?? "" }), async: true },
-        ],
+        providers: [{ token: MAIL, factory: () => ({ from: config?.from ?? "" }) }],
       });
-    };
-
-    const createLogExtension = (): Extension => {
-      return {
-        name: "log-extension",
-        providers: [{ token: LOG, factory: () => ({ log: vi.fn() }) }],
-      };
     };
 
     const app = await createApp({
       name: "TestApp",
-      extensions: [createLogExtension(), createMailExtension({ from: "1" })],
+      extensions: [createMailExtension({ from: "1" })],
+      providers: [{ token: LOG, factory: () => ({ log: vi.fn() }) }],
       expose: {
-        logger: {
-          token: LOG,
-        },
+        logger: LOG,
       },
     });
 
@@ -61,7 +51,7 @@ describe("createApp", () => {
     expect(log).toHaveProperty("log");
     expect(typeof log.log).toBe("function");
 
-    const mail = await app.getAsync<{ from: string }>(MAIL);
+    const mail = app.get<{ from: string }>(MAIL);
     expect(mail.from).toBe("1");
   });
 
@@ -73,13 +63,13 @@ describe("createApp", () => {
       extensions: [
         {
           name: "a",
-          boot: () => {
+          bootstrap: () => {
             order.push("A");
           },
         },
         {
           name: "b",
-          boot: async () => {
+          bootstrap: async () => {
             await new Promise((r) => setTimeout(r, 10));
             order.push("B");
           },
@@ -101,9 +91,6 @@ describe("createApp", () => {
       extensions: [
         {
           name: "BootExtension",
-          boot: async () => {
-            bootFn();
-          },
           providers: [
             {
               token: BOOT,
@@ -112,6 +99,9 @@ describe("createApp", () => {
               },
             },
           ],
+          bootstrap: async () => {
+            bootFn();
+          },
         },
       ],
     });
@@ -139,7 +129,7 @@ describe("createApp", () => {
           providers: [
             {
               token: A,
-              factory: async () => {
+              factory: () => {
                 return {
                   dispose: () => {
                     order.push("dispose");
@@ -151,10 +141,7 @@ describe("createApp", () => {
         },
       ],
       expose: {
-        a: {
-          token: A,
-          async: true,
-        },
+        a: A,
       },
     });
 
@@ -172,7 +159,7 @@ describe("createApp", () => {
       extensions: [
         {
           name: "fail",
-          boot: () => {
+          bootstrap: () => {
             throw new Error("Boot failed");
           },
         },

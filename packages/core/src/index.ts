@@ -1,9 +1,9 @@
-import { Container, inject, injectAsync, type Provider, type Token } from "@resolid/di";
+import { Container, inject, type Provider, type Token } from "@resolid/di";
 import { Emitter } from "@resolid/event";
 import { join } from "node:path";
 import { cwd, env } from "node:process";
 
-export { inject, injectAsync, type Emitter, type Provider as ServiceProvider, type Token };
+export { inject, type Emitter, type Provider, type Token };
 
 export type AppConfig = {
   readonly name: string;
@@ -18,29 +18,20 @@ export type AppContext = AppConfig & {
   runtimePath: (...paths: string[]) => string;
 };
 
-type BootFunction = (context: AppContext) => void | Promise<void>;
+type BootstrapFunction = (context: AppContext) => void | Promise<void>;
 
 export type Extension = {
   name: string;
   providers?: Provider[];
-  boot?: BootFunction;
+  bootstrap?: BootstrapFunction;
 };
 
 export type ExtensionCreator = (context: AppContext) => Extension;
 
-type ExposeEntry<T> = {
-  token: Token<T>;
-  async?: boolean;
-};
-
-type ExposeSchema = Record<string, ExposeEntry<unknown>>;
+type ExposeSchema = Record<string, Token>;
 
 type InferExpose<E extends ExposeSchema> = {
-  [K in keyof E]: E[K] extends { async: true; token: Token<infer T> }
-    ? T
-    : E[K] extends { token: Token<infer T> }
-      ? T
-      : never;
+  [K in keyof E]: E[K] extends Token<infer T> ? T : never;
 };
 
 export type AppOptions<E extends ExposeSchema = Record<string, never>> = AppConfig & {
@@ -53,10 +44,10 @@ class App<E extends Record<string, unknown>> {
   private readonly _root: string;
   private readonly _container: Container;
   private readonly _context: AppContext;
-  private readonly _boots: BootFunction[] = [];
+  private readonly _bootstraps: BootstrapFunction[] = [];
   private readonly _expose?: ExposeSchema;
 
-  private _booted: boolean = false;
+  private _started: boolean = false;
 
   public readonly name: string;
   public readonly debug: boolean;
@@ -89,7 +80,9 @@ class App<E extends Record<string, unknown>> {
       timezone,
       emitter: this.emitter,
       container: this._container,
+      /* istanbul ignore next -- @preserve */
       rootPath: (...paths: string[]) => this.rootPath(...paths),
+      /* istanbul ignore next -- @preserve */
       runtimePath: (...paths: string[]) => this.runtimePath(...paths),
     };
 
@@ -102,8 +95,8 @@ class App<E extends Record<string, unknown>> {
         }
       }
 
-      if (extension.boot) {
-        this._boots.push(extension.boot);
+      if (extension.bootstrap) {
+        this._bootstraps.push(extension.bootstrap);
       }
     }
 
@@ -117,11 +110,7 @@ class App<E extends Record<string, unknown>> {
   async init(): Promise<void> {
     if (this._expose) {
       for (const [key, value] of Object.entries(this._expose)) {
-        this.$[key as keyof E] = (
-          value.async
-            ? await this._container.getAsync(value.token)
-            : this._container.get(value.token)
-        ) as E[typeof key];
+        this.$[key as keyof E] = this._container.get(value) as E[typeof key];
       }
     }
   }
@@ -138,21 +127,17 @@ class App<E extends Record<string, unknown>> {
     return this._container.get(token);
   }
 
-  getAsync<T>(token: Token<T>): Promise<T> {
-    return this._container.getAsync(token);
-  }
-
   async run(): Promise<void> {
-    if (this._booted) {
+    if (this._started) {
       return;
     }
 
-    for (const boot of this._boots) {
-      await boot(this._context);
+    for (const bootstrap of this._bootstraps) {
+      await bootstrap(this._context);
     }
 
     this.emitter.emit("app:ready");
-    this._booted = true;
+    this._started = true;
   }
 
   async dispose(): Promise<void> {

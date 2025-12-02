@@ -89,7 +89,7 @@ export function createMySQLDatabaseExtension<
           },
         },
       ],
-      boot(context) {
+      bootstrap(context) {
         context.container.get(DatabaseService).connect();
       },
     };

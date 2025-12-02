@@ -31,14 +31,11 @@ export const app = await createApp({
       ].filter(Boolean) as LogTarget[],
       {
         loggers: [
-          inNode
-            ? ({
-                category: "app",
-                lowestLevel: "error",
-                sinks: ["app"],
-              } as LoggerEntity)
-            : undefined,
-        ].filter((v) => v != undefined),
+          inNode && {
+            category: "app",
+            sinks: ["app"],
+          },
+        ].filter(Boolean) as LoggerEntity[],
       },
     ),
     inNode && createFileLogExtension(),
@@ -59,9 +56,7 @@ export const app = await createApp({
   ].filter(Boolean) as Extension[],
   providers: [...moduleProviders],
   expose: {
-    logger: {
-      token: LogService,
-    },
+    logger: LogService,
   },
 });
 

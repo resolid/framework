@@ -11,10 +11,7 @@ describe("logExtension", () => {
       debug: true,
       extensions: [createLogExtension([])],
       expose: {
-        logger: {
-          token: LogService,
-          async: true,
-        },
+        logger: LogService,
       },
     });
 

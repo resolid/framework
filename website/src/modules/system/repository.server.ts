@@ -1,5 +1,5 @@
 import { Repository } from "@resolid/app-db-mysql";
-import type { ServiceProvider } from "@resolid/core";
+import type { Provider } from "@resolid/core";
 import { app } from "~/app";
 import { statusTable } from "./schema.server";
 
@@ -15,7 +15,7 @@ export function systemRepository() {
   return app.get(SystemRepository);
 }
 
-export const serviceProvider: ServiceProvider = {
+export const serviceProvider: Provider = {
   token: SystemRepository,
   factory() {
     return new SystemRepository();

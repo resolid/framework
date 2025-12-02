@@ -22,39 +22,3 @@ export function inject<T>(
     throw error;
   }
 }
-
-export function injectAsync<T>(token: Token<T>): Promise<T>;
-export function injectAsync<T>(
-  token: Token<T>,
-  options: { optional: true },
-): Promise<T | undefined>;
-export function injectAsync<T>(token: Token<T>, options: { lazy: true }): () => Promise<T>;
-export function injectAsync<T>(
-  token: Token<T>,
-  options: { lazy: true; optional: true },
-): () => Promise<T | undefined>;
-export function injectAsync<T>(
-  token: Token<T>,
-  options?: { lazy?: boolean; optional?: boolean },
-): Promise<T | undefined> | (() => Promise<T | undefined>) {
-  try {
-    if (options?.lazy) {
-      return InjectionContext.current().run((resolver) =>
-        resolver.getAsync(token, { ...options, lazy: true }),
-      );
-    }
-
-    return InjectionContext.current().runAsync((resolver) =>
-      resolver.getAsync(token, { ...options, lazy: false }),
-    );
-  } catch (error) {
-    if (error instanceof InjectionContextError && options?.optional === true) {
-      if (options?.lazy) {
-        return () => Promise.resolve(undefined);
-      }
-      return Promise.resolve(undefined);
-    }
-
-    return Promise.reject(error);
-  }
-}

@@ -44,9 +44,7 @@ export class LogService {
         default: this._defaultSink ?? getConsoleSink(),
         ...this._config.sinks,
       },
-      filters: {
-        ...this._config.filters,
-      },
+      filters: this._config.filters,
       loggers: [
         { category: ["logtape", "meta"], sinks: [] },
         { category: this._defaultCategory, sinks: ["default"] },
@@ -110,7 +108,7 @@ export function createLogTarget<T>(target: {
 
 export function createLogExtension(
   targets: readonly LogTarget[] = [],
-  config: LogConfig = {},
+  config: Omit<LogConfig, "sinks"> = {},
 ): ExtensionCreator {
   return (context) => {
     return {
@@ -118,22 +116,22 @@ export function createLogExtension(
       providers: [
         {
           token: LogService,
-          factory(resolver) {
+          factory() {
             /* istanbul ignore next -- @preserve */
             const sinks = targets.reduce<Record<string, Sink>>((acc, target) => {
-              const service = resolver.get(target.ref);
+              const service = context.container.get(target.ref);
               return { ...acc, ...target.sinks(service) };
             }, {});
 
             return new LogService({
-              ...config,
               sinks,
+              ...config,
               defaultCategory: config?.defaultCategory ?? context.name,
             });
           },
         },
       ],
-      async boot(context) {
+      async bootstrap(context) {
         await context.container.get(LogService).configure();
       },
     };
