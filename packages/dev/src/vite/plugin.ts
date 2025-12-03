@@ -36,7 +36,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
         },
       };
 
-      if (!reactRouterConfig.future?.unstable_viteEnvironmentApi && !reactRouterConfig.ssrBuild) {
+      if (!reactRouterConfig.future?.v8_viteEnvironmentApi && !reactRouterConfig.ssrBuild) {
         return baseConfig;
       }
 
@@ -49,7 +49,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
         },
       };
 
-      if (reactRouterConfig.future?.unstable_viteEnvironmentApi) {
+      if (reactRouterConfig.future?.v8_viteEnvironmentApi) {
         return {
           ...baseConfig,
           environments: {
@@ -109,7 +109,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
 
           const entry = reactRouterConfig!.entryFile;
 
-          const app = reactRouterConfig!.future?.unstable_viteEnvironmentApi
+          const app = reactRouterConfig!.future?.v8_viteEnvironmentApi
             ? (await (server.environments.ssr as RunnableDevEnvironment).runner.import(entry))[
                 "default"
               ]

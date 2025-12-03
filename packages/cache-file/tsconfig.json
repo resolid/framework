@@ -4,6 +4,9 @@
   "compilerOptions": {
     "allowJs": false,
     "declaration": true,
-    "isolatedDeclarations": true
+    "isolatedDeclarations": true,
+    "paths": {
+      "@resolid/cache": ["../cache/src"]
+    }
   }
 }
