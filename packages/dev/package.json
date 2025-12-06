@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.6",
-    "@react-router/dev": "^7.10.0",
+    "@react-router/dev": "^7.10.1",
     "@vercel/nft": "^1.1.1",
     "fast-glob": "^3.3.3",
     "hono": "^4.10.7",
@@ -66,12 +66,12 @@
   },
   "devDependencies": {
     "@netlify/types": "^2.2.0",
-    "tsdown": "^0.16.8"
+    "tsdown": "^0.17.0"
   },
   "peerDependencies": {
-    "@react-router/node": "^7.10.0",
+    "@react-router/node": "^7.10.1",
     "isbot": "^5.1.32",
-    "react-router": "^7.10.0",
+    "react-router": "^7.10.1",
     "vite": "^7.2.6"
   },
   "engines": {

@@ -19,19 +19,19 @@
     "typegen": "react-router typegen"
   },
   "dependencies": {
-    "@react-router/node": "^7.10.0",
+    "@react-router/node": "^7.10.1",
     "@resolid/app-db-mysql": "workspace:^",
     "@resolid/app-log": "workspace:^",
     "@resolid/app-log-file": "workspace:^",
     "@resolid/core": "workspace:^",
-    "@resolid/react-ui": "https://pkg.pr.new/resolid/react-ui/@resolid/react-ui@9bc6dc3",
+    "@resolid/react-ui": "https://pkg.pr.new/resolid/react-ui/@resolid/react-ui@5dc7950",
     "@tailwindcss/typography": "^0.5.19",
     "@vercel/functions": "^3.3.4",
     "isbot": "^5.1.32",
     "mysql2": "^3.15.3",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
-    "react-router": "^7.10.0",
+    "react-router": "^7.10.1",
     "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
