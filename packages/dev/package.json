@@ -56,7 +56,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.6",
+    "@hono/node-server": "^1.19.7",
     "@react-router/dev": "^7.10.1",
     "@vercel/nft": "^1.1.1",
     "fast-glob": "^3.3.3",
@@ -65,8 +65,8 @@
     "rolldown": "latest"
   },
   "devDependencies": {
-    "@netlify/types": "^2.2.0",
-    "tsdown": "^0.17.0"
+    "@netlify/types": "^2.3.0",
+    "tsdown": "^0.17.2"
   },
   "peerDependencies": {
     "@react-router/node": "^7.10.1",

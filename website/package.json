@@ -35,12 +35,12 @@
     "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
-    "@netlify/types": "^2.2.0",
+    "@netlify/types": "^2.3.0",
     "@resolid/dev": "workspace:^",
     "@tailwindcss/vite": "^4.1.17",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "vite": "^7.2.6",
+    "vite": "^7.2.7",
     "vite-plugin-inspect": "^11.3.3",
     "vite-tsconfig-paths": "^5.1.4"
   },

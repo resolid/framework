@@ -29,17 +29,17 @@
     "@resolid/config": "^3.10.3",
     "@svitejs/changesets-changelog-github-compact": "^1.2.0",
     "@tailwindcss/language-server": "^0.14.29",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.2",
     "@vitest/coverage-v8": "^4.0.15",
     "eslint": "^9.39.1",
-    "lefthook": "^2.0.8",
+    "lefthook": "^2.0.9",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "turbo": "^2.6.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
   },
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.25.0",
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24",
     "pnpm": "10.x"
