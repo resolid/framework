@@ -55,7 +55,7 @@
     "quick-lru": "^7.3.0"
   },
   "devDependencies": {
-    "tsdown": "^0.17.2",
+    "tsdown": "^0.17.4",
     "typescript": "^5.9.3"
   },
   "engines": {

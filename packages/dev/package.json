@@ -60,13 +60,13 @@
     "@react-router/dev": "^7.10.1",
     "@vercel/nft": "^1.1.1",
     "fast-glob": "^3.3.3",
-    "hono": "^4.10.7",
+    "hono": "^4.11.1",
     "minimatch": "^10.1.1",
     "rolldown": "latest"
   },
   "devDependencies": {
     "@netlify/types": "^2.3.0",
-    "tsdown": "^0.17.2"
+    "tsdown": "^0.17.4"
   },
   "peerDependencies": {
     "@react-router/node": "^7.10.1",
