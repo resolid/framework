@@ -7,16 +7,14 @@ import {
   type StreamFileSinkOptions,
 } from "@logtape/file";
 import type { Sink } from "@resolid/app-log";
-import type { ExtensionCreator } from "@resolid/core";
+import type { ExtensionCreator, PathResolver } from "@resolid/core";
 import { mkdir } from "node:fs";
 import { join } from "node:path";
-
-type RuntimePath = (...paths: string[]) => string;
 
 export class FileLogService {
   private readonly _path: string;
 
-  constructor(runtimePath: RuntimePath) {
+  constructor(runtimePath: PathResolver) {
     this._path = runtimePath("logs");
 
     mkdir(this._path, { recursive: true }, () => {});

@@ -11,11 +11,13 @@ export type AppConfig = {
   readonly timezone?: string;
 };
 
+export type PathResolver = (...paths: string[]) => string;
+
 export type AppContext = AppConfig & {
   emitter: Emitter;
   container: Container;
-  rootPath: (...paths: string[]) => string;
-  runtimePath: (...paths: string[]) => string;
+  rootPath: PathResolver;
+  runtimePath: PathResolver;
 };
 
 type BootstrapFunction = (context: AppContext) => void | Promise<void>;

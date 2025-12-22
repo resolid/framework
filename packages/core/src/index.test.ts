@@ -1,9 +1,9 @@
 import { join } from "node:path";
 import { cwd } from "node:process";
 import { describe, expect, it, vi } from "vitest";
-import { createApp, type ExtensionCreator, type Token } from "./index";
+import { createApp, type ExtensionCreator, type PathResolver, type Token } from "./index";
 
-const testPathMethod = (methodFn: (...paths: string[]) => string, basePath: string) => {
+const testPathMethod = (methodFn: PathResolver, basePath: string) => {
   it("should return base path when called with no arguments", () => {
     expect(methodFn()).toBe(basePath);
   });
