@@ -44,7 +44,7 @@
     "@resolid/core": "workspace:^"
   },
   "devDependencies": {
-    "tsdown": "^0.18.1",
+    "tsdown": "^0.18.2",
     "typescript": "^5.9.3"
   },
   "engines": {
