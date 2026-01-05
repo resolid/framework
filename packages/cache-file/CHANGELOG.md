@@ -1,5 +1,14 @@
 # @resolid/cache-file
 
+## 1.0.0
+
+### Patch Changes
+
+- update package export ([`d467466`](https://github.com/resolid/framework/commit/d467466ec8f96cc45d3af0586fb7ff8ad6b3249d))
+
+- Updated dependencies [[`d467466`](https://github.com/resolid/framework/commit/d467466ec8f96cc45d3af0586fb7ff8ad6b3249d)]:
+  - @resolid/cache@0.3.0
+
 ## 0.1.1
 
 ### Patch Changes
