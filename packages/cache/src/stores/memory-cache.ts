@@ -1,5 +1,5 @@
 import QuickLRU from "quick-lru";
-import type { CacheStore } from "../types";
+import type { CacheStore } from "./types";
 
 export class MemoryCache implements CacheStore {
   private readonly _lru: QuickLRU<string, string>;
