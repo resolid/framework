@@ -1,5 +1,11 @@
 # @resolid/cache
 
+## 0.3.0
+
+### Minor Changes
+
+- update package export ([`8a47361`](https://github.com/resolid/framework/commit/8a47361518f00368c151c055f400e27463cca0f5))
+
 ## 0.2.0
 
 ### Minor Changes
