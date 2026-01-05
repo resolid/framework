@@ -29,7 +29,6 @@
       "import": "./dist/index.mjs"
     }
   },
-  "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "files": [
     "dist"
@@ -44,7 +43,7 @@
     "@resolid/app-log": "workspace:^"
   },
   "devDependencies": {
-    "tsdown": "^0.18.2",
+    "tsdown": "^0.18.4",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {

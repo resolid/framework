@@ -4,8 +4,6 @@ export default defineConfig({
   entry: {
     index: "src/index.ts",
     stores: "src/stores.ts",
-    utils: "src/utils/index.ts",
-    types: "src/types/index.ts",
   },
   format: "esm",
   target: "es2022",
