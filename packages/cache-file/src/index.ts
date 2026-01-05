@@ -1,4 +1,4 @@
-import type { CacheStore } from "@resolid/cache/types";
+import type { CacheStore } from "@resolid/cache/stores";
 import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 

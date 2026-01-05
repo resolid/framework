@@ -1,6 +1,6 @@
 import { destr } from "destr";
 import { NullCache } from "./stores/null-cache";
-import type { CacheStore } from "./types";
+import type { CacheStore } from "./stores/types";
 import { normalizeKey } from "./utils";
 
 export interface CacheOptions {

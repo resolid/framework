@@ -42,7 +42,6 @@
       "import": "./dist/vite.mjs"
     }
   },
-  "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "bin": {
     "react-router": "./cli/react-router.js"
@@ -60,13 +59,13 @@
     "@react-router/dev": "^7.11.0",
     "@vercel/nft": "^1.1.1",
     "fast-glob": "^3.3.3",
-    "hono": "^4.11.1",
+    "hono": "^4.11.3",
     "minimatch": "^10.1.1",
     "rolldown": "latest"
   },
   "devDependencies": {
     "@netlify/types": "^2.3.0",
-    "tsdown": "^0.18.2"
+    "tsdown": "^0.18.4"
   },
   "peerDependencies": {
     "@react-router/node": "^7.11.0",
