@@ -39,7 +39,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@logtape/file": "^1.3.5",
+    "@logtape/file": "^1.3.6",
     "@resolid/app-log": "workspace:^"
   },
   "devDependencies": {
@@ -50,7 +50,7 @@
     "@resolid/core": "workspace:^"
   },
   "engines": {
-    "node": "^20.19.0 || ^22.13.0 || >=24"
+    "node": "^22.13.0 || >=24"
   },
   "publishConfig": {
     "access": "public",
