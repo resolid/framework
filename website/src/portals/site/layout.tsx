@@ -9,6 +9,7 @@ import {
 import { Link, Outlet } from "react-router";
 import { HistoryLink } from "~/components/history-link";
 import { ResolidLogo } from "~/components/resolid-logo";
+import { ResolidUiLogo } from "~/components/resolid-ui-logo";
 import { SpriteIcon } from "~/components/sprite-icon";
 
 export default function SiteLayout() {
@@ -46,6 +47,26 @@ export default function SiteLayout() {
               <TooltipContent>
                 <TooltipArrow />
                 Github 上的 Resolid Framework
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip placement={"bottom"}>
+              <TooltipTrigger
+                render={(props) => (
+                  <a
+                    {...props}
+                    className={"ms-3 hidden hover:text-fg-primary md:block"}
+                    aria-label="Resolid UI"
+                    href={"https://ui.resolid.tech"}
+                    target={"_blank"}
+                    rel={"noreferrer"}
+                  >
+                    <ResolidUiLogo height={16} />
+                  </a>
+                )}
+              />
+              <TooltipContent>
+                <TooltipArrow />
+                访问 Resolid UI
               </TooltipContent>
             </Tooltip>
           </div>
