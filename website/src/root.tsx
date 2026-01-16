@@ -1,6 +1,7 @@
 import { ConfigProvider } from "@resolid/react-ui";
 import type { PropsWithChildren } from "react";
 import { Outlet, Scripts, ScrollRestoration } from "react-router";
+import { ErrorComponent } from "~/components/error-component";
 import { RouteProcessBar } from "~/components/route-process-bar";
 import { VercelAnalytics } from "~/extensions/vercel/vercel-analytics";
 import { VercelSpeedInsights } from "~/extensions/vercel/vercel-speed-insights";
@@ -46,6 +47,8 @@ export const Layout = ({ children }: PropsWithChildren) => {
     </html>
   );
 };
+
+export const ErrorBoundary = ErrorComponent;
 
 export default function Root() {
   return <Outlet />;

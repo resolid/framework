@@ -7,6 +7,7 @@ import {
   TooltipTrigger,
 } from "@resolid/react-ui";
 import { Link, Outlet } from "react-router";
+import { ColorModeToggle } from "~/components/color-mode-toggle";
 import { HistoryLink } from "~/components/history-link";
 import { ResolidLogo } from "~/components/resolid-logo";
 import { ResolidUiLogo } from "~/components/resolid-ui-logo";
@@ -21,6 +22,7 @@ export default function SiteLayout() {
             <ResolidLogo />
           </Link>
           <div className={"inline-flex items-center gap-1 text-fg-muted"}>
+            <ColorModeToggle />
             <Tooltip placement={"bottom"}>
               <TooltipTrigger
                 render={(props) => (
