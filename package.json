@@ -26,7 +26,7 @@
     "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^20.3.1",
     "@commitlint/config-conventional": "^20.3.1",
-    "@resolid/config": "^3.10.3",
+    "@resolid/config": "^3.10.4",
     "@svitejs/changesets-changelog-github-compact": "^1.2.0",
     "@tailwindcss/language-server": "^0.14.29",
     "@types/node": "^24.10.9",
@@ -35,7 +35,7 @@
     "lefthook": "^2.0.15",
     "prettier": "^3.8.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "turbo": "^2.7.4",
+    "turbo": "^2.7.5",
     "typescript": "^5.9.3",
     "vitest": "^4.0.17"
   },
