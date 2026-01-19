@@ -3,7 +3,7 @@ import { SpriteIcon } from "~/components/sprite-icon";
 
 export default function HomeIndex() {
   return (
-    <div className={"max-w-3xl mx-auto prose px-4 py-8 dark:prose-invert"}>
+    <main className={"max-w-3xl mx-auto prose px-4 py-8 dark:prose-invert"}>
       <h1 className={"mt-16 text-center text-[3rem] leading-normal font-[800] md:text-[4rem]"}>
         Resolid
       </h1>
@@ -32,6 +32,6 @@ export default function HomeIndex() {
           )}
         />
       </div>
-    </div>
+    </main>
   );
 }
