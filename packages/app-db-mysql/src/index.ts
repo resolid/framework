@@ -1,7 +1,7 @@
 import { BaseRepository, type DatabaseConfig, DatabaseService } from "@resolid/app-db";
 import type { Emitter, ExtensionCreator } from "@resolid/core";
 import type { Simplify } from "drizzle-orm";
-import type { Mode } from "drizzle-orm/mysql-core";
+import { type Mode, mysqlTableCreator, type MySqlTableFn } from "drizzle-orm/mysql-core";
 import { drizzle, type MySql2Database, type MySql2DrizzleConfig } from "drizzle-orm/mysql2";
 import mysql, { type ConnectionOptions, type Pool } from "mysql2";
 
@@ -94,4 +94,8 @@ export function createMySQLDatabaseExtension<
       },
     };
   };
+}
+
+export function createDefineTable(prefix = ""): MySqlTableFn {
+  return mysqlTableCreator((name) => prefix + name);
 }

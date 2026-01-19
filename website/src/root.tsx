@@ -1,4 +1,5 @@
 import { ConfigProvider } from "@resolid/react-ui";
+import zhCN from "@resolid/react-ui/locales/zh-CN";
 import type { PropsWithChildren } from "react";
 import { Outlet, Scripts, ScrollRestoration } from "react-router";
 import { ErrorComponent } from "~/components/error-component";
@@ -9,10 +10,8 @@ import { VercelSpeedInsights } from "~/extensions/vercel/vercel-speed-insights";
 import style from "./root.css?url";
 
 export const Layout = ({ children }: PropsWithChildren) => {
-  const defaultLocale = "zh-CN";
-
   return (
-    <html lang={defaultLocale} suppressHydrationWarning>
+    <html lang={"zh-CN"} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -29,7 +28,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
       </head>
       <body className={"min-h-screen overflow-y-scroll"}>
         <RouteProcessBar />
-        <ConfigProvider locale={defaultLocale} colorMode={{ disableTransition: true }}>
+        <ConfigProvider locale={zhCN} colorMode={{ disableTransition: true }}>
           {children}
         </ConfigProvider>
         <ScrollRestoration />

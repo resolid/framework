@@ -1,6 +1,6 @@
 import { resolidVite } from "@resolid/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
-import { join } from "node:path";
+import { extname, join } from "node:path";
 import { type AliasOptions, defineConfig, type Plugin, type UserConfig } from "vite";
 import { analyzer } from "vite-bundle-analyzer";
 import viteBabel from "vite-plugin-babel";
@@ -32,6 +32,9 @@ export default defineConfig(({ command }) => {
               },
             ],
           ],
+        },
+        loader: (path) => {
+          return extname(path).substring(1) as "js" | "jsx";
         },
       }),
       {
