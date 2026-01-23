@@ -40,8 +40,8 @@ importers:
         specifier: ^20.3.1
         version: 20.3.1
       '@resolid/config':
-        specifier: ^3.10.4
-        version: 3.10.4(@typescript-eslint/parser@8.53.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(prettier@3.8.1)(typescript@5.9.3)
+        specifier: ^4.0.1
+        version: 4.0.1(@typescript-eslint/parser@8.53.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(prettier@3.8.1)(typescript@5.9.3)
       '@svitejs/changesets-changelog-github-compact':
         specifier: ^1.2.0
         version: 1.2.0
@@ -276,8 +276,8 @@ importers:
         specifier: workspace:^
         version: link:../packages/core
       '@resolid/react-ui':
-        specifier: https://pkg.pr.new/resolid/react-ui/@resolid/react-ui@17588f6
-        version: https://pkg.pr.new/resolid/react-ui/@resolid/react-ui@17588f6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.9.3)
+        specifier: https://pkg.pr.new/@resolid/react-ui@de4db2a
+        version: https://pkg.pr.new/@resolid/react-ui@de4db2a(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.9.3)
       '@tailwindcss/typography':
         specifier: ^0.5.19
         version: 0.5.19(tailwindcss@4.1.18)
@@ -1071,8 +1071,8 @@ packages:
   '@remix-run/node-fetch-server@0.9.0':
     resolution: {integrity: sha512-SoLMv7dbH+njWzXnOY6fI08dFMI5+/dQ+vY3n8RnnbdG7MdJEgiP28Xj/xWlnRnED/aB6SFw56Zop+LbmaaKqA==}
 
-  '@resolid/config@3.10.4':
-    resolution: {integrity: sha512-2HZkHGYwQCiLn/rh3tsdUr4q4ZN7TgMn2pQ/eMVJeYW00IPCVHiO3roMHJq3yJDIu2qObNlZzVDAWFkm3oz4JQ==}
+  '@resolid/config@4.0.1':
+    resolution: {integrity: sha512-XJupm9ZiFDrLQDOtMtCJcJW492g2ft98cXJX2AgHGbb0y9bldQvmr0FLfbxyB6u7Fm5TfD8Vqh/e8N6wT5q8Qw==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
     peerDependencies:
       eslint: ^9.39.1
@@ -1082,9 +1082,9 @@ packages:
       typescript:
         optional: true
 
-  '@resolid/react-ui@https://pkg.pr.new/resolid/react-ui/@resolid/react-ui@17588f6':
-    resolution: {tarball: https://pkg.pr.new/resolid/react-ui/@resolid/react-ui@17588f6}
-    version: 0.0.0
+  '@resolid/react-ui@https://pkg.pr.new/@resolid/react-ui@de4db2a':
+    resolution: {integrity: sha512-TZ5JwMnYfvBX8l1wFa+rAAJCJruYHyesnZ0AVJgMOD0PQqqajB3OqCzE4QxDGUG5DXEVVNNdt2SPxOznCIkL2Q==, tarball: https://pkg.pr.new/@resolid/react-ui@de4db2a}
+    version: 0.1.1
     peerDependencies:
       react: ^19.2.3
       react-dom: ^19.2.3
@@ -1783,8 +1783,8 @@ packages:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
     engines: {node: '>=6'}
 
-  caniuse-lite@1.0.30001765:
-    resolution: {integrity: sha512-LWcNtSyZrakjECqmpP4qdg0MMGdN368D7X8XvvAqOcqMv0RxnlqVKZl2V6/mBR68oYMxOZPLw/gO7DuisMHUvQ==}
+  caniuse-lite@1.0.30001766:
+    resolution: {integrity: sha512-4C0lfJ0/YPjJQHagaE9x2Elb69CIqEPZeG0anQt9SIvIoOH4a4uaRl73IavyO+0qZh6MDLH//DrXThEYKHkmYA==}
 
   chai@6.2.2:
     resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
@@ -4523,7 +4523,7 @@ snapshots:
 
   '@remix-run/node-fetch-server@0.9.0': {}
 
-  '@resolid/config@3.10.4(@typescript-eslint/parser@8.53.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(prettier@3.8.1)(typescript@5.9.3)':
+  '@resolid/config@4.0.1(@typescript-eslint/parser@8.53.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(prettier@3.8.1)(typescript@5.9.3)':
     dependencies:
       '@eslint/js': 9.39.2
       eslint: 9.39.2(jiti@2.6.1)
@@ -4544,7 +4544,7 @@ snapshots:
       - supports-color
       - vue-tsc
 
-  '@resolid/react-ui@https://pkg.pr.new/resolid/react-ui/@resolid/react-ui@17588f6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.9.3)':
+  '@resolid/react-ui@https://pkg.pr.new/@resolid/react-ui@de4db2a(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(typescript@5.9.3)':
     dependencies:
       '@floating-ui/react': 0.27.16(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@resolid/utils': 1.2.0(typescript@5.9.3)
@@ -5118,7 +5118,7 @@ snapshots:
   browserslist@4.28.1:
     dependencies:
       baseline-browser-mapping: 2.9.17
-      caniuse-lite: 1.0.30001765
+      caniuse-lite: 1.0.30001766
       electron-to-chromium: 1.5.277
       node-releases: 2.0.27
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
@@ -5133,7 +5133,7 @@ snapshots:
 
   callsites@3.1.0: {}
 
-  caniuse-lite@1.0.30001765: {}
+  caniuse-lite@1.0.30001766: {}
 
   chai@6.2.2: {}
 
