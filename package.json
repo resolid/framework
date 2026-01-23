@@ -30,16 +30,16 @@
     "@svitejs/changesets-changelog-github-compact": "^1.2.0",
     "@tailwindcss/language-server": "^0.14.29",
     "@types/node": "^24.10.9",
-    "@vitest/coverage-v8": "^4.0.17",
+    "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9.39.2",
     "lefthook": "^2.0.15",
-    "prettier": "^3.8.0",
+    "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "turbo": "^2.7.5",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.17"
+    "vitest": "^4.0.18"
   },
-  "packageManager": "pnpm@10.28.0",
+  "packageManager": "pnpm@10.28.1",
   "engines": {
     "node": "^22.13.0 || >=24",
     "pnpm": "10.x"

@@ -97,7 +97,7 @@ export async function buildPreset<BuildContext>({
       input: buildFile,
       output: {
         file: bundleFile,
-        inlineDynamicImports: true,
+        codeSplitting: false,
         legalComments: "none",
       },
       platform: "node",
