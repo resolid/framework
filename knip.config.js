@@ -1,0 +1,29 @@
+export default {
+  workspaces: {
+    website: {
+      entry: [
+        "src/server.ts",
+        "src/routes.ts",
+        "src/root.tsx",
+        "src/entry.{client,server}.tsx",
+        "src/portals/**/*.tsx",
+      ],
+      project: "src/**/*.{ts,tsx,css}",
+    },
+    "packages/*": {},
+    "packages/dev": {},
+  },
+
+  ignoreBinaries: ["only-allow"],
+
+  ignoreDependencies: [
+    "@changesets/cli",
+    "@tailwindcss/language-server",
+    "babel-plugin-react-compiler",
+  ],
+
+  compilers: {
+    css: (text) =>
+      [...text.matchAll(/(?<=@)(import|plugin)[^;]+/g)].join("\n").replace("plugin", "import"),
+  },
+};

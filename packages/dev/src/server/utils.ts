@@ -11,10 +11,8 @@ import {
 } from "react-router";
 
 import type { Http2Bindings, HttpBindings } from "@hono/node-server";
-import type { Context as HonoContext } from "hono";
 
 export type NodeEnv = { Bindings: HttpBindings | Http2Bindings };
-export type { HonoContext };
 
 type ReactRouterAppLoadContext = UNSAFE_MiddlewareEnabled extends true
   ? RouterContextProvider

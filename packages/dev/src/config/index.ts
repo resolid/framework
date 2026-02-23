@@ -11,7 +11,15 @@ export type VitePluginOptions = {
   devExclude?: (string | RegExp)[];
 };
 
-export type ReactRouterConfig = Omit<Config, "appDirectory" | "ssr">;
+export type ReactRouterConfig = Omit<
+  Config,
+  "appDirectory" | "ssr" | "serverModuleFormat" | "future"
+> & {
+  future?: Omit<
+    Config["future"],
+    "v8_middleware" | "v8_splitRouteModules" | "v8_viteEnvironmentApi"
+  >;
+};
 
 export type DevConfigOptions = Partial<VitePluginOptions> & {
   appDirectory?: string;
@@ -30,13 +38,15 @@ export const defineDevConfig = ({
   entryFile = "server.ts",
   appDirectory = "src",
   includeFiles = [],
-  reactRouterConfig,
+  reactRouterConfig = {},
   devExclude,
 }: DevConfigOptions): DevConfig => {
   const presetDefine =
     platform == "netlify" ? netlifyPreset : platform == "vercel" ? vercelPreset : nodePreset;
 
   const preset = presetDefine({ nodeVersion, includeFiles });
+
+  const { future, presets, ...restConfig } = reactRouterConfig;
 
   return {
     vitePluginOptions: {
@@ -46,10 +56,17 @@ export const defineDevConfig = ({
       devExclude,
     },
     reactRouterConfig: {
-      ...reactRouterConfig,
+      ...restConfig,
       appDirectory,
       ssr: true,
-      presets: reactRouterConfig?.presets ? [...reactRouterConfig.presets, preset] : [preset],
+      serverModuleFormat: "esm",
+      presets: presets ? [...presets, preset] : [preset],
+      future: {
+        v8_middleware: true,
+        v8_splitRouteModules: true,
+        v8_viteEnvironmentApi: true,
+        ...reactRouterConfig.future,
+      },
     },
   };
 };

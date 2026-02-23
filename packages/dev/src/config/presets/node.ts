@@ -1,7 +1,7 @@
 import type { Preset } from "@react-router/dev/config";
 import { buildPreset, type PresetBaseOptions } from "../utils";
 
-export type NodePresetOptions = PresetBaseOptions;
+type NodePresetOptions = PresetBaseOptions;
 
 export const nodePreset = (options: NodePresetOptions): Preset => {
   const nodeVersion = options.nodeVersion;

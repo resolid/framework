@@ -21,7 +21,7 @@ export const HistoryNavLink = (props: NavLinkProps) => {
   return <NavLink to={to} state={{ ...state, previous: true }} {...rest} />;
 };
 
-export type HistoryBackProps = ButtonProps & { backTo?: string | Partial<Path> };
+type HistoryBackProps = ButtonProps & { backTo?: string | Partial<Path> };
 
 export const HistoryBack = (props: PrimitiveProps<"button", HistoryBackProps, "children">) => {
   const { onClick, backTo = "/", ...rest } = props;

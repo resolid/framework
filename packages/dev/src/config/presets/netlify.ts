@@ -10,7 +10,7 @@ import {
   type PresetBaseOptions,
 } from "../utils";
 
-export type NetlifyPresetOptions = PresetBaseOptions;
+type NetlifyPresetOptions = PresetBaseOptions;
 
 export const netlifyPreset = (options: NetlifyPresetOptions): Preset => {
   const nodeVersion = options.nodeVersion;

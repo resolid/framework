@@ -1,0 +1,49 @@
+{
+  "name": "Resolid",
+  "short_name": "resolid",
+  "start_url": "/",
+  "theme_color": "#0969da",
+  "background_color": "#ffffff",
+  "description": "使用 React Router 驱动的全栈网站，展示使用现代 Web 技术构建高性能、可扩展和用户友好的 Web 应用程序的最佳实践。",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay"],
+  "icons": [
+    {
+      "src": "icons/pwa-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/sc-desktop.webp",
+      "sizes": "1280x1113",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "Resolid 主页"
+    },
+    {
+      "src": "/images/sc-mobile.webp",
+      "sizes": "583x1080",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "Resolid 移动主页"
+    }
+  ]
+}

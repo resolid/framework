@@ -1,9 +1,8 @@
 import { isRouteErrorResponse } from "react-router";
 import { HistoryBack } from "~/components/history-link";
+import type { Route } from "../../.react-router/types/src/+types/root";
 
-export type ErrorComponentProps = { error: unknown };
-
-export const ErrorComponent = ({ error }: ErrorComponentProps) => {
+export const ErrorComponent = ({ error }: Route.ErrorBoundaryProps) => {
   if (isRouteErrorResponse(error) && error.status == 404) {
     return (
       <div className={"relative mx-auto flex max-w-144 justify-center px-4 py-8"}>
@@ -33,6 +32,7 @@ export const ErrorComponent = ({ error }: ErrorComponentProps) => {
       <div className={"max-w-2xl mx-auto prose px-4 py-8 dark:prose-invert"}>
         <h1 className={"text-center"}>发生了错误</h1>
         <p>{error.message}</p>
+        <p>请求 Id:</p>
         <p>堆栈跟踪:</p>
         <pre className={"scrollbar scrollbar-base max-h-60"}>{error.stack}</pre>
         <div className={"not-prose mt-12 text-center"}>

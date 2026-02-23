@@ -1,13 +1,16 @@
 import { ConfigProvider } from "@resolid/react-ui";
 import zhCN from "@resolid/react-ui/locales/zh-CN";
 import type { PropsWithChildren } from "react";
-import { Outlet, Scripts, ScrollRestoration } from "react-router";
+import { Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { ErrorComponent } from "~/components/error-component";
 import { RouteProcessBar } from "~/components/route-process-bar";
 import { VercelAnalytics } from "~/extensions/vercel/vercel-analytics";
 import { VercelSpeedInsights } from "~/extensions/vercel/vercel-speed-insights";
+import { requestIdMiddleware } from "./extensions/middlewares/request-id.server";
 
 import style from "./root.css?url";
+
+export const middleware = [requestIdMiddleware];
 
 export const Layout = ({ children }: PropsWithChildren) => {
   return (
@@ -16,13 +19,10 @@ export const Layout = ({ children }: PropsWithChildren) => {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#0969da" />
-        <title>Resolid</title>
-        <meta
-          name="description"
-          content="A modern full-stack framework for building fast, scalable, and maintainable web applications."
-        />
+        <link rel="manifest" href="/manifest.webmanifest" crossOrigin="use-credentials" />
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
+        <Meta />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="stylesheet" href={style} />
       </head>

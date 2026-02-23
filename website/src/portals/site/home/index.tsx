@@ -8,8 +8,8 @@ export default function HomeIndex() {
         Resolid
       </h1>
       <p className={"text-center"}>
-        A modern full-stack framework for building fast, scalable, and maintainable web
-        applications.
+        使用 React Router 驱动的全栈网站，展示使用现代 Web 技术构建高性能、可扩展和用户友好的 Web
+        应用程序的最佳实践。
       </p>
       <div className={"not-prose mt-10 inline-flex w-full items-center justify-center gap-9"}>
         <Button color={"neutral"} size={"xl"}>

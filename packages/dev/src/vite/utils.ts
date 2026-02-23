@@ -5,7 +5,7 @@ import type { UserConfig } from "vite";
 import { normalizePath } from "vite";
 import type { VitePluginOptions } from "../config";
 
-export type ReactRouterPluginContext = {
+type ReactRouterPluginContext = {
   rootDirectory: string;
   reactRouterConfig: Required<ReactRouterConfig>;
   environmentBuildContext: { name: "client" | "ssr" } | null;

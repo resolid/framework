@@ -13,13 +13,11 @@ export { index, layout, route };
 
 export type { RouteConfigEntry };
 
-export const relativeFactory = (
-  directory: string,
-): {
+export function relativeFactory(directory: string): {
   route: typeof route;
   index: typeof index;
   layout: typeof layout;
-} => {
+} {
   const appDirectory = getAppDirectory();
 
   return {
@@ -48,4 +46,4 @@ export const relativeFactory = (
       );
     },
   };
-};
+}

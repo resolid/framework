@@ -33,6 +33,14 @@
       "types": "./dist/routes.d.mts",
       "import": "./dist/routes.mjs"
     },
+    "./router": {
+      "types": "./dist/router.d.mts",
+      "import": "./dist/router.mjs"
+    },
+    "./router.server": {
+      "types": "./dist/router.server.d.mts",
+      "import": "./dist/router.server.mjs"
+    },
     "./server": {
       "types": "./dist/server.d.mts",
       "import": "./dist/server.mjs"
@@ -57,10 +65,11 @@
   "dependencies": {
     "@hono/node-server": "^1.19.9",
     "@react-router/dev": "^7.13.0",
+    "@resolid/utils": "^1.2.5",
     "@vercel/nft": "^1.3.1",
     "fast-glob": "^3.3.3",
-    "hono": "^4.11.9",
-    "minimatch": "^10.1.2",
+    "hono": "^4.12.2",
+    "minimatch": "^10.2.2",
     "rolldown": "latest"
   },
   "devDependencies": {

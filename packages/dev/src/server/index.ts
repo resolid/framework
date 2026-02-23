@@ -7,13 +7,15 @@ import {
   type HonoNetlifyServerOptions,
   type NetlifyContext,
 } from "./platforms/netlify";
-import { createHonoNodeServer, type HonoNodeServerOptions } from "./platforms/node";
+import { cache, createHonoNodeServer, type HonoNodeServerOptions } from "./platforms/node";
 import { createHonoVercelServer, type HonoVercelServerOptions } from "./platforms/vercel";
 import type { NodeEnv } from "./utils";
 
 export type { Hono, HonoContext, NetlifyContext, NodeEnv };
 
 type PlatformConfig<T> = (config: T | undefined) => T | undefined;
+
+export const cacheControl: typeof cache = cache;
 
 export const nodeConfig: PlatformConfig<HonoNodeServerOptions> = (config) => config;
 

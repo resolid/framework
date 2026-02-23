@@ -9,7 +9,7 @@ import {
   type PresetBaseOptions,
 } from "../utils";
 
-export type VercelPresetOptions = PresetBaseOptions;
+type VercelPresetOptions = PresetBaseOptions;
 
 export const vercelPreset = (options: VercelPresetOptions): Preset => {
   const nodeVersion = options.nodeVersion;
