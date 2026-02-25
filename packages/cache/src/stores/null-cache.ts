@@ -1,4 +1,4 @@
-import type { CacheStore } from "../types";
+import type { CacheStore } from "./types";
 
 export class NullCache implements Required<CacheStore> {
   async get<T>(_key: string): Promise<T> {
