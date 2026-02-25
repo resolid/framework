@@ -1,5 +1,5 @@
 import { destr } from "destr";
-import type { CacheStore } from "./types";
+import type { CacheStore } from "./stores/types";
 import { NullCache } from "./stores/null-cache";
 import { normalizeKey } from "./utils";
 
