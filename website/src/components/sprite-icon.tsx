@@ -1,12 +1,12 @@
 import { tx } from "@resolid/react-ui";
 import spriteIcons from "~/assets/icons/sprite.svg";
 
-type SpriteIconProps = {
+interface SpriteIconProps {
   name: string;
   size?: string | number;
   color?: string;
   className?: string;
-};
+}
 
 export const SpriteIcon = (props: SpriteIconProps) => {
   const { name, size = "1em", color, className } = props;

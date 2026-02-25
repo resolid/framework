@@ -4,37 +4,41 @@
   "private": true,
   "description": "Logging module for Resolid applications",
   "keywords": [
-    "resolid",
     "log",
     "logger",
-    "logging"
+    "logging",
+    "resolid"
   ],
   "homepage": "https://www.resolid.tech",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/resolid/framework.git",
-    "directory": "packages/app-log"
-  },
   "license": "MIT",
   "author": {
     "name": "Huijie Wei",
     "email": "hello@resolid.tech"
   },
-  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/resolid/framework.git",
+    "directory": "packages/app-log"
+  },
+  "files": [
+    "dist"
+  ],
   "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     }
   },
-  "types": "./dist/index.d.mts",
-  "files": [
-    "dist"
-  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsdown",
-    "lint": "eslint .",
+    "lint": "oxlint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
@@ -48,9 +52,5 @@
   },
   "engines": {
     "node": "^22.13.0 || >=24"
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
   }
 }

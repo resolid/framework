@@ -6,13 +6,11 @@ export async function loader() {
   httpNotFound();
 }
 
-export const meta = mergeMeta(() => {
-  return [
-    {
-      title: "页面未找到",
-    },
-  ];
-});
+export const meta = mergeMeta(() => [
+  {
+    title: "页面未找到",
+  },
+]);
 
 export default function Catchall() {
   return null;

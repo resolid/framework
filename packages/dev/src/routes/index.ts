@@ -21,29 +21,26 @@ export function relativeFactory(directory: string): {
   const appDirectory = getAppDirectory();
 
   return {
-    route: (path, file, ...rest) => {
-      return route(
+    route: (path, file, ...rest) =>
+      route(
         path,
         relative(appDirectory, resolve(directory, file)),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(rest as any),
-      );
-    },
+      ),
 
-    index: (file, ...rest) => {
-      return index(
+    index: (file, ...rest) =>
+      index(
         relative(appDirectory, resolve(directory, file)),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(rest as any),
-      );
-    },
+      ),
 
-    layout: (file, ...rest) => {
-      return layout(
+    layout: (file, ...rest) =>
+      layout(
         relative(appDirectory, resolve(directory, file)),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(rest as any),
-      );
-    },
+      ),
   };
 }

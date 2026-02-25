@@ -10,8 +10,12 @@ export default {
       ],
       project: "src/**/*.{ts,tsx,css}",
     },
-    "packages/*": {},
-    "packages/dev": {},
+    "packages/*": {
+      ignore: ["oxlint.config.ts"],
+    },
+    "packages/dev": {
+      ignore: ["oxlint.config.ts"],
+    },
   },
 
   ignoreBinaries: ["only-allow"],

@@ -3,11 +3,11 @@ import { type Disposable, type Resolver, type Token, toString } from "../shared"
 
 export type Scope = "singleton" | "transient";
 
-export type Provider<T = unknown> = {
+export interface Provider<T = unknown> {
   token: Token<T>;
   factory: () => T;
   scope?: Scope;
-};
+}
 
 export class Container implements Resolver, Disposable {
   private readonly _providers = new Map<Token, Provider>();
@@ -44,9 +44,7 @@ export class Container implements Resolver, Disposable {
     this._constructing.push(token);
 
     try {
-      const value = new InjectionContext(this).run(() => {
-        return provider.factory();
-      });
+      const value = new InjectionContext(this).run(() => provider.factory());
 
       if (singleton) {
         this._singletons.set(token, value);
@@ -66,7 +64,8 @@ export class Container implements Resolver, Disposable {
   get<T>(token: Token<T>, options: { optional: true }): T | undefined;
   get<T>(token: Token<T>, options: { lazy: true }): () => T;
   get<T>(token: Token<T>, options: { lazy: true; optional: true }): () => T | undefined;
-  get<T>(token: Token<T>, options: { lazy?: false; optional?: boolean }): T | undefined;
+  // oxlint-disable-next-line typescript/unified-signatures
+  get<T>(token: Token<T>, options: { lazy: false; optional?: boolean }): T | undefined;
   get<T>(
     token: Token<T>,
     options?: { lazy?: boolean; optional?: boolean },
@@ -88,6 +87,7 @@ export class Container implements Resolver, Disposable {
       /* istanbul ignore else -- @preserve */
       if (typeof (instance as Disposable).dispose === "function") {
         try {
+          // oxlint-disable-next-line no-await-in-loop
           await (instance as Disposable).dispose();
         } catch (err) {
           errorCount++;

@@ -17,48 +17,44 @@ import { ResolidUiLogo } from "~/components/resolid-ui-logo";
 import { SpriteIcon } from "~/components/sprite-icon";
 import type { Route } from "./+types/layout";
 
-const NavMenu = ({ onClick }: { onClick?: MouseEventHandler<HTMLAnchorElement> }) => {
-  return (
-    <ul
-      className={tx(
-        "mx-auto flex max-w-80 list-none flex-col justify-end p-4 text-center font-medium tracking-widest",
-        "md:max-w-none md:flex-row md:p-0 md:tracking-normal",
-      )}
-    >
-      {[
-        { name: "主页", href: "", end: true },
-        { name: "关于", href: "about" },
-      ].map((menu) => {
-        return (
-          <li className={"p-2.5 md:px-4"} key={menu.name}>
-            <HistoryNavLink
-              className={({ isActive }) =>
-                tx("block hover:text-link-hovered", isActive && "text-link-pressed")
-              }
-              onClick={onClick}
-              to={menu.href}
-              end={menu.end}
-            >
-              {menu.name}
-            </HistoryNavLink>
-          </li>
-        );
-      })}
-      <li className={"inline-flex justify-center p-5 md:hidden"}>
-        <a href={"https://ui.resolid.tech"} target={"_blank"} rel={"noreferrer"}>
-          <ResolidUiLogo height={16} />
-        </a>
+const NavMenu = ({ onClick }: { onClick?: MouseEventHandler<HTMLAnchorElement> }) => (
+  <ul
+    className={tx(
+      "mx-auto flex max-w-80 list-none flex-col justify-end p-4 text-center font-medium tracking-widest",
+      "md:max-w-none md:flex-row md:p-0 md:tracking-normal",
+    )}
+  >
+    {[
+      { name: "主页", href: "", end: true },
+      { name: "关于", href: "about" },
+    ].map((menu) => (
+      <li className="p-2.5 md:px-4" key={menu.name}>
+        <HistoryNavLink
+          className={({ isActive }) =>
+            tx("block hover:text-link-hovered", isActive && "text-link-pressed")
+          }
+          onClick={onClick}
+          to={menu.href}
+          end={menu.end}
+        >
+          {menu.name}
+        </HistoryNavLink>
       </li>
-    </ul>
-  );
-};
+    ))}
+    <li className="inline-flex justify-center p-5 md:hidden">
+      <a href="https://ui.resolid.tech" target="_blank" rel="noreferrer">
+        <ResolidUiLogo height={16} />
+      </a>
+    </li>
+  </ul>
+);
 
 const NavBar = () => {
   const [opened, setOpened] = useState(false);
 
   return (
     <nav className="mx-auto flex h-16 items-center justify-between gap-4 px-4 xl:max-w-288">
-      <Link to={"/"} aria-label={"Resolid"}>
+      <Link to="/" aria-label="Resolid">
         <ResolidLogo />
       </Link>
       <div
@@ -70,26 +66,26 @@ const NavBar = () => {
       >
         <NavMenu onClick={() => setOpened(false)} />
       </div>
-      <div className={"inline-flex items-center gap-1 text-fg-muted"}>
+      <div className="inline-flex items-center gap-1 text-fg-muted">
         <ColorModeToggle />
-        <Tooltip placement={"bottom"}>
+        <Tooltip placement="bottom">
           <TooltipTrigger
             render={(props) => (
               <Button
                 {...props}
-                aria-label={"Github 上的 Resolid Framework"}
-                color={"neutral"}
-                variant={"ghost"}
-                size={"sm"}
+                aria-label="Github 上的 Resolid Framework"
+                color="neutral"
+                variant="ghost"
+                size="sm"
                 iconOnly
-                render={(props) => (
+                render={(buttonProps) => (
                   <a
-                    {...props}
-                    href={"https://github.com/resolid/framework"}
-                    target={"_blank"}
-                    rel={"noreferrer"}
+                    {...buttonProps}
+                    href="https://github.com/resolid/framework"
+                    target="_blank"
+                    rel="noreferrer"
                   >
-                    <SpriteIcon size={"1.5em"} name={"github"} />
+                    <SpriteIcon size="1.5em" name="github" />
                   </a>
                 )}
               />
@@ -100,16 +96,16 @@ const NavBar = () => {
             Github 上的 Resolid Framework
           </TooltipContent>
         </Tooltip>
-        <Tooltip placement={"bottom"}>
+        <Tooltip placement="bottom">
           <TooltipTrigger
             render={(props) => (
               <a
                 {...props}
-                className={"ms-3 hidden hover:text-fg-primary md:block"}
+                className="ms-3 hidden hover:text-fg-primary md:block"
                 aria-label="Resolid UI"
-                href={"https://ui.resolid.tech"}
-                target={"_blank"}
-                rel={"noreferrer"}
+                href="https://ui.resolid.tech"
+                target="_blank"
+                rel="noreferrer"
               >
                 <ResolidUiLogo height={16} />
               </a>
@@ -121,18 +117,18 @@ const NavBar = () => {
           </TooltipContent>
         </Tooltip>
         <Button
-          aria-label={"导航菜单"}
-          color={"neutral"}
-          variant={"ghost"}
-          size={"sm"}
+          aria-label="导航菜单"
+          color="neutral"
+          variant="ghost"
+          size="sm"
           iconOnly
-          className={"md:hidden"}
+          className="md:hidden"
           onClick={() => setOpened((prev) => !prev)}
         >
           {opened ? (
-            <SpriteIcon size={"1.5em"} name={"close"} />
+            <SpriteIcon size="1.5em" name="close" />
           ) : (
-            <SpriteIcon size={"1.5em"} name={"menu"} />
+            <SpriteIcon size="1.5em" name="menu" />
           )}
         </Button>
       </div>
@@ -213,7 +209,7 @@ export default function SiteLayout() {
       <header className="sticky top-0 z-20 w-full border-b border-bd-normal bg-bg-normal">
         <NavBar />
       </header>
-      <div className={"min-h-[calc(100vh-var(--spacing)*16-108px)]"}>
+      <div className="min-h-[calc(100vh-var(--spacing)*16-108px)]">
         <Outlet />
       </div>
       <footer className="border-t border-bd-normal">
@@ -221,17 +217,17 @@ export default function SiteLayout() {
           <p>Released under the MIT License</p>
           <p>Copyright Ⓒ 2022-present Resolid Tech</p>
           <p className="inline-flex items-center justify-center gap-2">
-            <Badge color={"success"} render={(props) => <HistoryLink {...props} to={"status"} />}>
-              <SpriteIcon className={"me-1"} name={"status"} />
+            <Badge color="success" render={(props) => <HistoryLink {...props} to="status" />}>
+              <SpriteIcon className="me-1" name="status" />
               运行状态
             </Badge>
             {import.meta.env.RESOLID_PLATFORM == "vercel" && (
-              <Badge className="pointer-events-none" color={"neutral"}>
+              <Badge className="pointer-events-none" color="neutral">
                 部署于 Vercel
               </Badge>
             )}
             {import.meta.env.RESOLID_PLATFORM == "netlify" && (
-              <Badge className="pointer-events-none" color={"secondary"}>
+              <Badge className="pointer-events-none" color="secondary">
                 部署于 Netlify
               </Badge>
             )}

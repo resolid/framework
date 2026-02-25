@@ -2,6 +2,7 @@ import type { Hono, Context as HonoContext } from "hono";
 import type { IncomingMessage, ServerResponse } from "http";
 import type { Http2ServerRequest, Http2ServerResponse } from "http2";
 import type { Platform } from "../types";
+import type { NodeEnv } from "./utils";
 import {
   createHonoNetlifyServer,
   type HonoNetlifyServerOptions,
@@ -9,7 +10,6 @@ import {
 } from "./platforms/netlify";
 import { cache, createHonoNodeServer, type HonoNodeServerOptions } from "./platforms/node";
 import { createHonoVercelServer, type HonoVercelServerOptions } from "./platforms/vercel";
-import type { NodeEnv } from "./utils";
 
 export type { Hono, HonoContext, NetlifyContext, NodeEnv };
 

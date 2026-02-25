@@ -1,5 +1,5 @@
-import { Repository } from "@resolid/app-db-mysql";
 import type { Provider } from "@resolid/core";
+import { Repository } from "@resolid/app-db-mysql";
 import { app } from "~/app";
 import { statusTable } from "./schema.server";
 

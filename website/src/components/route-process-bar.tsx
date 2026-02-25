@@ -15,7 +15,9 @@ export const RouteProcessBar = () => {
     }
 
     Promise.allSettled(ref.current.getAnimations().map(({ finished }) => finished)).then(() => {
-      if (!active) setAnimating(false);
+      if (!active) {
+        setAnimating(false);
+      }
     });
 
     const id = active ? setTimeout(() => setAnimating(true), 100) : null;

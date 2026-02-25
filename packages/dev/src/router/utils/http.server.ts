@@ -1,6 +1,10 @@
 import type { Socket } from "node:net";
 
-type GetClientIpOptions = { proxy: boolean; proxyCount?: number; ipHeaders?: string };
+interface GetClientIpOptions {
+  proxy: boolean;
+  proxyCount?: number;
+  ipHeaders?: string;
+}
 
 export function getClientIp(req: Request, socket: Socket, options?: GetClientIpOptions): string {
   const { proxy = false, proxyCount = 0, ipHeaders = "x-forwarded-for" } = options || {};

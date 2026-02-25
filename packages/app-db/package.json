@@ -4,38 +4,42 @@
   "private": true,
   "description": "Database module for Resolid applications",
   "keywords": [
-    "resolid",
-    "db",
     "database",
+    "db",
+    "drizzle-orm",
     "orm",
-    "drizzle-orm"
+    "resolid"
   ],
   "homepage": "https://www.resolid.tech",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/resolid/framework.git",
-    "directory": "packages/app-db"
-  },
   "license": "MIT",
   "author": {
     "name": "Huijie Wei",
     "email": "hello@resolid.tech"
   },
-  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/resolid/framework.git",
+    "directory": "packages/app-db"
+  },
+  "files": [
+    "dist"
+  ],
   "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     }
   },
-  "types": "./dist/index.d.mts",
-  "files": [
-    "dist"
-  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsdown",
-    "lint": "eslint .",
+    "lint": "oxlint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -51,9 +55,5 @@
   },
   "engines": {
     "node": "^22.13.0 || >=24"
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
   }
 }

@@ -4,7 +4,7 @@ import type { CacheStore } from "../types";
 export class MemoryCache implements CacheStore {
   private readonly _lru: QuickLRU<string, string>;
 
-  constructor(maxSize: number = 1000) {
+  constructor(maxSize = 1000) {
     this._lru = new QuickLRU({ maxSize });
   }
 

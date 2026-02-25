@@ -1,18 +1,17 @@
 import type { BuildManifest, Config as ReactRouterConfig } from "@react-router/dev/config";
 import { makeRe } from "minimatch";
 import { join, relative } from "node:path";
-import type { UserConfig } from "vite";
-import { normalizePath } from "vite";
+import { type UserConfig, normalizePath } from "vite";
 import type { VitePluginOptions } from "../config";
 
-type ReactRouterPluginContext = {
+interface ReactRouterPluginContext {
   rootDirectory: string;
   reactRouterConfig: Required<ReactRouterConfig>;
   environmentBuildContext: { name: "client" | "ssr" } | null;
   buildManifest: BuildManifest;
-};
+}
 
-export type ReactRouterPluginConfig = {
+export interface ReactRouterPluginConfig {
   entryFile: string;
   appDir: string;
   buildDir: string;
@@ -20,7 +19,7 @@ export type ReactRouterPluginConfig = {
   future: ReactRouterConfig["future"];
   ssrBuild: boolean;
   buildManifest: BuildManifest;
-};
+}
 
 export function resolveReactRouterPluginConfig(
   config: UserConfig,
@@ -48,7 +47,7 @@ export function resolveReactRouterPluginConfig(
 
 export function createExcludePatterns(appDir: string, userExclude?: (string | RegExp)[]): RegExp[] {
   const appPath = normalizePath(appDir);
-  const appRoot = appPath.split("/")[0];
+  const [appRoot] = appPath.split("/");
 
   const patterns: RegExp[] = [
     new RegExp(`^(?=\\/${appPath}\\/)((?!.*\\.data(\\?|$)).*\\..*(\\?.*)?$)`),

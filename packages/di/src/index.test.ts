@@ -89,9 +89,7 @@ describe("DI Container", () => {
     it("should be able to register and resolve simple dependencies", () => {
       container.add({
         token: TEST_TOKEN,
-        factory: () => {
-          return "TEST_TOKEN";
-        },
+        factory: () => "TEST_TOKEN",
       });
 
       const token = container.get(TEST_TOKEN);
@@ -347,9 +345,7 @@ describe("DI Container", () => {
     it("should be able to dispose all singleton resources", async () => {
       container.add({
         token: DatabaseService,
-        factory: () => {
-          return new DatabaseService();
-        },
+        factory: () => new DatabaseService(),
       });
 
       const db = container.get(DatabaseService);

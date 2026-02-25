@@ -5,11 +5,11 @@ import { cwd, env } from "node:process";
 
 export { inject, type Emitter, type Provider, type Token };
 
-export type AppConfig = {
+export interface AppConfig {
   readonly name: string;
   readonly debug?: boolean;
   readonly timezone?: string;
-};
+}
 
 export type PathResolver = (...paths: string[]) => string;
 
@@ -22,11 +22,11 @@ export type AppContext = AppConfig & {
 
 type BootstrapFunction = (context: AppContext) => void | Promise<void>;
 
-export type Extension = {
+export interface Extension {
   name: string;
   providers?: Provider[];
   bootstrap?: BootstrapFunction;
-};
+}
 
 export type ExtensionCreator = (context: AppContext) => Extension;
 
@@ -49,7 +49,7 @@ class App<E extends Record<string, unknown>> {
   private readonly _bootstraps: BootstrapFunction[] = [];
   private readonly _expose?: ExposeSchema;
 
-  private _started: boolean = false;
+  private _started = false;
 
   public readonly name: string;
   public readonly debug: boolean;
@@ -134,9 +134,7 @@ class App<E extends Record<string, unknown>> {
       return;
     }
 
-    for (const bootstrap of this._bootstraps) {
-      await bootstrap(this._context);
-    }
+    await Promise.all(this._bootstraps.map((bootstrap) => bootstrap(this._context)));
 
     this.emitter.emit("app:ready");
     this._started = true;

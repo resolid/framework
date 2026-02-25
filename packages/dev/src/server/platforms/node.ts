@@ -1,8 +1,8 @@
+import type { Hono, MiddlewareHandler } from "hono";
+import type { AddressInfo } from "node:net";
 import { serve, type ServerType } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
-import type { Hono, MiddlewareHandler } from "hono";
 import { logger } from "hono/logger";
-import type { AddressInfo } from "node:net";
 import { networkInterfaces } from "node:os";
 import { env } from "node:process";
 import { createHonoServer, type HonoServerOptions, type NodeEnv } from "../utils";
@@ -39,21 +39,19 @@ export async function createHonoNodeServer(
   const isProduction = mode == "production";
 
   const mergedOptions: HonoNodeServerOptions = {
-    ...{
-      port: Number(env.PORT) || 3000,
-      listeningListener: (info) => {
-        console.log(`🚀 Server started on port ${info.port}`);
+    port: Number(env.PORT) || 3000,
+    listeningListener: (info) => {
+      console.log(`🚀 Server started on port ${info.port}`);
 
-        const address = Object.values(networkInterfaces())
-          .flat()
-          .find((ip) => String(ip?.family).includes("4") && !ip?.internal)?.address;
+      const address = Object.values(networkInterfaces())
+        .flat()
+        .find((ip) => String(ip?.family).includes("4") && !ip?.internal)?.address;
 
-        const servePath = env.SERVE_PATH ? env.SERVE_PATH : "";
+      const servePath = env.SERVE_PATH ? env.SERVE_PATH : "";
 
-        console.log(
-          `[resolid-server] http://localhost:${info.port}${servePath}${address && ` (http://${address}:${info.port})`}`,
-        );
-      },
+      console.log(
+        `[resolid-server] http://localhost:${info.port}${servePath}${address && ` (http://${address}:${info.port})`}`,
+      );
     },
     ...options,
     defaultLogger: options.defaultLogger ?? !isProduction,
@@ -62,25 +60,25 @@ export async function createHonoNodeServer(
   let nodeServer: ServerType | null = null;
 
   const server = await createHonoServer(mode, {
-    configure: async (server) => {
+    configure: async (hono) => {
       if (isProduction) {
         const clientBuildPath = `${import.meta.env.RESOLID_BUILD_DIR}/client`;
 
-        server.use(
+        hono.use(
           `/${import.meta.env.RESOLID_ASSETS_DIR}/*`,
           cache(60 * 60 * 24 * 365, true),
           serveStatic({ root: clientBuildPath }),
         );
-        server.use("*", cache(60 * 60), serveStatic({ root: clientBuildPath }));
+        hono.use("*", cache(60 * 60), serveStatic({ root: clientBuildPath }));
       } else {
-        server.use("*", cache(60 * 60), serveStatic({ root: "./public" }));
+        hono.use("*", cache(60 * 60), serveStatic({ root: "./public" }));
       }
 
       if (mergedOptions.defaultLogger) {
-        server.use("*", logger());
+        hono.use("*", logger());
       }
 
-      await mergedOptions.configure?.(server);
+      await mergedOptions.configure?.(hono);
     },
     getLoadContext: mergedOptions.getLoadContext,
     honoOptions: mergedOptions.honoOptions,

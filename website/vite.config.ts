@@ -6,7 +6,6 @@ import { analyzer } from "vite-bundle-analyzer";
 import viteBabel from "vite-plugin-babel";
 import viteInspect from "vite-plugin-inspect";
 import tsconfigPaths from "vite-tsconfig-paths";
-
 import { vitePluginOptions } from "./resolid.config";
 
 export default defineConfig(({ command }) => {
@@ -33,9 +32,7 @@ export default defineConfig(({ command }) => {
             ],
           ],
         },
-        loader: (path) => {
-          return extname(path).substring(1) as "js" | "jsx";
-        },
+        loader: (path) => extname(path).substring(1) as "js" | "jsx",
       }),
       {
         ...analyzer({ enabled: enableAnalyzer }),

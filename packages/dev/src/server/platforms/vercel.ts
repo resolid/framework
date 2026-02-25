@@ -1,6 +1,6 @@
-import { handle } from "@hono/node-server/vercel";
 import type { IncomingMessage, ServerResponse } from "http";
 import type { Http2ServerRequest, Http2ServerResponse } from "http2";
+import { handle } from "@hono/node-server/vercel";
 import { env } from "node:process";
 import { createHonoServer, type HonoServerOptions, type NodeEnv } from "../utils";
 

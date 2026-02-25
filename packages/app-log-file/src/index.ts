@@ -1,3 +1,5 @@
+import type { Sink } from "@resolid/app-log";
+import type { ExtensionCreator, PathResolver } from "@resolid/core";
 import {
   type FileSinkOptions,
   getFileSink,
@@ -6,8 +8,6 @@ import {
   type RotatingFileSinkOptions,
   type StreamFileSinkOptions,
 } from "@logtape/file";
-import type { Sink } from "@resolid/app-log";
-import type { ExtensionCreator, PathResolver } from "@resolid/core";
 import { mkdir } from "node:fs";
 import { join } from "node:path";
 
@@ -38,17 +38,15 @@ export class FileLogService {
 }
 
 export function createFileLogExtension(): ExtensionCreator {
-  return (context) => {
-    return {
-      name: "resolid-file-log-module",
-      providers: [
-        {
-          token: FileLogService,
-          factory() {
-            return new FileLogService(context.runtimePath);
-          },
+  return (context) => ({
+    name: "resolid-file-log-module",
+    providers: [
+      {
+        token: FileLogService,
+        factory() {
+          return new FileLogService(context.runtimePath);
         },
-      ],
-    };
-  };
+      },
+    ],
+  });
 }

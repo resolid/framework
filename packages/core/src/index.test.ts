@@ -30,12 +30,12 @@ describe("createApp", () => {
     const LOG = Symbol("LOG") as Token<{ log: () => void }>;
     const MAIL = Symbol("MAIL");
 
-    const createMailExtension = (config: { from?: string } = {}): ExtensionCreator => {
-      return () => ({
+    const createMailExtension =
+      (config: { from?: string } = {}): ExtensionCreator =>
+      () => ({
         name: "mail-extension",
         providers: [{ token: MAIL, factory: () => ({ from: config?.from ?? "" }) }],
       });
-    };
 
     const app = await createApp({
       name: "TestApp",
@@ -129,13 +129,11 @@ describe("createApp", () => {
           providers: [
             {
               token: A,
-              factory: () => {
-                return {
-                  dispose: () => {
-                    order.push("dispose");
-                  },
-                };
-              },
+              factory: () => ({
+                dispose: () => {
+                  order.push("dispose");
+                },
+              }),
             },
           ],
         },

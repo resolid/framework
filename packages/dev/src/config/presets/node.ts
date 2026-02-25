@@ -4,25 +4,23 @@ import { buildPreset, type PresetBaseOptions } from "../utils";
 type NodePresetOptions = PresetBaseOptions;
 
 export const nodePreset = (options: NodePresetOptions): Preset => {
-  const nodeVersion = options.nodeVersion;
+  const { nodeVersion } = options;
 
   return {
     name: "@resolid/react-router-hono-node-preset",
-    reactRouterConfig: () => {
-      return {
-        buildEnd: async ({ buildManifest, reactRouterConfig, viteConfig }) => {
-          await buildPreset({
-            includeFiles: options.includeFiles,
-            nodeVersion,
-            buildManifest,
-            reactRouterConfig,
-            viteConfig,
-            buildStart: async () => {
-              console.log("Bundle Node Server for production...");
-            },
-          });
-        },
-      };
-    },
+    reactRouterConfig: () => ({
+      buildEnd: async ({ buildManifest, reactRouterConfig, viteConfig }) => {
+        await buildPreset({
+          includeFiles: options.includeFiles,
+          nodeVersion,
+          buildManifest,
+          reactRouterConfig,
+          viteConfig,
+          buildStart: async () => {
+            console.log("Bundle Node Server for production...");
+          },
+        });
+      },
+    }),
   };
 };

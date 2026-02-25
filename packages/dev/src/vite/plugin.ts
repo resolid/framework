@@ -1,8 +1,8 @@
+import type http from "node:http";
+import type { Connect, RunnableDevEnvironment, ViteDevServer, Plugin as VitePlugin } from "vite";
 import { getRequestListener } from "@hono/node-server";
 import { existsSync, statSync } from "node:fs";
-import type http from "node:http";
 import { join } from "node:path";
-import type { Connect, RunnableDevEnvironment, ViteDevServer, Plugin as VitePlugin } from "vite";
 import type { VitePluginOptions } from "../config";
 import {
   createExcludePatterns,
@@ -85,7 +85,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
       const excludePatterns = createExcludePatterns(reactRouterConfig.appDir, options?.devExclude);
 
       const createMiddleware =
-        async (server: ViteDevServer): Promise<Connect.HandleFunction> =>
+        async (devServer: ViteDevServer): Promise<Connect.HandleFunction> =>
         async (
           req: http.IncomingMessage,
           res: http.ServerResponse,
@@ -110,10 +110,10 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
           const entry = reactRouterConfig!.entryFile;
 
           const app = reactRouterConfig!.future?.v8_viteEnvironmentApi
-            ? (await (server.environments.ssr as RunnableDevEnvironment).runner.import(entry))[
+            ? (await (devServer.environments.ssr as RunnableDevEnvironment).runner.import(entry))[
                 "default"
               ]
-            : (await server.ssrLoadModule(entry))["default"];
+            : (await devServer.ssrLoadModule(entry))["default"];
 
           if (!app) {
             return next(new Error(`Failed to find default export from ${entry}`));
@@ -135,7 +135,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
                 let err: Error;
                 if (e instanceof Error) {
                   err = e;
-                  server.ssrFixStacktrace(err);
+                  devServer.ssrFixStacktrace(err);
                 } else if (typeof e === "string") {
                   err = new Error(`The response is not an instance of "Response", but: ${e}`);
                 } else {

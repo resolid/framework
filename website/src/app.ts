@@ -60,6 +60,6 @@ export const app = await createApp({
   },
 });
 
-app.emitter.on("app:ready", function () {
+app.emitter.on("app:ready", () => {
   app.$.logger.info("Resolid application started.");
 });

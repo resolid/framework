@@ -1,4 +1,4 @@
-export type CacheStore = {
+export interface CacheStore {
   get: (key: string) => Promise<string | undefined>;
   set: (key: string, value: string, ttl?: number) => Promise<boolean>;
   del: (key: string) => Promise<boolean>;
@@ -10,4 +10,4 @@ export type CacheStore = {
   has?: (key: string) => Promise<boolean>;
 
   dispose?: () => Promise<void> | void;
-};
+}

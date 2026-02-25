@@ -31,38 +31,36 @@ export const ColorModeToggle = () => {
   const setColorMode = useColorModeDispatch();
 
   return (
-    <DropdownMenu placement={"bottom"}>
+    <DropdownMenu placement="bottom">
       <DropdownMenuTrigger
         render={(props) => (
           <Button
-            aria-label={"颜色模式"}
-            color={"neutral"}
-            variant={"ghost"}
-            size={"sm"}
+            aria-label="颜色模式"
+            color="neutral"
+            variant="ghost"
+            size="sm"
             iconOnly
             {...props}
           />
         )}
       >
-        <SpriteIcon size={"1.325em"} name={colorModes[colorMode]?.icon} />
+        <SpriteIcon size="1.325em" name={colorModes[colorMode]?.icon} />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className={"text-sm"}>
+      <DropdownMenuContent className="text-sm">
         <DropdownMenuArrow />
-        {Object.entries(colorModes).map(([key, mode]) => {
-          return (
-            <DropdownMenuItem
-              key={key}
-              label={key}
-              className={colorMode == key ? "text-link" : ""}
-              onSelect={() => {
-                setColorMode(key as ColorMode);
-              }}
-            >
-              <SpriteIcon name={mode.icon} className={"me-1.5"} />
-              {mode.label}
-            </DropdownMenuItem>
-          );
-        })}
+        {Object.entries(colorModes).map(([key, mode]) => (
+          <DropdownMenuItem
+            key={key}
+            label={key}
+            className={colorMode == key ? "text-link" : ""}
+            onSelect={() => {
+              setColorMode(key as ColorMode);
+            }}
+          >
+            <SpriteIcon name={mode.icon} className="me-1.5" />
+            {mode.label}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

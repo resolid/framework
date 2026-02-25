@@ -1,6 +1,6 @@
+import type { DrizzleConfig } from "drizzle-orm";
 import { LogService } from "@resolid/app-log";
 import { type Emitter, inject } from "@resolid/core";
-import type { DrizzleConfig } from "drizzle-orm";
 
 export type DatabaseConfig<S extends Record<string, unknown>, C = unknown> = (
   | { connections: { name?: string; config: C }[]; connection?: never }
@@ -21,7 +21,7 @@ export abstract class DatabaseService<
 
   private readonly _source = "main";
 
-  protected constructor(
+  constructor(
     config: C,
     emitter: Emitter,
     logger: LogService | undefined = inject(LogService, { optional: true }),

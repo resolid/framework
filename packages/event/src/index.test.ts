@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Emitter } from "./index";
 
 describe("createEmitter", () => {
@@ -8,7 +8,7 @@ describe("createEmitter", () => {
     emitter = new Emitter();
   });
 
-  test("on & emit should call callback", () => {
+  it("on & emit should call callback", () => {
     const callback = vi.fn();
     emitter.on("test", callback);
 
@@ -18,7 +18,7 @@ describe("createEmitter", () => {
     expect(callback).toHaveBeenCalledWith(1, "a");
   });
 
-  test("off should remove specific callback", () => {
+  it("off should remove specific callback", () => {
     const callback1 = vi.fn();
     const callback2 = vi.fn();
 
@@ -32,7 +32,7 @@ describe("createEmitter", () => {
     expect(callback2).toHaveBeenCalledWith(123);
   });
 
-  test("offAll should remove all callbacks for a specific event", () => {
+  it("offAll should remove all callbacks for a specific event", () => {
     const cb1 = vi.fn();
     const cb2 = vi.fn();
     emitter.on("a", cb1);
@@ -47,7 +47,7 @@ describe("createEmitter", () => {
     expect(cb2).not.toHaveBeenCalled();
   });
 
-  test("offAll without argument should remove all events", () => {
+  it("offAll without argument should remove all events", () => {
     const cb1 = vi.fn();
     const cb2 = vi.fn();
     emitter.on("a", cb1);
@@ -61,7 +61,7 @@ describe("createEmitter", () => {
     expect(cb2).not.toHaveBeenCalled();
   });
 
-  test("once should call only once", () => {
+  it("once should call only once", () => {
     const cb = vi.fn();
     emitter.once("event", cb);
 
@@ -72,7 +72,7 @@ describe("createEmitter", () => {
     expect(cb).toHaveBeenCalledWith(1);
   });
 
-  test("on should return a function that unbinds the callback", () => {
+  it("on should return a function that unbinds the callback", () => {
     const cb = vi.fn();
     const off = emitter.on("event", cb);
 
@@ -84,7 +84,7 @@ describe("createEmitter", () => {
     expect(cb).toHaveBeenCalledTimes(1);
   });
 
-  test("emitAsync should call callbacks asynchronously", async () => {
+  it("emitAsync should call callbacks asynchronously", async () => {
     const cb1 = vi.fn();
     const cb2 = vi.fn();
 
@@ -102,7 +102,7 @@ describe("createEmitter", () => {
     expect(cb2).toHaveBeenCalledWith(42);
   });
 
-  test("emitAsync should be safe if callback list changes during execution", async () => {
+  it("emitAsync should be safe if callback list changes during execution", async () => {
     const cb1 = vi.fn(() => emitter.offAll("event"));
     const cb2 = vi.fn();
 
@@ -117,11 +117,11 @@ describe("createEmitter", () => {
     expect(cb2).toHaveBeenCalledTimes(1);
   });
 
-  test("emit should do nothing if event has no listeners", () => {
+  it("emit should do nothing if event has no listeners", () => {
     expect(() => emitter.emit("nonexistent")).not.toThrow();
   });
 
-  test("off should do nothing if event or callback does not exist", () => {
+  it("off should do nothing if event or callback does not exist", () => {
     const cb = vi.fn();
     expect(() => emitter.off("nonexistent", cb)).not.toThrow();
   });

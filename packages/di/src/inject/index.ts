@@ -1,5 +1,5 @@
-import { InjectionContext, InjectionContextError } from "../context";
 import type { Token } from "../shared";
+import { InjectionContext, InjectionContextError } from "../context";
 
 export function inject<T>(token: Token<T>): T;
 export function inject<T>(token: Token<T>, options: { optional: true }): T | undefined;

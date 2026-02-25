@@ -4,12 +4,12 @@ import { netlifyPreset } from "./presets/netlify";
 import { nodePreset } from "./presets/node";
 import { vercelPreset } from "./presets/vercel";
 
-export type VitePluginOptions = {
+export interface VitePluginOptions {
   platform: Platform;
   nodeVersion: NodeVersion;
   entryFile: string;
   devExclude?: (string | RegExp)[];
-};
+}
 
 export type ReactRouterConfig = Omit<
   Config,
@@ -27,10 +27,10 @@ export type DevConfigOptions = Partial<VitePluginOptions> & {
   reactRouterConfig?: ReactRouterConfig;
 };
 
-export type DevConfig = {
+export interface DevConfig {
   vitePluginOptions: VitePluginOptions;
   reactRouterConfig: Config;
-};
+}
 
 export const defineDevConfig = ({
   platform = "node",
@@ -65,7 +65,7 @@ export const defineDevConfig = ({
         v8_middleware: true,
         v8_splitRouteModules: true,
         v8_viteEnvironmentApi: true,
-        ...reactRouterConfig.future,
+        ...future,
       },
     },
   };

@@ -22,15 +22,18 @@ type OptionalToUndefined<T> = {
   [K in keyof T]: T[K] | undefined;
 };
 
-type PackageJson = {
+interface PackageJson {
   name?: string;
   type?: string;
   version?: string;
   scripts?: { postinstall?: string };
   dependencies?: Record<string, string>;
-};
+}
 
-export type PresetBaseOptions = { nodeVersion: NodeVersion; includeFiles?: string[] };
+export interface PresetBaseOptions {
+  nodeVersion: NodeVersion;
+  includeFiles?: string[];
+}
 
 type BuildPresetOptions<BuildContext> = OptionalToUndefined<PresetBaseOptions> & {
   nodeVersion: NodeVersion;
@@ -82,50 +85,57 @@ export async function buildPreset<BuildContext>({
 
   const context = await buildStart();
 
-  for (const bundle in serverBundles) {
-    const bundleId = serverBundles[bundle].id;
-    const buildFile = join(rootPath, serverBundles[bundle].file);
-    const buildPath = dirname(buildFile);
+  await Promise.all(
+    Object.entries(serverBundles).map(async ([, bundle]) => {
+      const bundleId = bundle.id;
+      const buildFile = join(rootPath, bundle.file);
+      const buildPath = dirname(buildFile);
 
-    await writePackageJson(join(buildPath, "package.json"), packageJson, packageDeps, nodeVersion);
+      await writePackageJson(
+        join(buildPath, "package.json"),
+        packageJson,
+        packageDeps,
+        nodeVersion,
+      );
 
-    console.log(`Bundle file for ${bundleId}...`);
+      console.log(`Bundle file for ${bundleId}...`);
 
-    const bundleFile = join(buildPath, "server.mjs");
+      const bundleFile = join(buildPath, "server.mjs");
 
-    await build({
-      input: buildFile,
-      output: {
-        file: bundleFile,
-        codeSplitting: false,
-        legalComments: "none",
-      },
-      platform: "node",
-      transform: {
-        define: {
-          "process.env.NODE_ENV": JSON.stringify("production"),
-          "import.meta.env.NODE_ENV": JSON.stringify("production"),
+      await build({
+        input: buildFile,
+        output: {
+          file: bundleFile,
+          codeSplitting: false,
+          legalComments: "none",
         },
-        target: `node${nodeVersion}`,
-      },
-      external: ["vite", ...Object.keys(packageDeps)],
-      plugins: [
-        esmExternalRequirePlugin({
-          external: ["vite", ...Object.keys(packageDeps)],
-          skipDuplicateCheck: true,
-        }),
-      ],
-    });
+        platform: "node",
+        transform: {
+          define: {
+            "process.env.NODE_ENV": JSON.stringify("production"),
+            "import.meta.env.NODE_ENV": JSON.stringify("production"),
+          },
+          target: `node${nodeVersion}`,
+        },
+        external: ["vite", ...Object.keys(packageDeps)],
+        plugins: [
+          esmExternalRequirePlugin({
+            external: ["vite", ...Object.keys(packageDeps)],
+            skipDuplicateCheck: true,
+          }),
+        ],
+      });
 
-    await rm(join(buildPath, assetsDir), { force: true, recursive: true });
-    await rm(buildFile, { force: true });
+      await rm(join(buildPath, assetsDir), { force: true, recursive: true });
+      await rm(buildFile, { force: true });
 
-    for (const file of matchedFiles) {
-      await cp(file, join(serverBuildPath, file), { recursive: true });
-    }
+      await Promise.all(
+        matchedFiles.map((file) => cp(file, join(serverBuildPath, file), { recursive: true })),
+      );
 
-    await buildBundleEnd?.(context, buildPath, bundleId, bundleFile, packageDeps);
-  }
+      await buildBundleEnd?.(context, buildPath, bundleId, bundleFile, packageDeps);
+    }),
+  );
 }
 
 function getPackageDependencies(
@@ -189,7 +199,7 @@ async function writePackageJson(
   await writeFile(outputFile, JSON.stringify(distPkg, null, 2), "utf8");
 }
 
-export async function createDir(paths: string[], rmBefore: boolean = false): Promise<string> {
+export async function createDir(paths: string[], rmBefore = false): Promise<string> {
   const presetRoot = join(...paths);
 
   if (rmBefore) {
@@ -222,9 +232,7 @@ export function getServerRoutes(buildManifest: BuildManifest | undefined): {
 
     const routePathBundles: Record<string, string[]> = {};
 
-    for (const routeId in buildManifest?.routeIdToServerBundleId) {
-      const serverBoundId = buildManifest?.routeIdToServerBundleId[routeId];
-
+    for (const [routeId, serverBoundId] of Object.entries(buildManifest?.routeIdToServerBundleId)) {
       if (!routePathBundles[serverBoundId]) {
         routePathBundles[serverBoundId] = [];
       }
@@ -238,31 +246,26 @@ export function getServerRoutes(buildManifest: BuildManifest | undefined): {
 
     const bundleRoutes: Record<string, { path: string; bundleId: string }> = {};
 
-    for (const bundleId in routePathBundles) {
-      const paths = routePathBundles[bundleId];
-
+    for (const [bundleId, paths] of Object.entries(routePathBundles)) {
       paths.sort((a, b) => (a.length < b.length ? -1 : 1));
 
       for (const path of paths) {
         if (
           !bundleRoutes[path] &&
-          !Object.keys(bundleRoutes).find((key) => {
-            return (
-              bundleRoutes[key].bundleId == bundleId && path.startsWith(bundleRoutes[key].path)
-            );
-          })
+          !Object.keys(bundleRoutes).find(
+            (key) =>
+              bundleRoutes[key].bundleId == bundleId && path.startsWith(bundleRoutes[key].path),
+          )
         ) {
           bundleRoutes[path] = { path: path, bundleId: bundleId };
         }
       }
     }
 
-    const result = Object.values(bundleRoutes).map((route) => {
-      return {
-        path: route.path.endsWith("/") ? route.path.slice(0, -1) : route.path,
-        bundleId: route.bundleId,
-      };
-    });
+    const result = Object.values(bundleRoutes).map((route) => ({
+      path: route.path.endsWith("/") ? route.path.slice(0, -1) : route.path,
+      bundleId: route.bundleId,
+    }));
 
     result.sort((a, b) => (a.path.length > b.path.length ? -1 : 1));
 
@@ -321,38 +324,40 @@ export async function copyFilesToFunction(
     }
   }
 
-  for (const origin of fileList) {
-    const dest = join(destPath, relative(ancestorDir, origin));
-    const real = await realpath(origin);
+  await Promise.all(
+    fileList.map(async (origin) => {
+      const dest = join(destPath, relative(ancestorDir, origin));
+      const real = await realpath(origin);
 
-    const isSymlink = real !== origin;
-    const isDirectory = (await stat(origin)).isDirectory();
+      const isSymlink = real !== origin;
+      const isDirectory = (await stat(origin)).isDirectory();
 
-    await mkdir(dirname(dest), { recursive: true });
+      await mkdir(dirname(dest), { recursive: true });
 
-    if (origin == bundleFile) {
-      const sourceDir = dirname(bundleFile);
-      const destDir = dirname(dest);
+      if (origin == bundleFile) {
+        const sourceDir = dirname(bundleFile);
+        const destDir = dirname(dest);
 
-      for (const file of (await readdir(sourceDir)).filter(
-        (file) => file != basename(bundleFile),
-      )) {
-        await cp(join(sourceDir, file), join(destDir, file), { recursive: true });
-      }
-    }
-
-    if (isSymlink) {
-      if (!existsSync(dest)) {
-        await symlink(
-          relative(dirname(dest), join(destPath, relative(ancestorDir, real))),
-          dest,
-          isDirectory ? "dir" : "file",
+        await Promise.all(
+          (await readdir(sourceDir))
+            .filter((file) => file !== basename(bundleFile))
+            .map((file) => cp(join(sourceDir, file), join(destDir, file), { recursive: true })),
         );
       }
-    } else if (!isDirectory) {
-      await cp(origin, dest);
-    }
-  }
+
+      if (isSymlink) {
+        if (!existsSync(dest)) {
+          await symlink(
+            relative(dirname(dest), join(destPath, relative(ancestorDir, real))),
+            dest,
+            isDirectory ? "dir" : "file",
+          );
+        }
+      } else if (!isDirectory) {
+        await cp(origin, dest);
+      }
+    }),
+  );
 
   return relative(ancestorDir, bundleFile);
 }

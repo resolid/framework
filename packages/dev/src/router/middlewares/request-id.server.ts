@@ -1,7 +1,7 @@
 import { random } from "@resolid/utils";
 import { createContext, type MiddlewareFunction, type RouterContextProvider } from "react-router";
 
-type CreateRequestIdMiddlewareOptions = {
+interface CreateRequestIdMiddlewareOptions {
   /**
    * The name of the header to read the requestId from.
    *
@@ -22,7 +22,7 @@ type CreateRequestIdMiddlewareOptions = {
    * @default () => random()
    */
   generator?: () => string;
-};
+}
 
 export function createRequestIdMiddleware({
   header = "X-Request-Id",

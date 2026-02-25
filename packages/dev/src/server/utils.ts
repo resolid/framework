@@ -1,6 +1,7 @@
-import { type Context, type Env, Hono } from "hono";
+import type { Http2Bindings, HttpBindings } from "@hono/node-server";
 import type { HonoOptions } from "hono/hono-base";
 import type { BlankEnv } from "hono/types";
+import { type Context, type Env, Hono } from "hono";
 import process from "node:process";
 import {
   type AppLoadContext,
@@ -10,15 +11,15 @@ import {
   type UNSAFE_MiddlewareEnabled,
 } from "react-router";
 
-import type { Http2Bindings, HttpBindings } from "@hono/node-server";
-
-export type NodeEnv = { Bindings: HttpBindings | Http2Bindings };
+export interface NodeEnv {
+  Bindings: HttpBindings | Http2Bindings;
+}
 
 type ReactRouterAppLoadContext = UNSAFE_MiddlewareEnabled extends true
   ? RouterContextProvider
   : AppLoadContext;
 
-export type HonoServerOptions<E extends Env = BlankEnv> = {
+export interface HonoServerOptions<E extends Env = BlankEnv> {
   configure?: <E extends Env = BlankEnv>(app: Hono<E>) => Promise<void> | void;
   getLoadContext?: (
     c: Context<E>,
@@ -29,7 +30,7 @@ export type HonoServerOptions<E extends Env = BlankEnv> = {
   ) => Promise<ReactRouterAppLoadContext> | ReactRouterAppLoadContext;
   onShutdown?: () => Promise<void> | void;
   honoOptions?: HonoOptions<E>;
-};
+}
 
 export async function createHonoServer<E extends Env = BlankEnv>(
   mode: string | undefined,
@@ -47,11 +48,11 @@ export async function createHonoServer<E extends Env = BlankEnv>(
       "virtual:react-router/server-build"
     )) as ServerBuild;
 
-    return (async (c) => {
+    return (async (ctx) => {
       const requestHandler = createRequestHandler(build, mode);
-      const loadContext = options.getLoadContext?.(c, { build, mode });
+      const loadContext = options.getLoadContext?.(ctx, { build, mode });
       return requestHandler(
-        c.req.raw,
+        ctx.req.raw,
         loadContext instanceof Promise ? await loadContext : loadContext,
       );
     })(c);

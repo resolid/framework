@@ -3,11 +3,11 @@ import { handle } from "hono/netlify";
 import { env } from "node:process";
 import { createHonoServer, type HonoServerOptions } from "../utils";
 
-type NetlifyEnv = {
+interface NetlifyEnv {
   Bindings: {
     context: NetlifyContext;
   };
-};
+}
 
 export type HonoNetlifyServerOptions = HonoServerOptions<NetlifyEnv>;
 

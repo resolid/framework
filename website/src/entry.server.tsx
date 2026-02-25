@@ -1,9 +1,7 @@
 import { isbot } from "isbot";
 import { PassThrough, Readable } from "node:stream";
-import type { RenderToPipeableStreamOptions } from "react-dom/server";
-import { renderToPipeableStream } from "react-dom/server";
-import type { AppLoadContext, EntryContext } from "react-router";
-import { ServerRouter } from "react-router";
+import { type RenderToPipeableStreamOptions, renderToPipeableStream } from "react-dom/server";
+import { type AppLoadContext, type EntryContext, ServerRouter } from "react-router";
 
 export const streamTimeout = 9_000;
 

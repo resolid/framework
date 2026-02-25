@@ -1,3 +1,4 @@
+import type { ExtensionCreator, Token } from "@resolid/core";
 import {
   type Config,
   configure,
@@ -10,7 +11,6 @@ import {
   withContext,
   withFilter,
 } from "@logtape/logtape";
-import type { ExtensionCreator, Token } from "@resolid/core";
 
 export type LoggerEntity = { category: string } & Omit<LoggerConfig<string, string>, "category">;
 
@@ -53,25 +53,20 @@ export class LogService {
     });
   }
 
-  debug = ((...args: Parameters<Logger["debug"]>) => {
-    return this.getLogger().debug(...args);
-  }) as Logger["debug"];
+  debug = ((...args: Parameters<Logger["debug"]>) =>
+    this.getLogger().debug(...args)) as Logger["debug"];
 
-  info = ((...args: Parameters<Logger["info"]>) => {
-    return this.getLogger().info(...args);
-  }) as Logger["info"];
+  info = ((...args: Parameters<Logger["info"]>) =>
+    this.getLogger().info(...args)) as Logger["info"];
 
-  warn = ((...args: Parameters<Logger["warn"]>) => {
-    return this.getLogger().warn(...args);
-  }) as Logger["warn"];
+  warn = ((...args: Parameters<Logger["warn"]>) =>
+    this.getLogger().warn(...args)) as Logger["warn"];
 
-  error = ((...args: Parameters<Logger["error"]>) => {
-    return this.getLogger().error(...args);
-  }) as Logger["error"];
+  error = ((...args: Parameters<Logger["error"]>) =>
+    this.getLogger().error(...args)) as Logger["error"];
 
-  fatal = ((...args: Parameters<Logger["fatal"]>) => {
-    return this.getLogger().fatal(...args);
-  }) as Logger["fatal"];
+  fatal = ((...args: Parameters<Logger["fatal"]>) =>
+    this.getLogger().fatal(...args)) as Logger["fatal"];
 
   category(name: string): LogCategory {
     return getLogger(name);
@@ -90,10 +85,10 @@ export class LogService {
   }
 }
 
-export type LogTarget = {
+export interface LogTarget {
   ref: Token<unknown>;
   sinks: (service: unknown) => Record<string, Sink>;
-};
+}
 
 /* istanbul ignore next -- @preserve */
 export function createLogTarget<T>(target: {
@@ -110,30 +105,28 @@ export function createLogExtension(
   targets: readonly LogTarget[] = [],
   config: Omit<LogConfig, "sinks"> = {},
 ): ExtensionCreator {
-  return (context) => {
-    return {
-      name: "resolid-log-module",
-      providers: [
-        {
-          token: LogService,
-          factory() {
-            /* istanbul ignore next -- @preserve */
-            const sinks = targets.reduce<Record<string, Sink>>((acc, target) => {
-              const service = context.container.get(target.ref);
-              return { ...acc, ...target.sinks(service) };
-            }, {});
+  return (context) => ({
+    name: "resolid-log-module",
+    providers: [
+      {
+        token: LogService,
+        factory() {
+          /* istanbul ignore next -- @preserve */
+          const sinks = targets.reduce<Record<string, Sink>>((acc, target) => {
+            const service = context.container.get(target.ref);
+            return { ...acc, ...target.sinks(service) };
+          }, {});
 
-            return new LogService({
-              sinks,
-              ...config,
-              defaultCategory: config?.defaultCategory ?? context.name,
-            });
-          },
+          return new LogService({
+            sinks,
+            ...config,
+            defaultCategory: config?.defaultCategory ?? context.name,
+          });
         },
-      ],
-      async bootstrap(context) {
-        await context.container.get(LogService).configure();
       },
-    };
-  };
+    ],
+    async bootstrap(ctx) {
+      await ctx.container.get(LogService).configure();
+    },
+  });
 }

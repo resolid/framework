@@ -14,6 +14,14 @@ declare module "react-router" {
   }
 }
 
+function createLoadContext(assign: Record<string, string | undefined>) {
+  const context = new RouterContextProvider();
+
+  Object.assign(context, assign);
+
+  return context;
+}
+
 export default await createServer((platform) => {
   const onShutdown = async () => {
     await app.dispose();
@@ -23,27 +31,25 @@ export default await createServer((platform) => {
     case "vercel":
       return vercelConfig({
         onShutdown,
-        getLoadContext: (ctx) => {
-          return createLoadContext({
+        getLoadContext: (ctx) =>
+          createLoadContext({
             remoteAddress: ipAddress(ctx.req.raw),
             requestOrigin: getRequestOrigin(
               ctx.req.raw,
               ctx.env.incoming.socket,
               env.RX_PROXY == 1,
             ),
-          });
-        },
+          }),
       });
 
     case "netlify":
       return netlifyConfig({
         onShutdown,
-        getLoadContext: (ctx) => {
-          return createLoadContext({
+        getLoadContext: (ctx) =>
+          createLoadContext({
             remoteAddress: ctx.env.context.ip,
             requestOrigin: ctx.env.context.site.url,
-          });
-        },
+          }),
       });
 
     default:
@@ -64,11 +70,3 @@ export default await createServer((platform) => {
       });
   }
 });
-
-function createLoadContext(assign: Record<string, string | undefined>) {
-  const context = new RouterContextProvider();
-
-  Object.assign(context, assign);
-
-  return context;
-}

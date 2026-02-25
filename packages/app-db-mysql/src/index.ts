@@ -1,6 +1,6 @@
-import { BaseRepository, type DatabaseConfig, DatabaseService } from "@resolid/app-db";
-import type { Emitter, ExtensionCreator } from "@resolid/core";
+import type { ExtensionCreator } from "@resolid/core";
 import type { Simplify } from "drizzle-orm";
+import { BaseRepository, type DatabaseConfig, DatabaseService } from "@resolid/app-db";
 import { type Mode, mysqlTableCreator, type MySqlTableFn } from "drizzle-orm/mysql-core";
 import { drizzle, type MySql2Database, type MySql2DrizzleConfig } from "drizzle-orm/mysql2";
 import mysql, { type ConnectionOptions, type Pool } from "mysql2";
@@ -36,10 +36,6 @@ export type MySQLDatabase<S extends Record<string, unknown>> = MySql2Database<S>
 class MySQLDatabaseService<
   S extends Record<string, unknown> = Record<string, never>,
 > extends DatabaseService<MySQLDatabase<S>, S, MySQLDatabaseConfig<S>> {
-  constructor(config: MySQLDatabaseConfig<S>, emitter: Emitter) {
-    super(config, emitter);
-  }
-
   override connect(): void {
     const connections = this.config.connections ?? [
       { config: this.config.connection, name: undefined },
@@ -78,22 +74,20 @@ export abstract class Repository extends BaseRepository<MySql2Database> {}
 export function createMySQLDatabaseExtension<
   S extends Record<string, unknown> = Record<string, never>,
 >(config: MySQLDatabaseConfig<S>): ExtensionCreator {
-  return (context) => {
-    return {
-      name: "resolid-mysql-db-module",
-      providers: [
-        {
-          token: DatabaseService,
-          factory() {
-            return new MySQLDatabaseService<S>(config, context.emitter);
-          },
+  return (context) => ({
+    name: "resolid-mysql-db-module",
+    providers: [
+      {
+        token: DatabaseService,
+        factory() {
+          return new MySQLDatabaseService<S>(config, context.emitter);
         },
-      ],
-      bootstrap(context) {
-        context.container.get(DatabaseService).connect();
       },
-    };
-  };
+    ],
+    bootstrap(ctx) {
+      ctx.container.get(DatabaseService).connect();
+    },
+  });
 }
 
 export function createDefineTable(prefix = ""): MySqlTableFn {

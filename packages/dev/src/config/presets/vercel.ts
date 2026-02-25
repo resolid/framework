@@ -12,64 +12,62 @@ import {
 type VercelPresetOptions = PresetBaseOptions;
 
 export const vercelPreset = (options: VercelPresetOptions): Preset => {
-  const nodeVersion = options.nodeVersion;
+  const { nodeVersion } = options;
 
   return {
     name: "@resolid/react-router-hono-vercel-preset",
-    reactRouterConfig: () => {
-      return {
-        buildEnd: async ({ buildManifest, reactRouterConfig, viteConfig }) => {
-          await buildPreset<{ vercelOutput: string; nftCache: object }>({
-            includeFiles: options.includeFiles,
-            nodeVersion,
-            buildManifest,
-            reactRouterConfig,
-            viteConfig,
-            buildStart: async () => {
-              const vercelOutput = await createDir([viteConfig.root, ".vercel", "output"], true);
+    reactRouterConfig: () => ({
+      buildEnd: async ({ buildManifest, reactRouterConfig, viteConfig }) => {
+        await buildPreset<{ vercelOutput: string; nftCache: object }>({
+          includeFiles: options.includeFiles,
+          nodeVersion,
+          buildManifest,
+          reactRouterConfig,
+          viteConfig,
+          buildStart: async () => {
+            const vercelOutput = await createDir([viteConfig.root, ".vercel", "output"], true);
 
-              await copyStaticFiles(join(reactRouterConfig.buildDirectory, "client"), vercelOutput);
-              await writeVercelConfigJson(
-                viteConfig.build.assetsDir ?? "assets",
-                buildManifest,
-                join(vercelOutput, "config.json"),
-              );
+            await copyStaticFiles(join(reactRouterConfig.buildDirectory, "client"), vercelOutput);
+            await writeVercelConfigJson(
+              viteConfig.build.assetsDir ?? "assets",
+              buildManifest,
+              join(vercelOutput, "config.json"),
+            );
 
-              return { vercelOutput, nftCache: {} };
-            },
-            buildBundleEnd: async (context, _buildPath, bundleId, bundleFile) => {
-              console.log(`Coping Vercel function files for ${bundleId}...`);
+            return { vercelOutput, nftCache: {} };
+          },
+          buildBundleEnd: async (context, _buildPath, bundleId, bundleFile) => {
+            console.log(`Coping Vercel function files for ${bundleId}...`);
 
-              const vercelFunctionDir = await createDir(
-                [context.vercelOutput, "functions", `_${bundleId}.func`],
-                true,
-              );
+            const vercelFunctionDir = await createDir(
+              [context.vercelOutput, "functions", `_${bundleId}.func`],
+              true,
+            );
 
-              const handleFile = await copyFilesToFunction(
-                bundleFile,
-                vercelFunctionDir,
-                context.nftCache,
-              );
+            const handleFile = await copyFilesToFunction(
+              bundleFile,
+              vercelFunctionDir,
+              context.nftCache,
+            );
 
-              await writeFile(
-                join(vercelFunctionDir, ".vc-config.json"),
-                JSON.stringify(
-                  {
-                    handler: handleFile,
-                    runtime: `nodejs${nodeVersion}.x`,
-                    launcherType: "Nodejs",
-                    supportsResponseStreaming: true,
-                  },
-                  null,
-                  2,
-                ),
-                "utf8",
-              );
-            },
-          });
-        },
-      };
-    },
+            await writeFile(
+              join(vercelFunctionDir, ".vc-config.json"),
+              JSON.stringify(
+                {
+                  handler: handleFile,
+                  runtime: `nodejs${nodeVersion}.x`,
+                  launcherType: "Nodejs",
+                  supportsResponseStreaming: true,
+                },
+                null,
+                2,
+              ),
+              "utf8",
+            );
+          },
+        });
+      },
+    }),
   };
 };
 

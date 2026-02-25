@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Cacher } from "./index";
 import type { CacheStore } from "./types";
+import { Cacher } from "./index";
 
 describe("createCache with fake store", () => {
   let cache: Cacher;
