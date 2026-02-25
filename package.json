@@ -27,7 +27,7 @@
     "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^20.4.2",
     "@commitlint/config-conventional": "^20.4.2",
-    "@resolid/config": "^5.0.1",
+    "@resolid/config": "^5.0.2",
     "@svitejs/changesets-changelog-github-compact": "^1.2.0",
     "@tailwindcss/language-server": "^0.14.29",
     "@types/node": "^24.10.13",
@@ -36,7 +36,7 @@
     "lefthook": "^2.1.1",
     "oxfmt": "^0.35.0",
     "oxlint": "^1.50.0",
-    "turbo": "^2.8.10",
+    "turbo": "^2.8.11",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
