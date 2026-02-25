@@ -1,5 +1,15 @@
 # @resolid/cache
 
+## 1.0.0
+
+### Major Changes
+
+- refactor: rewrite package export ([`3ef1a73`](https://github.com/resolid/framework/commit/3ef1a739e4b93b9bcbe00195284a77fe7bcb5bc6))
+
+### Patch Changes
+
+- chore: merge eslint and prettier to oxlint and oxfmt ([`89b6c49`](https://github.com/resolid/framework/commit/89b6c49cccb32cfeea7ac271e0cc5479ce3125cd))
+
 ## 0.2.0
 
 ### Minor Changes
