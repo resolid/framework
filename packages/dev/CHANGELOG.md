@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.2.0
+
+### Minor Changes
+
+- feat: remove @react-router/dev integration ([`1d86192`](https://github.com/resolid/framework/commit/1d86192512eadb95107935c5d0e3dc9b6a6837aa))
+
 ## 0.1.2
 
 ### Patch Changes
