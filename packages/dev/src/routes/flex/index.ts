@@ -1,0 +1,38 @@
+import { getAppDirectory, type RouteConfigEntry } from "@react-router/dev/routes";
+import { makeRe } from "minimatch";
+import { extname, join } from "node:path";
+import { filesToRouteManifest, routeManifestToRouteConfig, visitFiles } from "./utils";
+
+export type FolderRoutesOptions = {
+  routesDirectory?: string;
+  ignoredRouteFiles?: string[];
+};
+
+const routeModuleExtensions = [".js", ".jsx", ".ts", ".tsx", ".md", ".mdx"];
+
+export async function flexRoutes(options: FolderRoutesOptions = {}): Promise<RouteConfigEntry[]> {
+  const { routesDirectory = "routes", ignoredRouteFiles = [] } = options;
+
+  const appDirectory = getAppDirectory();
+  const ignoredFileRegex = ignoredRouteFiles
+    .map((re) => makeRe(re))
+    .filter((re): re is RegExp => !!re);
+
+  const files: string[] = [];
+
+  await visitFiles(join(appDirectory, routesDirectory), (file) => {
+    if (ignoredFileRegex.some((regex) => regex.test(file))) {
+      return;
+    }
+
+    if (!routeModuleExtensions.includes(extname(file))) {
+      return;
+    }
+
+    files.push(file);
+  });
+
+  const routeManifest = filesToRouteManifest(routesDirectory, files);
+
+  return routeManifestToRouteConfig(routeManifest);
+}

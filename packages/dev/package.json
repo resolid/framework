@@ -70,6 +70,7 @@
   "scripts": {
     "build": "tsdown",
     "lint": "oxlint",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
