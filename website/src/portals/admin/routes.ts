@@ -1,4 +1,5 @@
-import { prefix, relativeFactory } from "@resolid/dev/routes";
+import { prefix } from "@react-router/dev/routes";
+import { relativeFactory } from "@resolid/dev/routes";
 
 const { index, route, layout } = relativeFactory(import.meta.dirname);
 

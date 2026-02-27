@@ -39,6 +39,7 @@
     "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
+    "@react-router/dev": "^7.13.1",
     "@resolid/dev": "workspace:^",
     "@tailwindcss/vite": "^4.2.1",
     "@types/react": "^19.2.14",

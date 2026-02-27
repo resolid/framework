@@ -19,9 +19,6 @@ export default defineConfig(({ command }) => {
       viteBabel({
         filter: /\.[jt]sx?$/,
         babelConfig: {
-          compact: false,
-          babelrc: false,
-          configFile: false,
           presets: ["@babel/preset-typescript"],
           plugins: [
             [
@@ -31,8 +28,14 @@ export default defineConfig(({ command }) => {
               },
             ],
           ],
+          cloneInputAst: false,
+          compact: false,
+          sourceMaps: false,
+          babelrc: false,
+          configFile: false,
         },
         loader: (path) => extname(path).substring(1) as "js" | "jsx",
+        optimizeOnSSR: true,
       }),
       {
         ...analyzer({ enabled: enableAnalyzer }),

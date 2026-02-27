@@ -1,4 +1,4 @@
-import type { RouteConfig } from "@resolid/dev/routes";
+import type { RouteConfig } from "@react-router/dev/routes";
 import admin from "./portals/admin/routes";
 import site from "./portals/site/routes";
 

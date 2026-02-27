@@ -189,9 +189,6 @@ importers:
       '@netlify/types':
         specifier: ^2.3.0
         version: 2.3.0
-      '@react-router/dev':
-        specifier: ^7.13.1
-        version: 7.13.1(@types/node@24.10.15)(jiti@2.6.1)(lightningcss@1.31.1)(react-router@7.13.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)(vite@7.3.1(@types/node@24.10.15)(jiti@2.6.1)(lightningcss@1.31.1))
       '@react-router/node':
         specifier: ^7.13.1
         version: 7.13.1(react-router@7.13.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)
@@ -223,6 +220,9 @@ importers:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@24.10.15)(jiti@2.6.1)(lightningcss@1.31.1)
     devDependencies:
+      '@react-router/dev':
+        specifier: ^7.13.1
+        version: 7.13.1(@types/node@24.10.15)(jiti@2.6.1)(lightningcss@1.31.1)(react-router@7.13.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)(vite@7.3.1(@types/node@24.10.15)(jiti@2.6.1)(lightningcss@1.31.1))
       tsdown:
         specifier: ^0.20.3
         version: 0.20.3(oxc-resolver@11.19.0)(typescript@5.9.3)
@@ -302,6 +302,9 @@ importers:
         specifier: ^4.2.1
         version: 4.2.1
     devDependencies:
+      '@react-router/dev':
+        specifier: ^7.13.1
+        version: 7.13.1(@types/node@24.10.15)(jiti@2.6.1)(lightningcss@1.31.1)(react-router@7.13.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)(vite@7.3.1(@types/node@24.10.15)(jiti@2.6.1)(lightningcss@1.31.1))
       '@resolid/dev':
         specifier: workspace:^
         version: link:../packages/dev

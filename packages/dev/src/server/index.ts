@@ -1,7 +1,7 @@
 import type { Hono, Context as HonoContext } from "hono";
 import type { IncomingMessage, ServerResponse } from "http";
 import type { Http2ServerRequest, Http2ServerResponse } from "http2";
-import type { Platform } from "../types";
+import type { ServerPlatform } from "../types";
 import type { NodeEnv } from "./utils";
 import {
   createHonoNetlifyServer,
@@ -11,7 +11,7 @@ import {
 import { cache, createHonoNodeServer, type HonoNodeServerOptions } from "./platforms/node";
 import { createHonoVercelServer, type HonoVercelServerOptions } from "./platforms/vercel";
 
-export type { Hono, HonoContext, NetlifyContext, NodeEnv, Platform };
+export type { Hono, HonoContext, NetlifyContext, NodeEnv, ServerPlatform };
 
 type PlatformConfig<T> = (config: T | undefined) => T | undefined;
 
@@ -25,7 +25,7 @@ export const vercelConfig: PlatformConfig<HonoVercelServerOptions> = (config) =>
 
 export const createServer = async (
   factory: (
-    platform: Platform,
+    platform: ServerPlatform,
   ) => HonoNodeServerOptions | HonoNetlifyServerOptions | HonoVercelServerOptions | undefined,
 ): Promise<
   | ((req: Request, context: NetlifyContext) => Response | Promise<Response>)

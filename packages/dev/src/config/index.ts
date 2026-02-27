@@ -1,31 +1,33 @@
 import type { Config } from "@react-router/dev/config";
-import type { NodeVersion, Platform } from "../types";
+import type { Simplify } from "@resolid/utils";
+import type { NodeVersion, ServerPlatform } from "../types";
 import { netlifyPreset } from "./presets/netlify";
 import { nodePreset } from "./presets/node";
 import { vercelPreset } from "./presets/vercel";
 
 export interface VitePluginOptions {
-  platform: Platform;
+  platform: ServerPlatform;
   nodeVersion: NodeVersion;
   entryFile: string;
   devExclude?: (string | RegExp)[];
 }
 
-export type ReactRouterConfig = Omit<
-  Config,
-  "appDirectory" | "ssr" | "serverModuleFormat" | "future"
-> & {
-  future?: Omit<
-    Config["future"],
-    "v8_middleware" | "v8_splitRouteModules" | "v8_viteEnvironmentApi"
-  >;
-};
+export type ReactRouterConfig = Simplify<
+  Omit<Config, "appDirectory" | "ssr" | "serverModuleFormat" | "future"> & {
+    future?: Omit<
+      Config["future"],
+      "v8_middleware" | "v8_splitRouteModules" | "v8_viteEnvironmentApi"
+    >;
+  }
+>;
 
-export type DevConfigOptions = Partial<VitePluginOptions> & {
-  appDirectory?: string;
-  includeFiles?: string[];
-  reactRouterConfig?: ReactRouterConfig;
-};
+export type DevConfigOptions = Simplify<
+  Partial<VitePluginOptions> & {
+    appDirectory?: string;
+    includeFiles?: string[];
+    reactRouterConfig?: ReactRouterConfig;
+  }
+>;
 
 export interface DevConfig {
   vitePluginOptions: VitePluginOptions;

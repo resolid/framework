@@ -8,14 +8,10 @@
 ## Installation
 
 ```shell
-pnpm add @resolid/dev
-# or
-npm install @resolid/dev
-# or
-yarn add @resolid/dev
-# or
-bun add @resolid/dev
+pnpm add -D @resolid/dev @react-router/dev
 ```
+
+> If you use npm/yarn/bun, replace with the equivalent command.
 
 ## What is included
 

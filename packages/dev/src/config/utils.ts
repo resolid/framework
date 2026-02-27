@@ -107,7 +107,10 @@ export async function buildPreset<BuildContext>({
         output: {
           file: bundleFile,
           codeSplitting: false,
-          legalComments: "none",
+          minify: "dce-only",
+          comments: {
+            legal: false,
+          },
         },
         platform: "node",
         transform: {
