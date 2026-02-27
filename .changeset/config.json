@@ -1,5 +1,5 @@
 {
-  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "$schema": "https://unpkg.com/@changesets/config@3.1.2/schema.json",
   "changelog": ["@svitejs/changesets-changelog-github-compact", { "repo": "resolid/framework" }],
   "commit": false,
   "fixed": [],
@@ -16,7 +16,6 @@
     "@resolid/app-db-mysql",
     "@resolid/app-log",
     "@resolid/app-log-file",
-    "@resolid/dev",
     "resolid-website"
   ]
 }

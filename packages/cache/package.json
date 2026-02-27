@@ -33,7 +33,8 @@
     "./stores": {
       "types": "./dist/stores.d.mts",
       "import": "./dist/stores.mjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",

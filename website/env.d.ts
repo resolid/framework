@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 /// <reference types="@react-router/node" />
+/// <reference types="@resolid/dev/env" />
 
 declare namespace NodeJS {
   export interface ProcessEnv {
@@ -15,12 +16,4 @@ declare namespace NodeJS {
     readonly VERCEL: number;
     readonly NETLIFY: boolean;
   }
-}
-
-interface ImportMetaEnv {
-  readonly RESOLID_PLATFORM: "node" | "vercel" | "netlify";
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
 }

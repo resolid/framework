@@ -1,7 +1,7 @@
 {
   "name": "@resolid/dev",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "private": false,
   "description": "Development utils for Resolid applications",
   "keywords": [
     "netlify",
@@ -23,10 +23,12 @@
     "directory": "packages/dev"
   },
   "bin": {
-    "react-router": "./cli/react-router.js"
+    "react-router": "cli/react-router.js"
   },
   "files": [
-    "dist"
+    "cli",
+    "dist",
+    "env.d.ts"
   ],
   "type": "module",
   "sideEffects": false,
@@ -35,6 +37,9 @@
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
+    },
+    "./env": {
+      "types": "./env.d.ts"
     },
     "./routes": {
       "types": "./dist/routes.d.mts",
@@ -55,7 +60,8 @@
     "./vite": {
       "types": "./dist/vite.d.mts",
       "import": "./dist/vite.mjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",

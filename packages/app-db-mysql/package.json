@@ -36,7 +36,8 @@
     "./drizzle": {
       "types": "./dist/drizzle.d.mts",
       "import": "./dist/drizzle.mjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",
