@@ -74,18 +74,18 @@ export abstract class Repository extends BaseRepository<MySql2Database> {}
 export function createMySQLDatabaseExtension<
   S extends Record<string, unknown> = Record<string, never>,
 >(config: MySQLDatabaseConfig<S>): ExtensionCreator {
-  return (context) => ({
+  return ({ emitter, container }) => ({
     name: "resolid-mysql-db-module",
     providers: [
       {
         token: DatabaseService,
         factory() {
-          return new MySQLDatabaseService<S>(config, context.emitter);
+          return new MySQLDatabaseService<S>(config, emitter);
         },
       },
     ],
-    bootstrap(ctx) {
-      ctx.container.get(DatabaseService).connect();
+    bootstrap() {
+      container.get(DatabaseService).connect();
     },
   });
 }

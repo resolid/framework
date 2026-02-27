@@ -105,7 +105,7 @@ export function createLogExtension(
   targets: readonly LogTarget[] = [],
   config: Omit<LogConfig, "sinks"> = {},
 ): ExtensionCreator {
-  return (context) => ({
+  return ({ name, container }) => ({
     name: "resolid-log-module",
     providers: [
       {
@@ -113,20 +113,20 @@ export function createLogExtension(
         factory() {
           /* istanbul ignore next -- @preserve */
           const sinks = targets.reduce<Record<string, Sink>>((acc, target) => {
-            const service = context.container.get(target.ref);
+            const service = container.get(target.ref);
             return { ...acc, ...target.sinks(service) };
           }, {});
 
           return new LogService({
             sinks,
             ...config,
-            defaultCategory: config?.defaultCategory ?? context.name,
+            defaultCategory: config?.defaultCategory ?? name,
           });
         },
       },
     ],
-    async bootstrap(ctx) {
-      await ctx.container.get(LogService).configure();
+    async bootstrap() {
+      await container.get(LogService).configure();
     },
   });
 }

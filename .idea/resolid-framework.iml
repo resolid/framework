@@ -5,6 +5,7 @@
       <excludeFolder url="file://$MODULE_DIR$/website/.netlify" />
       <excludeFolder url="file://$MODULE_DIR$/website/.vercel" />
       <excludeFolder url="file://$MODULE_DIR$/website/runtime" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/cache-file/.temp" />
       <excludePattern pattern="coverage" />
       <excludePattern pattern=".turbo" />
     </content>

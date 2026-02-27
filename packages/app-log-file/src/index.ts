@@ -38,13 +38,13 @@ export class FileLogService {
 }
 
 export function createFileLogExtension(): ExtensionCreator {
-  return (context) => ({
+  return ({ runtimePath }) => ({
     name: "resolid-file-log-module",
     providers: [
       {
         token: FileLogService,
         factory() {
-          return new FileLogService(context.runtimePath);
+          return new FileLogService(runtimePath);
         },
       },
     ],
