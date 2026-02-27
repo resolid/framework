@@ -43,7 +43,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@logtape/logtape": "^2.0.2",
+    "@logtape/logtape": "^2.0.4",
     "@resolid/core": "workspace:^"
   },
   "devDependencies": {
