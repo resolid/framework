@@ -1,5 +1,15 @@
 # @resolid/dev
 
+## 0.3.0
+
+### Minor Changes
+
+- feat: rewrite server to http ([`274a843`](https://github.com/resolid/framework/commit/274a843a3c77249a62461e3524bb8ab41df9f29c))
+
+### Patch Changes
+
+- refactor: remove for...in iteration ([`08755e3`](https://github.com/resolid/framework/commit/08755e3af1c1120ce03c62897f2f5cb0659eeefa))
+
 ## 0.2.0
 
 ### Minor Changes
