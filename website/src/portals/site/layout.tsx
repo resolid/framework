@@ -1,3 +1,4 @@
+import { getRequestOrigin } from "@resolid/dev/http.server";
 import {
   Badge,
   Button,
@@ -138,7 +139,7 @@ const NavBar = () => {
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   return {
-    requestOrigin: context.requestOrigin ?? request.url,
+    requestOrigin: getRequestOrigin(context) ?? request.url,
   };
 }
 

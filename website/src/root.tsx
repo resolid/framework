@@ -6,11 +6,8 @@ import { ErrorComponent } from "~/components/error-component";
 import { RouteProcessBar } from "~/components/route-process-bar";
 import { VercelAnalytics } from "~/extensions/vercel/vercel-analytics";
 import { VercelSpeedInsights } from "~/extensions/vercel/vercel-speed-insights";
-import { requestIdMiddleware } from "./extensions/middlewares/request-id.server";
 
 import style from "./root.css?url";
-
-export const middleware = [requestIdMiddleware];
 
 // noinspection HtmlRequiredTitleElement
 export const Layout = ({ children }: PropsWithChildren) => (

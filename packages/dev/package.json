@@ -37,21 +37,17 @@
     "./env": {
       "types": "./env.d.ts"
     },
-    "./routes": {
-      "types": "./dist/routes.d.mts",
-      "import": "./dist/routes.mjs"
+    "./http.server": {
+      "types": "./dist/http.d.mts",
+      "import": "./dist/http.mjs"
     },
     "./router": {
       "types": "./dist/router.d.mts",
       "import": "./dist/router.mjs"
     },
-    "./router.server": {
-      "types": "./dist/router.server.d.mts",
-      "import": "./dist/router.server.mjs"
-    },
-    "./server": {
-      "types": "./dist/server.d.mts",
-      "import": "./dist/server.mjs"
+    "./routes": {
+      "types": "./dist/routes.d.mts",
+      "import": "./dist/routes.mjs"
     },
     "./vite": {
       "types": "./dist/vite.d.mts",

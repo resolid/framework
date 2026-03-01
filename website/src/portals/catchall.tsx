@@ -1,5 +1,5 @@
+import { httpNotFound } from "@resolid/dev/http.server";
 import { mergeMeta } from "@resolid/dev/router";
-import { httpNotFound } from "@resolid/dev/router.server";
 import { ErrorComponent } from "~/components/error-component";
 
 export async function loader() {

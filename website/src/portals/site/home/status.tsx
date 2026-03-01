@@ -1,8 +1,8 @@
 import { format } from "@formkit/tempo";
+import { getClientIp, getRequestId } from "@resolid/dev/http.server";
 import { mergeMeta } from "@resolid/dev/router";
 import { Alert, AlertDescription, AlertTitle, ClientOnly } from "@resolid/react-ui";
 import { Suspense, useMemo } from "react";
-import { getRequestId } from "~/extensions/middlewares/request-id.server";
 import { systemRepository } from "~/modules/system/repository.server";
 import type { Route } from "./+types/status";
 
@@ -18,7 +18,7 @@ export async function loader({ context }: Route.LoaderArgs) {
       message: "服务器渲染正常",
       datetime: new Date().toISOString(),
       requestId: getRequestId(context),
-      remoteAddress: context.remoteAddress ?? "Unknown",
+      remoteAddress: getClientIp(context),
     },
     db: systemRepository()
       .getFirst()
@@ -68,23 +68,23 @@ export default function Status({ loaderData }: Route.ComponentProps) {
         ))}
       </Suspense>
       <Alert className="not-prose my-5" color="primary">
-        <AlertDescription className="grid grid-cols-2 gap-1">
-          <dt className={""}>服务器时间：</dt>
-          <dd className="font-mono">
+        <AlertDescription className="grid grid-cols-1 items-center gap-1 md:grid-cols-[max-content_1fr]">
+          <dt>服务器时间：</dt>
+          <dd className="font-mono text-sm">
             <ClientOnly>{() => formatDatetime(ssr.datetime)}</ClientOnly>
           </dd>
-          <dt className={""}>客户端地址：</dt>
-          <dd className="font-mono">{ssr.remoteAddress}</dd>
-          <dt className={""}>客户端时间：</dt>
-          <dd className="font-mono">
+          <dt>客户端地址：</dt>
+          <dd className="font-mono text-sm">{ssr.remoteAddress}</dd>
+          <dt>客户端时间：</dt>
+          <dd className="font-mono text-sm">
             <ClientOnly>{() => formatDatetime(new Date())}</ClientOnly>
           </dd>
-          <dt className={""}>客户端时区：</dt>
-          <dd className="font-mono">
+          <dt>客户端时区：</dt>
+          <dd className="font-mono text-sm">
             <ClientOnly>{clientTimeZone}</ClientOnly>
           </dd>
-          <dt className={""}>请求 Id：</dt>
-          <dd className="font-mono">{ssr.requestId}</dd>
+          <dt>请求 Id：</dt>
+          <dd className="font-mono text-sm">{ssr.requestId}</dd>
         </AlertDescription>
       </Alert>
     </div>
