@@ -16,6 +16,6 @@
     "@resolid/app-db-mysql",
     "@resolid/app-log",
     "@resolid/app-log-file",
-    "resolid-website"
+    "website"
   ]
 }

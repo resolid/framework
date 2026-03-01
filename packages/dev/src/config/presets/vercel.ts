@@ -11,15 +11,13 @@ import {
 
 type VercelPresetOptions = PresetBaseOptions;
 
-export const vercelPreset = (options: VercelPresetOptions): Preset => {
-  const { nodeVersion } = options;
-
+export const vercelPreset = ({ nodeVersion, includeFiles }: VercelPresetOptions): Preset => {
   return {
     name: "@resolid/react-router-hono-vercel-preset",
     reactRouterConfig: () => ({
       buildEnd: async ({ buildManifest, reactRouterConfig, viteConfig }) => {
         await buildPreset<{ vercelOutput: string; nftCache: object }>({
-          includeFiles: options.includeFiles,
+          includeFiles,
           nodeVersion,
           buildManifest,
           reactRouterConfig,

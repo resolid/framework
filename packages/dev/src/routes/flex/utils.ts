@@ -39,9 +39,8 @@ export function routeManifestToRouteConfig(
     [id: string]: Omit<RouteConfigEntry, "id"> & Required<Pick<RouteConfigEntry, "id">>;
   } = {};
 
-  for (const id in routeManifest) {
-    const route = routeManifest[id];
-    routeConfigById[id] = {
+  for (const [routeId, route] of Object.entries(routeManifest)) {
+    routeConfigById[routeId] = {
       id: route.id,
       file: route.file,
       path: route.path,
@@ -52,8 +51,7 @@ export function routeManifestToRouteConfig(
 
   const routeConfig: RouteConfigEntry[] = [];
 
-  for (const id in routeConfigById) {
-    const route = routeConfigById[id];
+  for (const [, route] of Object.entries(routeConfigById)) {
     const { parentId } = routeManifest[route.id];
 
     if (parentId === rootId) {

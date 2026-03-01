@@ -64,10 +64,10 @@ export const defineDevConfig = ({
       serverModuleFormat: "esm",
       presets: presets ? [...presets, preset] : [preset],
       future: {
+        ...future,
         v8_middleware: true,
         v8_splitRouteModules: true,
         v8_viteEnvironmentApi: true,
-        ...future,
       },
     },
   };

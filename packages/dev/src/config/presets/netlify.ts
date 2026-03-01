@@ -12,9 +12,7 @@ import {
 
 type NetlifyPresetOptions = PresetBaseOptions;
 
-export const netlifyPreset = (options: NetlifyPresetOptions): Preset => {
-  const { nodeVersion } = options;
-
+export const netlifyPreset = ({ nodeVersion, includeFiles }: NetlifyPresetOptions): Preset => {
   return {
     name: "@resolid/react-router-hono-netlify-preset",
     reactRouterConfig: () => ({
@@ -25,7 +23,7 @@ export const netlifyPreset = (options: NetlifyPresetOptions): Preset => {
           serverRoutes: { path: string; bundleId: string }[];
           nftCache: object;
         }>({
-          includeFiles: options.includeFiles,
+          includeFiles,
           nodeVersion,
           buildManifest: buildManifest,
           reactRouterConfig: reactRouterConfig,

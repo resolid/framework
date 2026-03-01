@@ -3,15 +3,13 @@ import { buildPreset, type PresetBaseOptions } from "../utils";
 
 type NodePresetOptions = PresetBaseOptions;
 
-export const nodePreset = (options: NodePresetOptions): Preset => {
-  const { nodeVersion } = options;
-
+export const nodePreset = ({ nodeVersion, includeFiles }: NodePresetOptions): Preset => {
   return {
     name: "@resolid/react-router-hono-node-preset",
     reactRouterConfig: () => ({
       buildEnd: async ({ buildManifest, reactRouterConfig, viteConfig }) => {
         await buildPreset({
-          includeFiles: options.includeFiles,
+          includeFiles,
           nodeVersion,
           buildManifest,
           reactRouterConfig,
