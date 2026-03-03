@@ -16,6 +16,7 @@ export interface ReactRouterPluginConfig {
   appDir: string;
   buildDir: string;
   assetsDir: string;
+  basename: string;
   future: ReactRouterConfig["future"];
   ssrBuild: boolean;
   buildManifest: BuildManifest;
@@ -40,6 +41,7 @@ export function resolveReactRouterPluginConfig(
     buildDir: relative(rootDirectory, reactRouterConfig.buildDirectory),
     assetsDir: config.build?.assetsDir || "assets",
     ssrBuild: environmentBuildContext?.name === "ssr",
+    basename: reactRouterConfig.basename,
     future: reactRouterConfig.future,
     buildManifest,
   };

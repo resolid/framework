@@ -1,9 +1,8 @@
 import { format } from "@formkit/tempo";
-import { getClientIp, getRequestId } from "@resolid/dev/http.server";
 import { mergeMeta } from "@resolid/dev/router";
 import { Alert, AlertDescription, AlertTitle, ClientOnly } from "@resolid/react-ui";
 import { Suspense, useMemo } from "react";
-import { systemRepository } from "~/modules/system/repository.server";
+import { SystemRepository } from "~/modules/system/repository.server";
 import type { Route } from "./+types/status";
 
 export const meta = mergeMeta(() => [
@@ -17,10 +16,11 @@ export async function loader({ context }: Route.LoaderArgs) {
     ssr: {
       message: "服务器渲染正常",
       datetime: new Date().toISOString(),
-      requestId: getRequestId(context),
-      remoteAddress: getClientIp(context),
+      requestId: context.hono.get("requestId"),
+      remoteAddress: context.hono.get("clientIp"),
     },
-    db: systemRepository()
+    db: context.app
+      .get(SystemRepository)
       .getFirst()
       .then(() => ({ success: true, message: "数据库访问正常" }))
       .catch(() => ({ success: false, message: "数据库访问失败" })),

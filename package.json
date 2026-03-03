@@ -33,9 +33,9 @@
     "@types/node": "^24.11.0",
     "@vitest/coverage-v8": "^4.0.18",
     "knip": "^5.85.0",
-    "lefthook": "^2.1.1",
+    "lefthook": "^2.1.2",
     "oxfmt": "^0.35.0",
-    "oxlint": "^1.50.0",
+    "oxlint": "^1.51.0",
     "turbo": "^2.8.12",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"

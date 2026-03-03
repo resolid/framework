@@ -46,26 +46,6 @@ export default defineConfig(({ command }) => {
       !isBuild && tsconfigPaths(),
       !isBuild && viteInspect(),
     ].filter(Boolean),
-    environments: {
-      ssr: {
-        build: {
-          rollupOptions: {
-            output: {
-              manualChunks: undefined,
-            },
-            onwarn(warning, warn) {
-              if (
-                warning.code === "UNUSED_EXTERNAL_IMPORT" &&
-                warning.message.includes("react/jsx-runtime")
-              ) {
-                return;
-              }
-              warn(warning);
-            },
-          },
-        },
-      },
-    },
     build: {
       rollupOptions: {
         output: {

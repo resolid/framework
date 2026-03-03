@@ -14,7 +14,7 @@
     "dev": "react-router dev",
     "lint": "oxlint",
     "start:site": "NODE_ENV=production SERVER_PORT=3001 node --env-file=.env ./build/server/site/server.mjs",
-    "start:admin": "NODE_ENV=production SERVER_PORT=3002 SERVE_PATH=/admin node --env-file=.env ./build/server/admin/server.mjs",
+    "start:admin": "NODE_ENV=production SERVER_PORT=3002 SERVER_PATH=admin node --env-file=.env ./build/server/admin/server.mjs",
     "typecheck": "react-router typegen && tsc --noEmit",
     "typegen": "react-router typegen"
   },

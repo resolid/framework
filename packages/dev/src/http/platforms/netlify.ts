@@ -1,15 +1,19 @@
 import type { Context as NetlifyContext } from "@netlify/types";
+import type { Context } from "hono";
 import { handle } from "hono/netlify";
 import { env } from "node:process";
-import { createHonoServer, type HonoServerBaseOptions } from "../utils/server";
+import type { ClientIpGetter } from "../middlewares/client-ip";
+import type { RequestIdGenerator } from "../middlewares/request-id";
+import type { RequestOriginGetter } from "../middlewares/request-origin";
+import { createHonoServer, type HonoServerOptions } from "../utils/server";
 
-interface NetlifyEnv {
+export type NetlifyEnv = {
   Bindings: {
     context: NetlifyContext;
   };
-}
+};
 
-export type HonoNetlifyServerOptions = HonoServerBaseOptions<NetlifyEnv>;
+export type HonoNetlifyServerOptions = HonoServerOptions<NetlifyEnv>;
 
 export type HonoNetlifyServer = (
   req: Request,
@@ -21,12 +25,21 @@ export async function createHonoNetlifyServer(
 ): Promise<HonoNetlifyServer> {
   const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
 
-  const hono = await createHonoServer<NetlifyEnv>(mode, {
+  const app = await createHonoServer<NetlifyEnv>(mode, {
     ...options,
-    getClientIp: (ctx) => ctx.env.context.ip,
-    getRequestId: (ctx) => ctx.env.context.requestId,
-    getRequestOrigin: (ctx) => ctx.env.context.site.url,
   });
 
-  return handle(hono);
+  return handle(app);
+}
+
+export function netlifyClientIpGetter(): ClientIpGetter {
+  return (ctx: Context<NetlifyEnv>) => ctx.env.context.ip;
+}
+
+export function netlifyRequestIdGenerator(): RequestIdGenerator {
+  return (ctx: Context<NetlifyEnv>) => ctx.env.context.requestId;
+}
+
+export function netlifyRequestOriginGetter(): RequestOriginGetter {
+  return (ctx: Context<NetlifyEnv>) => ctx.env.context.site.url;
 }

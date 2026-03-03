@@ -1,5 +1,11 @@
 import type http from "node:http";
-import type { Connect, RunnableDevEnvironment, ViteDevServer, Plugin as VitePlugin } from "vite";
+import type {
+  Connect,
+  RunnableDevEnvironment,
+  ViteDevServer,
+  Plugin as VitePlugin,
+  UserConfig,
+} from "vite";
 import { getRequestListener } from "@hono/node-server";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -25,9 +31,10 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
         return;
       }
 
-      const baseConfig = {
+      const baseConfig: UserConfig = {
         define: {
           "import.meta.env.RESOLID_PLATFORM": JSON.stringify(options.platform),
+          "import.meta.env.RESOLID_BASENAME": JSON.stringify(reactRouterConfig.basename),
           "import.meta.env.RESOLID_BUILD_DIR": JSON.stringify(reactRouterConfig.buildDir),
           "import.meta.env.RESOLID_ASSETS_DIR": JSON.stringify(reactRouterConfig.assetsDir),
         },
@@ -40,11 +47,20 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
         return baseConfig;
       }
 
-      const ssrConfig = {
+      const ssrConfig: UserConfig = {
         build: {
           target: `node${options.nodeVersion}`,
           rollupOptions: {
             input: reactRouterConfig.entryFile,
+            output: {
+              manualChunks: undefined,
+            },
+            onwarn(warning, warn) {
+              if (warning.code === "UNUSED_EXTERNAL_IMPORT" && warning.message.includes("react")) {
+                return;
+              }
+              warn(warning);
+            },
           },
         },
       };

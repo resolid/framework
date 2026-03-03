@@ -2,7 +2,6 @@ import type { Http2Bindings, HttpBindings } from "@hono/node-server";
 import type { HonoOptions } from "hono/hono-base";
 import type { BlankEnv } from "hono/types";
 import { type Context, type Env, Hono } from "hono";
-import { requestId } from "hono/request-id";
 import process from "node:process";
 import {
   type AppLoadContext,
@@ -10,75 +9,61 @@ import {
   RouterContextProvider,
   type ServerBuild,
 } from "react-router";
-import { clientIp, clientIpContext } from "../middlewares/client-ip";
-import { requestIdContext } from "../middlewares/request-id";
-import { requestOrigin, requestOriginContext } from "../middlewares/request-origin";
+// @ts-expect-error - Virtual module provided by React Router at build time
+import * as build from "virtual:react-router/server-build";
 
-export type PlatformConfig<T> = (config: T | undefined) => T | undefined;
-
-export interface NodeEnv {
+export type NodeEnv = {
   Bindings: HttpBindings | Http2Bindings;
-}
+};
 
-export interface HonoServerBaseOptions<E extends Env = BlankEnv> {
+export interface HonoServerOptions<E extends Env = BlankEnv> {
   configure?: <E extends Env = BlankEnv>(app: Hono<E>) => Promise<void> | void;
   honoOptions?: HonoOptions<E>;
-  onShutdown?: () => Promise<void> | void;
   getLoadContext?: (
-    context: Context<E>,
+    c: Context<E>,
     options: {
       build: ServerBuild;
       mode?: string;
     },
   ) => Promise<RouterContextProvider> | RouterContextProvider;
+  onShutdown?: () => Promise<void> | void;
 }
-
-type HonoServerOptions<E extends Env = BlankEnv> = HonoServerBaseOptions<E> & {
-  getClientIp: (ctx: Context<E>) => string;
-  getRequestId: (ctx: Context<E>) => string;
-  getRequestOrigin: (ctx: Context<E>) => string | undefined;
-};
 
 export async function createHonoServer<E extends Env = BlankEnv>(
   mode: string | undefined,
   options: HonoServerOptions<E>,
 ): Promise<Hono<E>> {
-  const hono = new Hono<E>(options.honoOptions);
+  const basename = import.meta.env.RESOLID_BASENAME;
 
-  const build = (await import(
-    // @ts-expect-error - Virtual module provided by React Router at build time
-    "virtual:react-router/server-build"
-  )) as ServerBuild;
-
-  hono.use(
-    "*",
-    clientIp(options.getClientIp),
-    requestId({ generator: options.getRequestId }),
-    requestOrigin(options.getRequestOrigin),
-  );
+  const app = new Hono<E>(options.honoOptions);
 
   if (options.configure) {
-    await options.configure(hono);
+    await options.configure(app);
   }
 
-  hono.use("*", async (c) => {
-    return (async (ctx) => {
-      const getLoadContext = options.getLoadContext?.(ctx, { build, mode });
+  const routeApp = new Hono<E>({
+    strict: false,
+  });
 
+  routeApp.use(async (c) => {
+    return (async (ctx) => {
+      const requestHandler = createRequestHandler(build, mode);
+      const getLoadContext = options.getLoadContext?.(ctx, { build, mode });
       const loadContext =
         (getLoadContext instanceof Promise ? await getLoadContext : getLoadContext) ??
         new RouterContextProvider();
 
-      loadContext.set(clientIpContext, ctx.get("clientIp"));
-      loadContext.set(requestIdContext, ctx.get("requestId"));
-      loadContext.set(requestOriginContext, ctx.get("requestOrigin"));
+      Object.assign(loadContext, { hono: ctx });
 
-      return createRequestHandler(build, mode)(
-        ctx.req.raw,
-        loadContext as unknown as AppLoadContext,
-      );
+      return requestHandler(ctx.req.raw, loadContext as unknown as AppLoadContext);
     })(c);
   });
+
+  app.route(`${basename}`, routeApp);
+
+  if (basename) {
+    app.route(`${basename}.data`, routeApp);
+  }
 
   async function shutdown() {
     options.onShutdown?.();
@@ -92,5 +77,5 @@ export async function createHonoServer<E extends Env = BlankEnv>(
   process.on("SIGINT", shutdown);
   process.on("SIGTERM", shutdown);
 
-  return hono;
+  return app;
 }

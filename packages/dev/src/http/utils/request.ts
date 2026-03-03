@@ -1,7 +1,7 @@
 import type { Socket } from "node:net";
 
 export interface GetClientIpOptions {
-  proxy: boolean;
+  proxy?: boolean;
   proxyCount?: number;
   ipHeaders?: string;
 }

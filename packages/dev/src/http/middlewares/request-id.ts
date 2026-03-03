@@ -1,12 +1,16 @@
-import type { Context } from "hono";
-import { createContext, type RouterContext, RouterContextProvider } from "react-router";
+import type { Context, MiddlewareHandler } from "hono";
+import { requestId as honoRequestId, type RequestIdVariables } from "hono/request-id";
+import { randomBytes } from "node:crypto";
 
-export const requestIdContext: RouterContext<string> = createContext<string>();
+export type RequestIdGenerator = (c: Context) => string;
 
-export function getRequestId(context: Readonly<RouterContextProvider> | Context): string {
-  if (context instanceof RouterContextProvider) {
-    return context.get(requestIdContext);
-  }
+declare module "hono" {
+  // oxlint-disable-next-line typescript/no-empty-object-type
+  interface ContextVariableMap extends RequestIdVariables {}
+}
 
-  return (context as Context).get("requestId");
+export function requestId(
+  generator: RequestIdGenerator = () => randomBytes(16).toString("hex"),
+): MiddlewareHandler {
+  return honoRequestId({ generator });
 }
