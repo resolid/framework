@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.3.1
+
+### Patch Changes
+
+- fix: rewrite middleware architecture for clearer dependency boundaries ([`edcccd7`](https://github.com/resolid/framework/commit/edcccd7dc52dbaf11c557c1c0a21aa18547c12bc))
+
 ## 0.3.0
 
 ### Minor Changes
