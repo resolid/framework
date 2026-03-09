@@ -1,6 +1,7 @@
-import { format } from "@formkit/tempo";
 import { mergeMeta } from "@resolid/dev/router";
 import { Alert, AlertDescription, AlertTitle, ClientOnly } from "@resolid/react-ui";
+import { deviceTimezone } from "@resolid/utils";
+import { formatDate } from "@resolid/utils/date";
 import { Suspense, useMemo } from "react";
 import { SystemRepository } from "~/modules/system/repository.server";
 import type { Route } from "./+types/status";
@@ -32,18 +33,14 @@ export default function Status({ loaderData }: Route.ComponentProps) {
 
   const clientTimeZone = useMemo(() => {
     if (typeof window !== "undefined") {
-      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return deviceTimezone();
     }
 
     return "";
   }, []);
 
   const formatDatetime = (datetime: Date | string) =>
-    format({
-      date: datetime,
-      format: "YYYY-MM-DD HH:mm",
-      tz: clientTimeZone,
-    });
+    formatDate(datetime, "YYYY-MM-DD HH:mm", { timezone: clientTimeZone });
 
   return (
     <div className="mx-auto prose px-4 py-8 dark:prose-invert">

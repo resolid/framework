@@ -14,5 +14,7 @@ export default defineConfig({
   treeshake: true,
   clean: true,
   minify: true,
-  external: ["virtual:react-router/server-build"],
+  deps: {
+    neverBundle: ["virtual:react-router/server-build"],
+  },
 }) as UserConfig;

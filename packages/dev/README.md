@@ -18,13 +18,12 @@ pnpm add -D @resolid/dev @react-router/dev
 - `defineDevConfig` (`@resolid/dev`): generate unified `vitePluginOptions` and `reactRouterConfig`.
 - `resolidVite` (`@resolid/dev/vite`): combine Resolid plugin behavior with React Router Vite
   plugin.
-- Route helpers (`@resolid/dev/routes`):`flexRoutes`, `relativeFactory`, `prefix`, `route`,
-  `layout`, `index`.
+- Route helpers (`@resolid/dev/routes`):`flexRoutes`, `relativeFactory`.
 - Router helpers (`@resolid/dev/router`): `mergeMeta`.
-- Server-side router helpers (`@resolid/dev/router.server`):
-  `createRequestIdMiddleware`, `httpNotFound`, `getClientIp`, `getRequestOrigin`.
-- Server adapters (`@resolid/dev/server`): `createServer`, `nodeConfig`, `netlifyConfig`,
-  `vercelConfig`.
+- HTTP server helpers (`@resolid/dev/http.server`):
+  `requestId`, `clientIp`, `requestOrigin`, `httpProblem`, `httpNotFound`, `httpRedirect`.
+- HTTP platform adapters (`@resolid/dev/http.server`): `createHonoNodeServer`,
+  `createHonoNetlifyServer`, `createHonoVercelServer`.
 
 ## Usage patterns
 
@@ -73,18 +72,11 @@ export default reactRouterConfig;
 
 ```ts
 // src/server.ts
-import { createServer, netlifyConfig, nodeConfig, vercelConfig } from "@resolid/dev/server";
+import { createHonoVercelServer, createHonoNodeServer } from "@resolid/dev/http.server";
 
-export default await createServer((platform) => {
-  switch (platform) {
-    case "vercel":
-      return vercelConfig({});
-    case "netlify":
-      return netlifyConfig({});
-    default:
-      return nodeConfig({});
-  }
-});
+export default await (import.meta.env.RESOLID_PLATFORM == "vercel"
+  ? createHonoVercelServer()
+  : createHonoNodeServer());
 ```
 
 ### 5) React Router document
