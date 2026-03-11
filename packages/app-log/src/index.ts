@@ -113,8 +113,7 @@ export function createLogExtension(
         factory() {
           /* istanbul ignore next -- @preserve */
           const sinks = targets.reduce<Record<string, Sink>>((acc, target) => {
-            const service = container.get(target.ref);
-            return { ...acc, ...target.sinks(service) };
+            return Object.assign(acc, target.sinks(container.get(target.ref)));
           }, {});
 
           return new LogService({

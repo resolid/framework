@@ -7,15 +7,19 @@ export async function visitFiles(
   visitor: (file: string) => void,
   base: string = dir,
 ): Promise<void> {
-  for (const entry of await readdir(dir, { withFileTypes: true, encoding: "utf8" })) {
-    const file = join(dir, entry.name);
+  const entries = await readdir(dir, { withFileTypes: true, encoding: "utf8" });
 
-    if (entry.isDirectory()) {
-      await visitFiles(file, visitor, base);
-    } else if (entry.isFile()) {
-      visitor(relative(base, file));
-    }
-  }
+  await Promise.all(
+    entries.map(async (entry) => {
+      const filePath = join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        return visitFiles(filePath, visitor, base);
+      } else if (entry.isFile()) {
+        visitor(relative(base, filePath));
+      }
+    }),
+  );
 }
 
 type RouteManifestEntry = {
@@ -378,7 +382,9 @@ class PrefixLookupTrie {
   };
 
   add(value: string): void {
-    if (!value) throw new Error("Cannot add empty string to PrefixLookupTrie");
+    if (!value) {
+      throw new Error("Cannot add empty string to PrefixLookupTrie");
+    }
 
     let node = this.root;
     for (const char of value) {
@@ -395,7 +401,10 @@ class PrefixLookupTrie {
   findAndRemove(prefix: string, filter: (nodeValue: string) => boolean): string[] {
     let node = this.root;
     for (const char of prefix) {
-      if (!node[char]) return [];
+      if (!node[char]) {
+        return [];
+      }
+
       node = node[char];
     }
 

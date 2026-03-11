@@ -53,12 +53,12 @@
     "drizzle-orm": "^0.45.1"
   },
   "devDependencies": {
-    "tsdown": "^0.21.0",
+    "tsdown": "^0.21.1",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "@resolid/core": "workspace:^",
-    "mysql2": "^3.16.0"
+    "mysql2": "^3.19.1"
   },
   "engines": {
     "node": "^22.13.0 || >=24"
