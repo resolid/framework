@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.3.2
+
+### Patch Changes
+
+- style: fix code style issues reported by oxlint ([`91ba105`](https://github.com/resolid/framework/commit/91ba10502e1765173cceeabefb388136dbd86b26))
+
 ## 0.3.1
 
 ### Patch Changes
