@@ -1,5 +1,13 @@
 # @resolid/dev
 
+## 0.3.2
+
+### Patch Changes
+
+- fix: avoid HMR listener leak for process signals ([`df37b5b`](https://github.com/resolid/framework/commit/df37b5b769feaf84f9dedc53e473b2cebe4b4bce))
+
+- style: fix code style issues reported by oxlint ([`91ba105`](https://github.com/resolid/framework/commit/91ba10502e1765173cceeabefb388136dbd86b26))
+
 ## 0.3.1
 
 ### Patch Changes
