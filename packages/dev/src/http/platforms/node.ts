@@ -16,6 +16,7 @@ export type HonoNodeServerOptions = HonoServerOptions<NodeEnv> & {
   port?: number;
   defaultLogger?: boolean;
   listeningListener?: (info: AddressInfo) => void;
+  onShutdown?: () => Promise<void> | void;
 };
 
 export type HonoNodeServer = Hono<NodeEnv>;
@@ -69,10 +70,6 @@ export async function createHonoNodeServer(
     },
     honoOptions: mergedOptions.honoOptions,
     getLoadContext: mergedOptions.getLoadContext,
-    onShutdown: async () => {
-      server?.close();
-      mergedOptions.onShutdown?.();
-    },
   });
 
   if (isProduction) {
@@ -83,6 +80,27 @@ export async function createHonoNodeServer(
       },
       mergedOptions.listeningListener,
     );
+  }
+
+  async function shutdown() {
+    server?.close();
+    mergedOptions.onShutdown?.();
+
+    process.removeListener("SIGINT", shutdown);
+    process.removeListener("SIGTERM", shutdown);
+
+    console.log("[resolid] Node server shutdown.");
+
+    process.exit(0);
+  }
+
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
+
+  // @ts-expect-error hot
+  if (import.meta.hot) {
+    process.removeListener("SIGINT", shutdown);
+    process.removeListener("SIGTERM", shutdown);
   }
 
   return app;

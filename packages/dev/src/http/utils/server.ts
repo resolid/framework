@@ -2,7 +2,6 @@ import type { Http2Bindings, HttpBindings } from "@hono/node-server";
 import type { HonoOptions } from "hono/hono-base";
 import type { BlankEnv } from "hono/types";
 import { type Context, type Env, Hono } from "hono";
-import process from "node:process";
 import {
   type AppLoadContext,
   createRequestHandler,
@@ -26,7 +25,6 @@ export interface HonoServerOptions<E extends Env = BlankEnv> {
       mode?: string;
     },
   ) => Promise<RouterContextProvider> | RouterContextProvider;
-  onShutdown?: () => Promise<void> | void;
 }
 
 export async function createHonoServer<E extends Env = BlankEnv>(
@@ -64,18 +62,6 @@ export async function createHonoServer<E extends Env = BlankEnv>(
   if (basename) {
     app.route(`${basename}.data`, routeApp);
   }
-
-  async function shutdown() {
-    options.onShutdown?.();
-
-    process.removeListener("SIGINT", shutdown);
-    process.removeListener("SIGTERM", shutdown);
-
-    process.exit(0);
-  }
-
-  process.on("SIGINT", shutdown);
-  process.on("SIGTERM", shutdown);
 
   return app;
 }
