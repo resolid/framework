@@ -1,5 +1,4 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
   "files.associations": {
     "*.css": "tailwindcss"
   },
@@ -25,5 +24,6 @@
   "tailwindCSS.experimental.configFile": "website/src/root.css",
   "vitest.maximumConfigs": 15,
   "prettier.enable": false,
-  "eslint.enable": false
+  "eslint.enable": false,
+  "js/ts.tsdk.path": "node_modules/typescript/lib"
 }
