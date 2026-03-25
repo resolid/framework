@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.7.2
+
+### Patch Changes
+
+- style: fix oxlint warnings ([`5092f5f`](https://github.com/resolid/framework/commit/5092f5f0a537ec34b0b3bbc1413402f90e61ba0c))
+
 ## 0.7.1
 
 ### Patch Changes
@@ -23,6 +29,7 @@
 ### Minor Changes
 
 - ## Features ([`21cdb36`](https://github.com/resolid/framework/commit/21cdb36989650216bec4fc46da0f22f74e68910d))
+
   - **di:** refactor of dependency injection container
     - Rewritten container core with async provider support
     - Added injection context handling
@@ -30,6 +37,7 @@
     - Simplified extension registration mechanism
 
   ### BREAKING CHANGES
+
   - Old provider registration and resolution APIs are no longer compatible
   - Container instances must now use async initialization for async dependencies
 
