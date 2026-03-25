@@ -27,7 +27,7 @@ export const vercelPreset = ({ nodeVersion, includeFiles }: VercelPresetOptions)
 
             await copyStaticFiles(join(reactRouterConfig.buildDirectory, "client"), vercelOutput);
             await writeVercelConfigJson(
-              viteConfig.build.assetsDir ?? "assets",
+              viteConfig.build.assetsDir,
               buildManifest,
               join(vercelOutput, "config.json"),
             );

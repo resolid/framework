@@ -10,8 +10,8 @@ export interface Provider<T = unknown> {
 }
 
 export class Container implements Resolver, Disposable {
-  private readonly _providers = new Map<Token, Provider>();
-  private readonly _singletons = new Map<Token, unknown>();
+  private readonly _providers: Map<Token, Provider> = new Map();
+  private readonly _singletons: Map<Token, unknown> = new Map();
   private readonly _constructing: Token[] = [];
 
   private _checkCircularDependency(token: Token) {
@@ -92,7 +92,7 @@ export class Container implements Resolver, Disposable {
         } catch (err) {
           errorCount++;
           /* istanbul ignore next -- @preserve */
-          errorMsg += `${toString(token)}: ${err instanceof Error ? err.message : err}; `;
+          errorMsg += `${toString(token)}: ${err instanceof Error ? err.message : String(err)}; `;
         }
       }
     }

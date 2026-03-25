@@ -44,7 +44,7 @@ export const ColorModeToggle = () => {
           />
         )}
       >
-        <SpriteIcon size="1.325em" name={colorModes[colorMode]?.icon} />
+        <SpriteIcon size="1.325em" name={colorModes[colorMode].icon} />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="text-sm">
         <DropdownMenuArrow />

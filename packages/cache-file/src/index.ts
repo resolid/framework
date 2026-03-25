@@ -6,7 +6,7 @@ const INVALID_KEY_RE = /(\.\/|\.\.\/)/;
 
 export class FileCache implements CacheStore {
   private readonly _basePath: string;
-  private readonly _locks = new Map<string, Promise<void>>();
+  private readonly _locks: Map<string, Promise<void>> = new Map();
 
   constructor(basePath: string) {
     this._basePath = basePath;
@@ -34,7 +34,7 @@ export class FileCache implements CacheStore {
     const prev = this._locks.get(key) ?? Promise.resolve();
 
     let release!: () => void;
-    const current = new Promise<void>((r) => (release = r));
+    const current: Promise<void> = new Promise((r) => (release = r));
 
     this._locks.set(
       key,

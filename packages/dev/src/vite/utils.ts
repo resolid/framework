@@ -8,7 +8,7 @@ interface ReactRouterPluginContext {
   rootDirectory: string;
   reactRouterConfig: Required<ReactRouterConfig>;
   environmentBuildContext: { name: "client" | "ssr" } | null;
-  buildManifest: BuildManifest;
+  buildManifest: BuildManifest | null;
 }
 
 export interface ReactRouterPluginConfig {
@@ -19,7 +19,7 @@ export interface ReactRouterPluginConfig {
   basename: string;
   future: ReactRouterConfig["future"];
   ssrBuild: boolean;
-  buildManifest: BuildManifest;
+  buildManifest: BuildManifest | null;
 }
 
 export function resolveReactRouterPluginConfig(
@@ -39,7 +39,7 @@ export function resolveReactRouterPluginConfig(
     entryFile: join(appDir, options.entryFile),
     appDir: appDir,
     buildDir: relative(rootDirectory, reactRouterConfig.buildDirectory),
-    assetsDir: config.build?.assetsDir || "assets",
+    assetsDir: config.build?.assetsDir ?? "assets",
     ssrBuild: environmentBuildContext?.name === "ssr",
     basename: reactRouterConfig.basename,
     future: reactRouterConfig.future,

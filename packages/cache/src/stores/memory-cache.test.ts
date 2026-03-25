@@ -46,7 +46,7 @@ describe("createMemoryCache", () => {
 
   it("should dispose the cache", async () => {
     await cache.set("x", "y");
-    await cache.dispose?.();
+    await cache.dispose();
     expect(await cache.get("x")).toBeUndefined();
   });
 

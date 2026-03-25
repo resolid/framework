@@ -1,7 +1,9 @@
 import { defineConfig, type ViteUserConfig } from "vitest/config";
 
-export default defineConfig({
+const config: ViteUserConfig = defineConfig({
   test: {
     dir: "./src",
   },
-}) as ViteUserConfig;
+});
+
+export default config;

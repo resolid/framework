@@ -31,17 +31,16 @@ type RouteManifestEntry = {
   file: string;
 };
 
-type RouteManifest = {
-  [routeId: string]: RouteManifestEntry;
-};
+type RouteManifest = Record<string, RouteManifestEntry>;
 
 export function routeManifestToRouteConfig(
   routeManifest: RouteManifest,
   rootId = "root",
 ): RouteConfigEntry[] {
-  const routeConfigById: {
-    [id: string]: Omit<RouteConfigEntry, "id"> & Required<Pick<RouteConfigEntry, "id">>;
-  } = {};
+  const routeConfigById: Record<
+    string,
+    Omit<RouteConfigEntry, "id"> & Required<Pick<RouteConfigEntry, "id">>
+  > = {};
 
   for (const [routeId, route] of Object.entries(routeManifest)) {
     routeConfigById[routeId] = {
@@ -56,7 +55,7 @@ export function routeManifestToRouteConfig(
   const routeConfig: RouteConfigEntry[] = [];
 
   for (const [, route] of Object.entries(routeConfigById)) {
-    const { parentId } = routeManifest[route.id];
+    const { parentId } = routeManifest[route.id]!;
 
     if (parentId === rootId) {
       routeConfig.push(route);
@@ -64,7 +63,7 @@ export function routeManifestToRouteConfig(
       const parentRoute = parentId && routeConfigById[parentId];
 
       if (parentRoute) {
-        parentRoute.children = parentRoute.children || [];
+        parentRoute.children = parentRoute.children ?? [];
         parentRoute.children.push(route);
       }
     }
@@ -75,8 +74,8 @@ export function routeManifestToRouteConfig(
 
 export function filesToRouteManifest(routesDirectory: string, files: string[]): RouteManifest {
   const routeManifest: RouteManifest = {};
-  const routeIds = new Map<string, string>();
-  const routeIdConflicts = new Map<string, string[]>();
+  const routeIds: Map<string, string> = new Map();
+  const routeIdConflicts: Map<string, string[]> = new Map();
 
   for (const file of files) {
     const normalizedFile = normalizeSlashes(join(routesDirectory, file));
@@ -123,50 +122,48 @@ export function filesToRouteManifest(routesDirectory: string, files: string[]): 
 
     if (childRouteIds.length > 0) {
       for (const childRouteId of childRouteIds) {
-        routeManifest[childRouteId].parentId = routeId;
+        routeManifest[childRouteId]!.parentId = routeId;
       }
     }
   }
 
-  const parentChildrenMap = new Map<string, RouteManifestEntry[]>();
+  const parentChildrenMap: Map<string, RouteManifestEntry[]> = new Map();
 
   for (const [routeId] of sortedRouteIds) {
-    const config = routeManifest[routeId];
+    const config = routeManifest[routeId]!;
 
     if (!config.parentId) {
       continue;
     }
 
-    const existingChildren = parentChildrenMap.get(config.parentId) || [];
+    const existingChildren = parentChildrenMap.get(config.parentId) ?? [];
     existingChildren.push(config);
     parentChildrenMap.set(config.parentId, existingChildren);
   }
 
-  const uniqueRoutes = new Map<string, RouteManifestEntry>();
-  const urlConflicts = new Map<string, RouteManifestEntry[]>();
+  const uniqueRoutes: Map<string, RouteManifestEntry> = new Map();
+  const urlConflicts: Map<string, RouteManifestEntry[]> = new Map();
 
   for (const [routeId] of sortedRouteIds) {
-    const config = routeManifest[routeId];
-    const originalPathname = config.path || "";
+    const config = routeManifest[routeId]!;
+    const originalPathname = config.path ?? "";
     const parentConfig = config.parentId ? routeManifest[config.parentId] : null;
+
     let pathname = config.path;
 
     if (parentConfig?.path && pathname) {
       pathname = pathname.slice(parentConfig.path.length).replace(/^\//, "").replace(/\/$/, "");
     }
 
-    if (!config.parentId) {
-      config.parentId = "root";
-    }
-
-    config.path = pathname || undefined;
+    config.parentId ??= "root";
+    config.path = pathname?.length == 0 ? undefined : pathname;
 
     const lastRouteSegment = config.id
       .replace(new RegExp(`^${routesDirectory}/`), "")
       .split(/[./]/)
       .pop();
 
-    if (lastRouteSegment && lastRouteSegment[0] == "_" && lastRouteSegment !== "_index") {
+    if (lastRouteSegment?.[0] == "_" && lastRouteSegment !== "_index") {
       continue;
     }
 
@@ -177,9 +174,7 @@ export function filesToRouteManifest(routesDirectory: string, files: string[]): 
 
     if (conflict && (originalPathname || config.index)) {
       let currentConflicts = urlConflicts.get(originalPathname);
-      if (!currentConflicts) {
-        currentConflicts = [conflict];
-      }
+      currentConflicts ??= [conflict];
       currentConflicts.push(config);
       urlConflicts.set(originalPathname, currentConflicts);
     }
@@ -200,7 +195,7 @@ export function filesToRouteManifest(routesDirectory: string, files: string[]): 
   if (urlConflicts.size > 0) {
     for (const [path, routes] of urlConflicts.entries()) {
       for (let i = 1; i < routes.length; i++) {
-        delete routeManifest[routes[i].id];
+        delete routeManifest[routes[i]!.id];
       }
 
       const [taken, ...others] = routes.map((r) => r.file);
@@ -353,8 +348,9 @@ function createRoutePath(
   const localSegments = isIndex ? routeSegments.slice(0, -1) : routeSegments;
 
   for (let index = 0; index < localSegments.length; index++) {
-    const rawSegment = rawRouteSegments[index];
-    let segment = localSegments[index];
+    const rawSegment = rawRouteSegments[index]!;
+
+    let segment = localSegments[index]!;
 
     if (segment.startsWith("_") && rawSegment.startsWith("_")) {
       continue;
@@ -387,14 +383,14 @@ class PrefixLookupTrie {
     }
 
     let node = this.root;
+
     for (const char of value) {
-      if (!node[char]) {
-        node[char] = {
-          [PrefixLookupTrieEndSymbol]: false,
-        };
-      }
+      node[char] ??= {
+        [PrefixLookupTrieEndSymbol]: false,
+      };
       node = node[char];
     }
+
     node[PrefixLookupTrieEndSymbol] = true;
   }
 
@@ -418,7 +414,7 @@ class PrefixLookupTrie {
     filter: (nodeValue: string) => boolean,
   ): string[] {
     for (const char of Object.keys(node)) {
-      this.#findAndRemoveRecursive(values, node[char], prefix + char, filter);
+      this.#findAndRemoveRecursive(values, node[char]!, prefix + char, filter);
     }
 
     if (node[PrefixLookupTrieEndSymbol] && filter(prefix)) {

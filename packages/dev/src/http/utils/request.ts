@@ -7,7 +7,7 @@ export interface GetClientIpOptions {
 }
 
 export function getRemoteAddr(req: Request, socket: Socket, options?: GetClientIpOptions): string {
-  const { proxy = false, proxyCount = 0, ipHeaders = "x-forwarded-for" } = options || {};
+  const { proxy = false, proxyCount = 0, ipHeaders = "x-forwarded-for" } = options ?? {};
 
   const val = req.headers.get(ipHeaders);
 
@@ -17,7 +17,7 @@ export function getRemoteAddr(req: Request, socket: Socket, options?: GetClientI
     ips = ips.slice(-proxyCount);
   }
 
-  return ips[0] || socket.remoteAddress || "";
+  return ips[0] ?? socket.remoteAddress ?? "";
 }
 
 export function getRequestOrigin(req: Request, socket: Socket, proxy = false): string {

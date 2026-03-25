@@ -14,11 +14,13 @@ export const RouteProcessBar = () => {
       return;
     }
 
-    Promise.allSettled(ref.current.getAnimations().map(({ finished }) => finished)).then(() => {
-      if (!active) {
-        setAnimating(false);
-      }
-    });
+    void Promise.allSettled(ref.current.getAnimations().map(({ finished }) => finished)).then(
+      () => {
+        if (!active) {
+          setAnimating(false);
+        }
+      },
+    );
 
     const id = active ? setTimeout(() => setAnimating(true), 100) : null;
 

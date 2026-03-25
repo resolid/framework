@@ -1,7 +1,7 @@
 export const normalizeKey = (key: string): string => {
   const normalized = key
     .split("?")[0]
-    .replace(/[/\\]/g, ":")
+    ?.replace(/[/\\]/g, ":")
     .replace(/:+/g, ":")
     .replace(/^:|:$/g, "");
 

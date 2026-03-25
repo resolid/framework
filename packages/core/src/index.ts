@@ -150,7 +150,7 @@ class App<E extends Record<string, unknown>> {
 export async function createApp<E extends ExposeSchema = Record<string, never>>(
   options: AppOptions<E>,
 ): Promise<App<InferExpose<E>>> {
-  const app = new App<InferExpose<E>>(options as unknown as AppOptions);
+  const app: App<InferExpose<E>> = new App(options as unknown as AppOptions);
 
   await app.init();
 

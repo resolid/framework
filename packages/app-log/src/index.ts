@@ -86,7 +86,7 @@ export class LogService {
 }
 
 export interface LogTarget {
-  ref: Token<unknown>;
+  ref: Token;
   sinks: (service: unknown) => Record<string, Sink>;
 }
 
@@ -96,7 +96,7 @@ export function createLogTarget<T>(target: {
   sinks: (service: T) => Record<string, Sink>;
 }): LogTarget {
   return {
-    ref: target.ref as Token<unknown>,
+    ref: target.ref as Token,
     sinks: target.sinks as (service: unknown) => Record<string, Sink>,
   };
 }
@@ -119,7 +119,7 @@ export function createLogExtension(
           return new LogService({
             sinks,
             ...config,
-            defaultCategory: config?.defaultCategory ?? name,
+            defaultCategory: config.defaultCategory ?? name,
           });
         },
       },

@@ -44,12 +44,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@logtape/file": "^2.0.4",
+    "@logtape/file": "^2.0.5",
     "@resolid/app-log": "workspace:^"
   },
   "devDependencies": {
-    "tsdown": "^0.21.4",
-    "typescript": "^5.9.3"
+    "tsdown": "^0.21.5"
   },
   "peerDependencies": {
     "@resolid/core": "workspace:^"

@@ -1,7 +1,7 @@
 import { resolve } from "path";
 import { defineConfig, type ViteUserConfig } from "vitest/config";
 
-export default defineConfig({
+const config: ViteUserConfig = defineConfig({
   test: {
     dir: "./src",
     coverage: {
@@ -14,4 +14,6 @@ export default defineConfig({
       "@resolid/app-db": resolve(import.meta.dirname, "../app-db/src"),
     },
   },
-}) as ViteUserConfig;
+});
+
+export default config;

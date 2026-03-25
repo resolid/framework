@@ -35,5 +35,5 @@ export function vercelRequestIdGenerator(): RequestIdGenerator {
 }
 
 export function vercelRequestOriginGetter(): RequestOriginGetter {
-  return () => `https://${env["VERCEL_PROJECT_PRODUCTION_URL"]}`;
+  return () => `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`;
 }

@@ -44,12 +44,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@logtape/logtape": "^2.0.4",
+    "@logtape/logtape": "^2.0.5",
     "@resolid/core": "workspace:^"
   },
   "devDependencies": {
-    "tsdown": "^0.21.4",
-    "typescript": "^5.9.3"
+    "tsdown": "^0.21.5"
   },
   "engines": {
     "node": "^22.13.0 || >=24"

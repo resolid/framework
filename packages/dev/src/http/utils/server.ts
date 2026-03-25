@@ -33,13 +33,13 @@ export async function createHonoServer<E extends Env = BlankEnv>(
 ): Promise<Hono<E>> {
   const basename = import.meta.env.RESOLID_BASENAME;
 
-  const app = new Hono<E>(options.honoOptions);
+  const app: Hono<E> = new Hono(options.honoOptions);
 
   if (options.configure) {
     await options.configure(app);
   }
 
-  const routeApp = new Hono<E>({
+  const routeApp: Hono<E> = new Hono({
     strict: false,
   });
 
@@ -57,7 +57,7 @@ export async function createHonoServer<E extends Env = BlankEnv>(
     })(c);
   });
 
-  app.route(`${basename}`, routeApp);
+  app.route(basename, routeApp);
 
   if (basename) {
     app.route(`${basename}.data`, routeApp);

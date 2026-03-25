@@ -17,12 +17,13 @@
     "**/.vercel/**": true,
     "**/build/**": true
   },
-  "editor.formatOnSave": true,
   "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "oxc.typeAware": true,
   "debug.javascript.codelens.npmScripts": "never",
   "tailwindCSS.classFunctions": ["tx", "tv"],
   "tailwindCSS.experimental.configFile": "website/src/root.css",
-  "vitest.maximumConfigs": 15,
   "prettier.enable": false,
   "eslint.enable": false,
   "js/ts.tsdk.path": "node_modules/typescript/lib"

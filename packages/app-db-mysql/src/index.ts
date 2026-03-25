@@ -84,8 +84,8 @@ export function createMySQLDatabaseExtension<
         },
       },
     ],
-    bootstrap() {
-      container.get(DatabaseService).connect();
+    async bootstrap() {
+      await container.get(DatabaseService).connect();
     },
   });
 }

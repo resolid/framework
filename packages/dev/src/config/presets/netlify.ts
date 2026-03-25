@@ -32,7 +32,7 @@ export const netlifyPreset = ({ nodeVersion, includeFiles }: NetlifyPresetOption
             const netlifyRoot = await createDir([viteConfig.root, ".netlify", "v1"], true);
 
             await writeNetlifyConfigJson(
-              viteConfig.build.assetsDir ?? "assets",
+              viteConfig.build.assetsDir,
               join(netlifyRoot, "config.json"),
             );
 

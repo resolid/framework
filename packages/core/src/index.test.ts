@@ -34,7 +34,7 @@ describe("createApp", () => {
       (config: { from?: string } = {}): ExtensionCreator =>
       () => ({
         name: "mail-extension",
-        providers: [{ token: MAIL, factory: () => ({ from: config?.from ?? "" }) }],
+        providers: [{ token: MAIL, factory: () => ({ from: config.from ?? "" }) }],
       });
 
     const app = await createApp({

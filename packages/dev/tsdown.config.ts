@@ -1,6 +1,6 @@
 import { defineConfig, type UserConfig } from "tsdown";
 
-export default defineConfig({
+const config: UserConfig = defineConfig({
   entry: {
     index: "src/index.ts",
     http: "src/http/index.ts",
@@ -17,4 +17,6 @@ export default defineConfig({
   deps: {
     neverBundle: ["virtual:react-router/server-build"],
   },
-}) as UserConfig;
+});
+
+export default config;

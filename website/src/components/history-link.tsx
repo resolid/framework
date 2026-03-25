@@ -29,19 +29,19 @@ export const HistoryBack = (props: PrimitiveProps<"button", HistoryBackProps, "c
   const navigate = useNavigate();
   const { state } = useLocation();
 
-  const historyBack = () => {
+  const historyBack = async () => {
     if (state?.previous) {
-      navigate(-1);
+      await navigate(-1);
     } else {
-      navigate(backTo);
+      await navigate(backTo);
     }
   };
 
   return (
     <Button
-      onClick={(e) => {
+      onClick={async (e) => {
         onClick?.(e);
-        historyBack();
+        await historyBack();
       }}
       {...rest}
     >

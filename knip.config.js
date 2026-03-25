@@ -8,7 +8,11 @@ export default {
 
   ignoreBinaries: ["only-allow"],
 
-  ignoreDependencies: ["@tailwindcss/language-server", "babel-plugin-react-compiler"],
+  ignoreDependencies: [
+    "@tailwindcss/language-server",
+    "@tailwindcss/typography",
+    "babel-plugin-react-compiler",
+  ],
 
   compilers: {
     css: (text) =>

@@ -56,7 +56,7 @@ type BuildPresetOptions<BuildContext> = OptionalToUndefined<PresetBaseOptions> &
 
 export async function buildPreset<BuildContext>({
   includeFiles = [],
-  nodeVersion = 22,
+  nodeVersion,
   buildManifest,
   reactRouterConfig,
   viteConfig,
@@ -64,7 +64,7 @@ export async function buildPreset<BuildContext>({
   buildBundleEnd,
 }: BuildPresetOptions<BuildContext>): Promise<void> {
   const rootPath = viteConfig.root;
-  const assetsDir = viteConfig.build.assetsDir ?? "assets";
+  const { assetsDir } = viteConfig.build;
   const packageJson = JSON.parse(
     await readFile(join(rootPath, "package.json"), "utf8"),
   ) as PackageJson;
@@ -81,7 +81,7 @@ export async function buildPreset<BuildContext>({
     },
   };
 
-  const matchedFiles = includeFiles?.length > 0 ? await fg(includeFiles, { cwd: rootPath }) : [];
+  const matchedFiles = includeFiles.length > 0 ? await fg(includeFiles, { cwd: rootPath }) : [];
 
   const context = await buildStart();
 
@@ -235,10 +235,8 @@ export function getServerRoutes(buildManifest: BuildManifest | undefined): {
 
     const routePathBundles: Record<string, string[]> = {};
 
-    for (const [routeId, serverBoundId] of Object.entries(buildManifest?.routeIdToServerBundleId)) {
-      if (!routePathBundles[serverBoundId]) {
-        routePathBundles[serverBoundId] = [];
-      }
+    for (const [routeId, serverBoundId] of Object.entries(buildManifest.routeIdToServerBundleId)) {
+      routePathBundles[serverBoundId] ??= [];
 
       for (const routePath of routes) {
         if (routePath.id == routeId) {
@@ -257,7 +255,7 @@ export function getServerRoutes(buildManifest: BuildManifest | undefined): {
           !bundleRoutes[path] &&
           !Object.keys(bundleRoutes).find(
             (key) =>
-              bundleRoutes[key].bundleId == bundleId && path.startsWith(bundleRoutes[key].path),
+              bundleRoutes[key]!.bundleId == bundleId && path.startsWith(bundleRoutes[key]!.path),
           )
         ) {
           bundleRoutes[path] = { path: path, bundleId: bundleId };
@@ -286,7 +284,7 @@ function getRoutePathsFromParentId(routes: BuildManifest["routes"], parentId: st
   const paths: string[] = [];
 
   const findPath = (routeId: string) => {
-    const route = routes[routeId];
+    const route = routes[routeId]!;
 
     if (route.parentId) {
       findPath(route.parentId);
@@ -319,7 +317,7 @@ export async function copyFilesToFunction(
 
   const fileList = Array.from(traced.fileList).map((file) => join(base, file));
 
-  let ancestorDir = dirname(fileList[0]);
+  let ancestorDir = dirname(fileList[0]!);
 
   for (const file of fileList.slice(1)) {
     while (!file.startsWith(ancestorDir)) {

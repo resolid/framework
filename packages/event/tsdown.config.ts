@@ -1,6 +1,6 @@
 import { defineConfig, type UserConfig } from "tsdown";
 
-export default defineConfig({
+const config: UserConfig = defineConfig({
   entry: "src/index.ts",
   format: "esm",
   target: "es2022",
@@ -8,4 +8,6 @@ export default defineConfig({
   treeshake: true,
   clean: true,
   minify: true,
-}) as UserConfig;
+});
+
+export default config;

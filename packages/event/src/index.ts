@@ -2,7 +2,7 @@ type Callback<Args extends unknown[] = unknown[]> = (...args: Args) => void;
 
 export class Emitter {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private readonly _events = new Map<string, Callback<any>[]>();
+  private readonly _events: Map<string, Callback<any>[]> = new Map();
 
   on<Args extends unknown[]>(event: string, callback: Callback<Args>): () => void {
     let callbacks = this._events.get(event);
@@ -60,10 +60,8 @@ export class Emitter {
       return;
     }
 
-    const len = callbacks.length;
-
-    for (let i = 0; i < len; i++) {
-      callbacks[i](...args);
+    for (const callback of callbacks) {
+      callback(...args);
     }
   }
 
@@ -76,10 +74,8 @@ export class Emitter {
     }
 
     queueMicrotask(() => {
-      const len = callbacks.length;
-
-      for (let i = 0; i < len; i++) {
-        callbacks[i](...args);
+      for (const callback of callbacks) {
+        callback(...args);
       }
     });
   }

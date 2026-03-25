@@ -1,10 +1,7 @@
 {
-  "extends": "@resolid/config/tsconfig/base.json",
+  "extends": "@resolid/config/tsconfig/lib.json",
   "include": ["src/**/*", "*.config.ts"],
   "compilerOptions": {
-    "allowJs": false,
-    "declaration": true,
-    "isolatedDeclarations": true,
     "paths": {
       "@resolid/di": ["../di/src"],
       "@resolid/event": ["../event/src"]

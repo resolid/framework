@@ -86,7 +86,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
       if (reactRouterConfig?.buildManifest?.serverBundles) {
         for (const key of Object.keys(reactRouterConfig.buildManifest.serverBundles)) {
           if (config.environments[`ssrBundle_${key}`]) {
-            config.environments[`ssrBundle_${key}`].build.rollupOptions.input =
+            config.environments[`ssrBundle_${key}`]!.build.rollupOptions.input =
               reactRouterConfig.entryFile;
           }
         }
@@ -98,7 +98,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
         return;
       }
 
-      const excludePatterns = createExcludePatterns(reactRouterConfig.appDir, options?.devExclude);
+      const excludePatterns = createExcludePatterns(reactRouterConfig.appDir, options.devExclude);
 
       const createMiddleware =
         async (devServer: ViteDevServer): Promise<Connect.HandleFunction> =>
@@ -126,10 +126,9 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
           const entry = reactRouterConfig!.entryFile;
 
           const app = reactRouterConfig!.future?.v8_viteEnvironmentApi
-            ? (await (devServer.environments.ssr as RunnableDevEnvironment).runner.import(entry))[
-                "default"
-              ]
-            : (await devServer.ssrLoadModule(entry))["default"];
+            ? (await (devServer.environments.ssr as RunnableDevEnvironment).runner.import(entry))
+                .default
+            : (await devServer.ssrLoadModule(entry)).default;
 
           if (!app) {
             return next(new Error(`Failed to find default export from ${entry}`));
@@ -155,7 +154,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
                 } else if (typeof e === "string") {
                   err = new Error(`The response is not an instance of "Response", but: ${e}`);
                 } else {
-                  err = new Error(`Unknown error: ${e}`);
+                  err = new Error(`Unknown error: ${String(e)}`);
                 }
 
                 next(err);

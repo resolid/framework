@@ -29,7 +29,7 @@ export async function createHonoNodeServer(
   const basename = import.meta.env.RESOLID_BASENAME;
 
   const mergedOptions: HonoNodeServerOptions = {
-    port: options.port || 3000,
+    port: options.port ?? 3000,
     listeningListener: (info) => {
       console.log(`🚀 Server started on port ${info.port}`);
 
@@ -75,7 +75,7 @@ export async function createHonoNodeServer(
   if (isProduction) {
     server = serve(
       {
-        ...app,
+        fetch: app.fetch,
         port: mergedOptions.port,
       },
       mergedOptions.listeningListener,
@@ -84,7 +84,7 @@ export async function createHonoNodeServer(
 
   async function shutdown() {
     server?.close();
-    mergedOptions.onShutdown?.();
+    await mergedOptions.onShutdown?.();
 
     process.removeListener("SIGINT", shutdown);
     process.removeListener("SIGTERM", shutdown);
