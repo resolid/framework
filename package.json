@@ -39,7 +39,7 @@
     "lefthook": "^2.1.4",
     "oxfmt": "^0.42.0",
     "oxlint": "^1.57.0",
-    "oxlint-tsgolint": "^0.17.3",
+    "oxlint-tsgolint": "^0.17.4",
     "turbo": "^2.8.20",
     "typescript": "^6.0.2",
     "vitest": "^4.1.1"
@@ -59,6 +59,7 @@
       "react": "^19.2.4",
       "react-dom": "^19.2.4",
       "react-is": "^19.2.4",
+      "typescript": "^6.0.2",
       "safer-buffer": "npm:@nolyfill/safer-buffer@^1"
     }
   }
