@@ -1,5 +1,11 @@
 # @resolid/event
 
+## 0.2.2
+
+### Patch Changes
+
+- style: fix oxlint warnings ([`5092f5f`](https://github.com/resolid/framework/commit/5092f5f0a537ec34b0b3bbc1413402f90e61ba0c))
+
 ## 0.2.1
 
 ### Patch Changes

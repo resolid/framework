@@ -1,5 +1,14 @@
 # @resolid/cache-file
 
+## 1.0.1
+
+### Patch Changes
+
+- style: fix oxlint warnings ([`5092f5f`](https://github.com/resolid/framework/commit/5092f5f0a537ec34b0b3bbc1413402f90e61ba0c))
+
+- Updated dependencies [[`5092f5f`](https://github.com/resolid/framework/commit/5092f5f0a537ec34b0b3bbc1413402f90e61ba0c)]:
+  - @resolid/cache@1.0.1
+
 ## 1.0.0
 
 ### Patch Changes
