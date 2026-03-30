@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.3.5
+
+### Patch Changes
+
+- fix: add optimizeDeps exclude to prevent virtual module pre-bundling ([`7f14332`](https://github.com/resolid/framework/commit/7f14332f850737fe4263bcab6abc709cc8b4a25e))
+
 ## 0.3.4
 
 ### Patch Changes
