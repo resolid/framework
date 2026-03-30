@@ -7,4 +7,5 @@ export default oxfmtConfig({
     functions: ["tx", "tv"],
     preserveWhitespace: true,
   },
+  ignorePatterns: ["CHANGELOG.md"],
 }) as OxfmtConfig;

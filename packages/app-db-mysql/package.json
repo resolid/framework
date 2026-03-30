@@ -50,10 +50,10 @@
   },
   "dependencies": {
     "@resolid/app-db": "workspace:^",
-    "drizzle-orm": "^0.45.1"
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
-    "tsdown": "^0.21.5"
+    "tsdown": "^0.21.7"
   },
   "peerDependencies": {
     "@resolid/core": "workspace:^",
