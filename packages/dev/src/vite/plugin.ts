@@ -41,6 +41,9 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
         ssr: {
           noExternal: ["@resolid/dev"],
         },
+        optimizeDeps: {
+          exclude: ["@resolid/dev/http.server"],
+        },
       };
 
       if (!reactRouterConfig.future?.v8_viteEnvironmentApi && !reactRouterConfig.ssrBuild) {
