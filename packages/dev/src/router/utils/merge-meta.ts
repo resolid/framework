@@ -1,12 +1,16 @@
-import type { MetaArgs, MetaDescriptor } from "react-router";
+import type { MetaDescriptor } from "react-router";
 
-export function mergeMeta(metaFn: (arg: MetaArgs) => MetaDescriptor[], titleJoin = " - ") {
-  return (arg: MetaArgs): MetaDescriptor[] => {
-    const leafMeta = metaFn(arg);
+// oxlint-disable-next-line typescript/no-explicit-any
+export function mergeMeta<A extends { matches: any[] }>(
+  metaFn: (args: A) => MetaDescriptor[],
+  titleJoin = " - ",
+): (args: A) => MetaDescriptor[] {
+  return (args) => {
+    const leafMeta = metaFn(args);
 
-    const mergedMeta = arg.matches.reduceRight((acc, match) => {
+    const mergedMeta = args.matches.reduceRight((acc, match) => {
       for (const parentMeta of match.meta) {
-        const index = acc.findIndex((meta) => {
+        const index = acc.findIndex((meta: MetaDescriptor) => {
           if ("name" in meta && "name" in parentMeta) {
             return meta.name === parentMeta.name;
           }
@@ -35,7 +39,6 @@ export function mergeMeta(metaFn: (arg: MetaArgs) => MetaDescriptor[], titleJoin
 
     for (const meta of mergedMeta) {
       if ("title" in meta) {
-        // noinspection SuspiciousTypeOfGuard
         if (typeof meta.title === "string" && meta.title.length > 0) {
           titles.push(...meta.title.split(titleJoin));
         }
