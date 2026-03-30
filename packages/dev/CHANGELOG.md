@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.3.4
+
+### Patch Changes
+
+- fix: update mergeMeta types ([`985eaaf`](https://github.com/resolid/framework/commit/985eaaf56ecf1f9e6bb62647bc514e012c39829d))
+
 ## 0.3.3
 
 ### Patch Changes
