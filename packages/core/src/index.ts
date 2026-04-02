@@ -134,7 +134,9 @@ class App<E extends Record<string, unknown>> {
       return;
     }
 
-    await Promise.all(this._bootstraps.map((bootstrap) => bootstrap(this._context)));
+    await Promise.all(
+      this._bootstraps.map((bootstrap) => Promise.resolve(bootstrap(this._context))),
+    );
 
     this.emitter.emit("app:ready");
     this._started = true;
