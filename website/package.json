@@ -24,7 +24,7 @@
     "@resolid/app-log": "workspace:^",
     "@resolid/app-log-file": "workspace:^",
     "@resolid/core": "workspace:^",
-    "@resolid/react-ui": "^0.2.0",
+    "@resolid/react-ui": "^0.2.1",
     "@resolid/utils": "^1.3.7",
     "@tailwindcss/typography": "^0.5.19",
     "@vercel/analytics": "^2.0.1",

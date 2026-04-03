@@ -14,7 +14,7 @@ export default defineConfig(({ command }) => {
       resolidVite(vitePluginOptions),
       tailwindcss(),
       rolldownBabel({ presets: [reactCompilerPreset()] }),
-    ].filter(Boolean),
+    ],
     build: {
       rolldownOptions: {
         output: {
