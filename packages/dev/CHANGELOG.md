@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.4.0
+
+### Minor Changes
+
+- feat: upgrade vite to v8 ([`4d90ceb`](https://github.com/resolid/framework/commit/4d90cebd527397609eb1ddb090d0f800e8014afd))
+
 ## 0.3.5
 
 ### Patch Changes
