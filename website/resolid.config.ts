@@ -6,9 +6,6 @@ export const { vitePluginOptions, reactRouterConfig } = defineDevConfig({
   nodeVersion: 24,
   platform: env.VERCEL == 1 ? "vercel" : env.NETLIFY ? "netlify" : "node",
   reactRouterConfig: {
-    future: {
-      unstable_optimizeDeps: true,
-    },
     serverBundles: ({ branch }) =>
       branch.some((route) => route.id.startsWith("portals/admin")) ? "admin" : "site",
   },

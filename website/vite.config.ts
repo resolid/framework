@@ -1,78 +1,35 @@
 import { resolidVite } from "@resolid/dev/vite";
+import rolldownBabel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
-import { extname, join } from "node:path";
-import { type AliasOptions, defineConfig, type Plugin, type UserConfig } from "vite";
-import { analyzer } from "vite-bundle-analyzer";
-import viteBabel from "vite-plugin-babel";
-import viteInspect from "vite-plugin-inspect";
-import tsconfigPaths from "vite-tsconfig-paths";
+import { reactCompilerPreset } from "@vitejs/plugin-react";
+import { join } from "node:path";
+import { type AliasOptions, defineConfig, type UserConfig } from "vite";
 import { vitePluginOptions } from "./resolid.config";
 
 export default defineConfig(({ command }) => {
   const isBuild = command == "build";
-  const enableAnalyzer = false;
 
   return {
     plugins: [
       resolidVite(vitePluginOptions),
       tailwindcss(),
-      viteBabel({
-        filter: /\.[jt]sx?$/,
-        babelConfig: {
-          presets: ["@babel/preset-typescript"],
-          plugins: [
-            [
-              "babel-plugin-react-compiler",
-              {
-                target: "19",
-              },
-            ],
-          ],
-          cloneInputAst: false,
-          compact: false,
-          sourceMaps: false,
-          babelrc: false,
-          configFile: false,
-        },
-        loader: (path) => extname(path).substring(1) as "js" | "jsx",
-        optimizeOnSSR: true,
-      }),
-      {
-        ...analyzer({ enabled: enableAnalyzer }),
-        applyToEnvironment(env) {
-          return env.name == "client";
-        },
-      } as Plugin,
-      !isBuild && tsconfigPaths(),
-      !isBuild && viteInspect(),
+      rolldownBabel({ presets: [reactCompilerPreset()] }),
     ].filter(Boolean),
     build: {
-      rollupOptions: {
+      rolldownOptions: {
         output: {
-          manualChunks: (id) => {
-            if (
-              id.includes("/node_modules/react/") ||
-              id.includes("/node_modules/react-dom/") ||
-              id.includes("/node_modules/react-is/") ||
-              id.includes("/node_modules/scheduler/")
-            ) {
-              return "react";
-            }
-
-            if (
-              id.includes("/node_modules/@react-router/") ||
-              id.includes("/node_modules/react-router/")
-            ) {
-              return "react-router";
-            }
-
-            if (
-              id.includes("src/components/history-link.tsx") ||
-              id.includes("src/components/error-component.tsx") ||
-              id.includes("src/components/sprite-icon.tsx")
-            ) {
-              return "components";
-            }
+          codeSplitting: {
+            groups: [
+              { name: "react", test: /node_modules[\\/](react|react-dom|react-is|scheduler)[\\/]/ },
+              {
+                name: "react-router",
+                test: /node_modules[\\/](@react-router|react-router)[\\/]/,
+              },
+              {
+                name: "components",
+                test: /src[\\/]components[\\/](history-link|error-component|sprite-icon)\.tsx/,
+              },
+            ],
           },
         },
       },
@@ -81,6 +38,7 @@ export default defineConfig(({ command }) => {
       external: ["mysql2"],
     },
     resolve: {
+      tsconfigPaths: !isBuild,
       alias: [isBuild && { find: "~", replacement: join(__dirname, "./src") }].filter(
         Boolean,
       ) as AliasOptions,

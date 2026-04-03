@@ -53,10 +53,10 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
       const ssrConfig: UserConfig = {
         build: {
           target: `node${options.nodeVersion}`,
-          rollupOptions: {
+          rolldownOptions: {
             input: reactRouterConfig.entryFile,
             output: {
-              manualChunks: undefined,
+              codeSplitting: false,
             },
             onwarn(warning, warn) {
               if (warning.code === "UNUSED_EXTERNAL_IMPORT" && warning.message.includes("react")) {
@@ -89,7 +89,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
       if (reactRouterConfig?.buildManifest?.serverBundles) {
         for (const key of Object.keys(reactRouterConfig.buildManifest.serverBundles)) {
           if (config.environments[`ssrBundle_${key}`]) {
-            config.environments[`ssrBundle_${key}`]!.build.rollupOptions.input =
+            config.environments[`ssrBundle_${key}`]!.build.rolldownOptions.input =
               reactRouterConfig.entryFile;
           }
         }
