@@ -57,7 +57,7 @@
   },
   "peerDependencies": {
     "@resolid/core": "workspace:^",
-    "mysql2": "^3.20.0"
+    "mysql2": "^3.21.1"
   },
   "engines": {
     "node": "^22.13.0 || >=24"
