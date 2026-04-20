@@ -53,7 +53,7 @@
     "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
-    "tsdown": "^0.21.8"
+    "tsdown": "^0.21.9"
   },
   "peerDependencies": {
     "@resolid/core": "workspace:^",
