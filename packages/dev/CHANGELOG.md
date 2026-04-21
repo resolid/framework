@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.4.1
+
+### Patch Changes
+
+- feat: upgrade @hono/node-server to v2 ([`5b83ebc`](https://github.com/resolid/framework/commit/5b83ebce7f10e9b0331e75e6d7bbf8d9df9ed428))
+
 ## 0.4.0
 
 ### Minor Changes
