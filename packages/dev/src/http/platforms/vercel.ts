@@ -1,6 +1,4 @@
-import type { IncomingMessage, ServerResponse } from "http";
-import type { Http2ServerRequest, Http2ServerResponse } from "http2";
-import { handle } from "@hono/node-server/vercel";
+import type { Hono } from "hono";
 import { env } from "node:process";
 import type { ClientIpGetter } from "../middlewares/client-ip";
 import type { RequestIdGenerator } from "../middlewares/request-id";
@@ -9,21 +7,16 @@ import { createHonoServer, type HonoServerOptions, type NodeEnv } from "../utils
 
 export type HonoVercelServerOptions = HonoServerOptions<NodeEnv>;
 
-export type HonoVercelServer = (
-  incoming: IncomingMessage | Http2ServerRequest,
-  outgoing: ServerResponse | Http2ServerResponse,
-) => Promise<void>;
+export type HonoVercelServer = Hono<NodeEnv>;
 
 export const createHonoVercelServer = async (
   options: HonoVercelServerOptions = {},
 ): Promise<HonoVercelServer> => {
   const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
 
-  const app = await createHonoServer<NodeEnv>(mode, {
+  return await createHonoServer<NodeEnv>(mode, {
     ...options,
   });
-
-  return handle(app);
 };
 
 export function vercelClientIpGetter(): ClientIpGetter {
