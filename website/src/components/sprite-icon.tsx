@@ -8,7 +8,7 @@ interface SpriteIconProps {
   className?: string;
 }
 
-export const SpriteIcon = (props: SpriteIconProps) => {
+export function SpriteIcon(props: SpriteIconProps) {
   const { name, size = "1em", color, className } = props;
 
   return (
@@ -16,4 +16,4 @@ export const SpriteIcon = (props: SpriteIconProps) => {
       <use color={color} href={`${spriteIcons}#${name}`} />
     </svg>
   );
-};
+}

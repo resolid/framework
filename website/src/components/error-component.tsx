@@ -2,7 +2,7 @@ import { isRouteErrorResponse } from "react-router";
 import { HistoryBack } from "~/components/history-link";
 import type { Route } from "../../.react-router/types/src/+types/root";
 
-export const ErrorComponent = ({ error }: Route.ErrorBoundaryProps) => {
+export function ErrorComponent({ error }: Route.ErrorBoundaryProps) {
   if (isRouteErrorResponse(error) && error.status == 404) {
     return (
       <div className="relative mx-auto flex max-w-144 justify-center px-4 py-8">
@@ -51,4 +51,4 @@ export const ErrorComponent = ({ error }: Route.ErrorBoundaryProps) => {
       </div>
     </div>
   );
-};
+}

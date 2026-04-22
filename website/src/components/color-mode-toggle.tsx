@@ -26,7 +26,7 @@ const colorModes = {
   },
 };
 
-export const ColorModeToggle = () => {
+export function ColorModeToggle() {
   const colorMode = useColorModeState();
   const setColorMode = useColorModeDispatch();
 
@@ -64,4 +64,4 @@ export const ColorModeToggle = () => {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-};
+}

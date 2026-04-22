@@ -75,15 +75,15 @@
     "rolldown": "latest"
   },
   "devDependencies": {
-    "@react-router/dev": "^7.14.1",
+    "@react-router/dev": "^7.14.2",
     "tsdown": "^0.21.9"
   },
   "peerDependencies": {
     "@netlify/types": "^2.6.0",
-    "@react-router/dev": "^7.14.1",
-    "@react-router/node": "^7.14.1",
+    "@react-router/dev": "^7.14.2",
+    "@react-router/node": "^7.14.2",
     "isbot": "^5.1.39",
-    "react-router": "^7.14.1",
+    "react-router": "^7.14.2",
     "vite": "^8.0.9"
   },
   "engines": {

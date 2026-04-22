@@ -1,4 +1,4 @@
-export const normalizeKey = (key: string): string => {
+export function normalizeKey(key: string): string {
   const normalized = key
     .split("?")[0]
     ?.replace(/[/\\]/g, ":")
@@ -10,4 +10,4 @@ export const normalizeKey = (key: string): string => {
   }
 
   return normalized;
-};
+}

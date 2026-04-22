@@ -9,15 +9,15 @@ export type HonoVercelServerOptions = HonoServerOptions<NodeEnv>;
 
 export type HonoVercelServer = Hono<NodeEnv>;
 
-export const createHonoVercelServer = async (
+export async function createHonoVercelServer(
   options: HonoVercelServerOptions = {},
-): Promise<HonoVercelServer> => {
+): Promise<HonoVercelServer> {
   const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
 
   return await createHonoServer<NodeEnv>(mode, {
     ...options,
   });
-};
+}
 
 export function vercelClientIpGetter(): ClientIpGetter {
   return (ctx) => ctx.req.raw.headers.get("x-real-ip") ?? "";

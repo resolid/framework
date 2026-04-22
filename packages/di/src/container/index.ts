@@ -64,7 +64,6 @@ export class Container implements Resolver, Disposable {
   get<T>(token: Token<T>, options: { optional: true }): T | undefined;
   get<T>(token: Token<T>, options: { lazy: true }): () => T;
   get<T>(token: Token<T>, options: { lazy: true; optional: true }): () => T | undefined;
-  // oxlint-disable-next-line typescript/unified-signatures
   get<T>(token: Token<T>, options: { lazy: false; optional?: boolean }): T | undefined;
   get<T>(
     token: Token<T>,

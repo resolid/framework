@@ -44,7 +44,7 @@ type BuildPresetOptions<BuildContext> = OptionalToUndefined<PresetBaseOptions> &
     serverBuildFile: string;
   }>;
   viteConfig: ResolvedConfig;
-  buildStart: () => Promise<BuildContext>;
+  buildStart: () => Promise<BuildContext> | BuildContext;
   buildBundleEnd?: (
     context: BuildContext,
     buildPath: string,

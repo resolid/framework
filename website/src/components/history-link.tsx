@@ -9,21 +9,21 @@ import {
   useNavigate,
 } from "react-router";
 
-export const HistoryLink = (props: LinkProps) => {
+export function HistoryLink(props: LinkProps) {
   const { state, to, ...rest } = props;
 
   return <Link to={to} state={{ ...state, previous: true }} {...rest} />;
-};
+}
 
-export const HistoryNavLink = (props: NavLinkProps) => {
+export function HistoryNavLink(props: NavLinkProps) {
   const { state, to, ...rest } = props;
 
   return <NavLink to={to} state={{ ...state, previous: true }} {...rest} />;
-};
+}
 
 type HistoryBackProps = ButtonProps & { backTo?: string | Partial<Path> };
 
-export const HistoryBack = (props: PrimitiveProps<"button", HistoryBackProps, "children">) => {
+export function HistoryBack(props: PrimitiveProps<"button", HistoryBackProps, "children">) {
   const { onClick, backTo = "/", ...rest } = props;
 
   const navigate = useNavigate();
@@ -48,4 +48,4 @@ export const HistoryBack = (props: PrimitiveProps<"button", HistoryBackProps, "c
       点击返回
     </Button>
   );
-};
+}

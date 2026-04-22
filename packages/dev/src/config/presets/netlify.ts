@@ -12,52 +12,57 @@ import {
 
 type NetlifyPresetOptions = PresetBaseOptions;
 
-export const netlifyPreset = ({ nodeVersion, includeFiles }: NetlifyPresetOptions): Preset => {
+export function netlifyPreset({ nodeVersion, includeFiles }: NetlifyPresetOptions): Preset {
   return {
     name: "@resolid/react-router-hono-netlify-preset",
-    reactRouterConfig: () => ({
-      buildEnd: async ({ buildManifest, reactRouterConfig, viteConfig }) => {
-        await buildPreset<{
-          netlifyRoot: string;
-          netlifyFunctionDir: string;
-          serverRoutes: { path: string; bundleId: string }[];
-          nftCache: object;
-        }>({
-          includeFiles,
-          nodeVersion,
-          buildManifest: buildManifest,
-          reactRouterConfig: reactRouterConfig,
-          viteConfig: viteConfig,
-          buildStart: async () => {
-            const netlifyRoot = await createDir([viteConfig.root, ".netlify", "v1"], true);
+    reactRouterConfig() {
+      return {
+        async buildEnd({ buildManifest, reactRouterConfig, viteConfig }) {
+          await buildPreset<{
+            netlifyRoot: string;
+            netlifyFunctionDir: string;
+            serverRoutes: { path: string; bundleId: string }[];
+            nftCache: object;
+          }>({
+            includeFiles,
+            nodeVersion,
+            buildManifest: buildManifest,
+            reactRouterConfig: reactRouterConfig,
+            viteConfig: viteConfig,
+            async buildStart() {
+              const netlifyRoot = await createDir([viteConfig.root, ".netlify", "v1"], true);
 
-            await writeNetlifyConfigJson(
-              viteConfig.build.assetsDir,
-              join(netlifyRoot, "config.json"),
-            );
+              await writeNetlifyConfigJson(
+                viteConfig.build.assetsDir,
+                join(netlifyRoot, "config.json"),
+              );
 
-            const netlifyFunctionDir = await createDir([netlifyRoot, "functions"]);
+              const netlifyFunctionDir = await createDir([netlifyRoot, "functions"]);
 
-            const serverRoutes = getServerRoutes(buildManifest);
+              const serverRoutes = getServerRoutes(buildManifest);
 
-            return { netlifyRoot, netlifyFunctionDir, serverRoutes, nftCache: {} };
-          },
-          buildBundleEnd: async (context, _buildPath, bundleId, bundleFile) => {
-            console.log(`Coping Netlify function files for ${bundleId}...`);
+              return { netlifyRoot, netlifyFunctionDir, serverRoutes, nftCache: {} };
+            },
+            async buildBundleEnd(context, _buildPath, bundleId, bundleFile) {
+              console.log(`Coping Netlify function files for ${bundleId}...`);
 
-            const handleFile = await copyFilesToFunction(
-              bundleFile,
-              await createDir([context.netlifyFunctionDir, bundleId], true),
-              context.nftCache,
-            );
+              const handleFile = await copyFilesToFunction(
+                bundleFile,
+                await createDir([context.netlifyFunctionDir, bundleId], true),
+                context.nftCache,
+              );
 
-            const serverRoutePath = context.serverRoutes.find((r) => r.bundleId == bundleId)?.path;
+              const serverRoutePath = context.serverRoutes.find(
+                (r) => r.bundleId == bundleId,
+              )?.path;
 
-            const pathPattern = !serverRoutePath ? "/*" : [serverRoutePath, `${serverRoutePath}/*`];
+              const pathPattern = !serverRoutePath
+                ? "/*"
+                : [serverRoutePath, `${serverRoutePath}/*`];
 
-            await writeFile(
-              join(context.netlifyFunctionDir, `${bundleId}.mjs`),
-              `export { default } from "./${join(bundleId, handleFile)}";
+              await writeFile(
+                join(context.netlifyFunctionDir, `${bundleId}.mjs`),
+                `export { default } from "./${join(bundleId, handleFile)}";
 
 export const config = {
   path: ${Array.isArray(pathPattern) ? JSON.stringify(pathPattern) : `"${pathPattern}"`},
@@ -67,16 +72,17 @@ export const config = {
   nodeVersion: ${nodeVersion}
 };
 `,
-              "utf8",
-            );
-          },
-        });
-      },
-    }),
+                "utf8",
+              );
+            },
+          });
+        },
+      };
+    },
   };
-};
+}
 
-const writeNetlifyConfigJson = async (assetsDir: string, netlifyConfigFile: string) => {
+async function writeNetlifyConfigJson(assetsDir: string, netlifyConfigFile: string) {
   console.log("Writing Netlify config file...");
 
   const configJson: { headers: unknown[] } = {
@@ -89,4 +95,4 @@ const writeNetlifyConfigJson = async (assetsDir: string, netlifyConfigFile: stri
   });
 
   await writeFile(netlifyConfigFile, JSON.stringify(configJson, null, 2), "utf8");
-};
+}
