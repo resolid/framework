@@ -44,7 +44,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "tsdown": "^0.21.9"
+    "tsdown": "^0.21.10"
   },
   "peerDependencies": {
     "@resolid/cache": "workspace:^"
