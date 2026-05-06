@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.5.0
+
+### Minor Changes
+
+- feat: add navigation hooks and components ([`bd1bbb2`](https://github.com/resolid/framework/commit/bd1bbb2de681f9af17071b20ca96c940c934fa6d))
+
 ## 0.4.1
 
 ### Patch Changes
