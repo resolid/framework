@@ -1,35 +1,8 @@
+import { useRouteProgress } from "@resolid/dev/router";
 import { tx } from "@resolid/react-ui";
-import { useEffect, useRef, useState } from "react";
-import { useNavigation } from "react-router";
 
 export function RouteProcessBar() {
-  const transition = useNavigation();
-  const active = transition.state !== "idle";
-
-  const ref = useRef<HTMLDivElement>(null);
-  const [animating, setAnimating] = useState(false);
-
-  useEffect(() => {
-    if (!ref.current) {
-      return;
-    }
-
-    void Promise.allSettled(ref.current.getAnimations().map(({ finished }) => finished)).then(
-      () => {
-        if (!active) {
-          setAnimating(false);
-        }
-      },
-    );
-
-    const id = active ? setTimeout(() => setAnimating(true), 100) : null;
-
-    return () => {
-      if (id) {
-        clearTimeout(id);
-      }
-    };
-  }, [active]);
+  const { ref, active, animating, state } = useRouteProgress();
 
   return (
     <div
@@ -42,9 +15,9 @@ export function RouteProcessBar() {
         className={tx(
           "h-full transition-[width,background-image] duration-500",
           "bg-linear-to-r from-bg-primary-emphasis to-bg-primary-pressed",
-          transition.state === "idle" && (animating ? "w-full" : "w-0 opacity-0 transition-none"),
-          transition.state === "submitting" && "w-4/12",
-          transition.state === "loading" && "w-10/12",
+          state === "idle" && (animating ? "w-full" : "w-0 opacity-0 transition-none"),
+          state === "submitting" && "w-4/12",
+          state === "loading" && "w-10/12",
         )}
       />
     </div>

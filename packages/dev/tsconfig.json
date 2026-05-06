@@ -1,4 +1,4 @@
 {
-  "extends": "@resolid/config/tsconfig/lib.json",
+  "extends": ["@resolid/config/tsconfig/react.json", "@resolid/config/tsconfig/lib.json"],
   "include": ["src/**/*", "*.config.ts"]
 }

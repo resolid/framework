@@ -36,7 +36,7 @@ export interface DevConfig {
 
 export const defineDevConfig = ({
   platform = "node",
-  nodeVersion = 22,
+  nodeVersion = 24,
   entryFile = "server.ts",
   appDirectory = "src",
   includeFiles = [],
@@ -68,6 +68,7 @@ export const defineDevConfig = ({
         v8_middleware: true,
         v8_splitRouteModules: true,
         v8_viteEnvironmentApi: true,
+        v8_passThroughRequests: true,
       },
     },
   };

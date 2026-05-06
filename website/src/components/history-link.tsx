@@ -1,41 +1,19 @@
-import { Button, type ButtonProps, type PrimitiveProps } from "@resolid/react-ui";
 import {
-  Link,
-  type LinkProps,
-  NavLink,
-  type NavLinkProps,
-  type Path,
-  useLocation,
-  useNavigate,
-} from "react-router";
+  HistoryLink,
+  HistoryNavLink,
+  useHistoryBack,
+  type UseHistoryBackOptions,
+} from "@resolid/dev/router";
+import { Button, type ButtonProps, type PrimitiveProps } from "@resolid/react-ui";
 
-export function HistoryLink(props: LinkProps) {
-  const { state, to, ...rest } = props;
+export { HistoryLink, HistoryNavLink };
 
-  return <Link to={to} state={{ ...state, previous: true }} {...rest} />;
-}
-
-export function HistoryNavLink(props: NavLinkProps) {
-  const { state, to, ...rest } = props;
-
-  return <NavLink to={to} state={{ ...state, previous: true }} {...rest} />;
-}
-
-type HistoryBackProps = ButtonProps & { backTo?: string | Partial<Path> };
+type HistoryBackProps = ButtonProps & UseHistoryBackOptions;
 
 export function HistoryBack(props: PrimitiveProps<"button", HistoryBackProps, "children">) {
   const { onClick, backTo = "/", ...rest } = props;
 
-  const navigate = useNavigate();
-  const { state } = useLocation();
-
-  const historyBack = async () => {
-    if (state?.previous) {
-      await navigate(-1);
-    } else {
-      await navigate(backTo);
-    }
-  };
+  const historyBack = useHistoryBack(backTo);
 
   return (
     <Button
