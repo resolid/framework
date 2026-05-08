@@ -1,3 +1,15 @@
 packages:
   - packages/*
   - website
+overrides:
+  react: ^19.2.6
+  react-dom: ^19.2.6
+  react-is: ^19.2.6
+  typescript: ^6.0.3
+  vite-node: ^6.0.0
+  safer-buffer: npm:@nolyfill/safer-buffer@^1
+engineStrict: true
+allowBuilds:
+  "@tailwindcss/oxide": true
+  esbuild: true
+  lefthook: true

@@ -43,7 +43,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "tsdown": "^0.21.10"
+    "tsdown": "^0.22.0"
   },
   "engines": {
     "node": "^22.13.0 || >=24"
