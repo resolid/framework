@@ -13,32 +13,31 @@ import {
   type Env,
   type Hono,
 } from "@resolid/dev/http.server";
-import { platform } from "~/foundation/platform.server";
 
 export function configure<E extends Env>(hono: Hono<E>) {
   hono.use(
     clientIp(
-      platform == "netlify"
+      import.meta.env.RESOLID_PLATFORM == "netlify"
         ? netlifyClientIpGetter()
-        : platform == "vercel"
+        : import.meta.env.RESOLID_PLATFORM == "vercel"
           ? vercelClientIpGetter()
           : nodeClientIpGetter(),
     ),
   );
   hono.use(
     requestId(
-      platform == "netlify"
+      import.meta.env.RESOLID_PLATFORM == "netlify"
         ? netlifyRequestIdGenerator()
-        : platform == "vercel"
+        : import.meta.env.RESOLID_PLATFORM == "vercel"
           ? vercelRequestIdGenerator()
           : undefined,
     ),
   );
   hono.use(
     requestOrigin(
-      platform == "netlify"
+      import.meta.env.RESOLID_PLATFORM == "netlify"
         ? netlifyRequestOriginGetter()
-        : platform == "vercel"
+        : import.meta.env.RESOLID_PLATFORM == "vercel"
           ? vercelRequestOriginGetter()
           : nodeRequestOriginGetter(),
     ),

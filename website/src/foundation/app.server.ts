@@ -10,10 +10,9 @@ import { createFileLogExtension, FileLogService } from "@resolid/app-log-file";
 import { createApp, type Extension } from "@resolid/core";
 import { attachDatabasePool } from "@vercel/functions";
 import { env } from "node:process";
-import { platform } from "~/foundation/platform.server";
 import { moduleProviders } from "~/modules/providers";
 
-const inNode = platform == "node";
+const inNode = import.meta.env.RESOLID_PLATFORM == "node";
 
 export const app = await createApp({
   name: "resolid",
@@ -49,7 +48,7 @@ export const app = await createApp({
         },
       },
       enhancer: (pool) => {
-        if (platform == "vercel") {
+        if (import.meta.env.RESOLID_PLATFORM == "vercel") {
           attachDatabasePool(pool);
         }
       },

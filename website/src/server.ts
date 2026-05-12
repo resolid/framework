@@ -7,7 +7,6 @@ import { env } from "node:process";
 import { RouterContextProvider } from "react-router";
 import { app } from "~/foundation/app.server";
 import { configure } from "~/foundation/hono.server";
-import { platform } from "~/foundation/platform.server";
 
 await app.run();
 
@@ -27,12 +26,12 @@ declare module "react-router" {
   interface RouterContextProvider extends AppContext {}
 }
 
-export default platform == "netlify"
+export default import.meta.env.RESOLID_PLATFORM == "netlify"
   ? await createHonoNetlifyServer({
       configure,
       getLoadContext,
     })
-  : platform == "vercel"
+  : import.meta.env.RESOLID_PLATFORM == "vercel"
     ? await createHonoVercelServer({
         configure,
         getLoadContext,
