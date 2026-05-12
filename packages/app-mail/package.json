@@ -1,0 +1,55 @@
+{
+  "name": "@resolid/app-mail",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Mail module for Resolid applications",
+  "keywords": [
+    "mail",
+    "resolid"
+  ],
+  "homepage": "https://www.resolid.tech",
+  "license": "MIT",
+  "author": {
+    "name": "Huijie Wei",
+    "email": "hello@resolid.tech"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/resolid/framework.git",
+    "directory": "packages/app-mail"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsdown",
+    "lint": "oxlint",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@resolid/core": "workspace:^",
+    "nodemailer": "^8.0.7"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^8.0.0",
+    "tsdown": "^0.22.0"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24"
+  }
+}

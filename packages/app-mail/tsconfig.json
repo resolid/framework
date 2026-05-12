@@ -1,0 +1,9 @@
+{
+  "extends": "@resolid/config/tsconfig/lib.json",
+  "include": ["src/**/*", "*.config.ts"],
+  "compilerOptions": {
+    "paths": {
+      "@resolid/core": ["../core/src"]
+    }
+  }
+}
