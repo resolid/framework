@@ -1,4 +1,3 @@
-import { resolve } from "path";
 import { defineConfig, type ViteUserConfig } from "vitest/config";
 
 const config: ViteUserConfig = defineConfig({
@@ -9,10 +8,7 @@ const config: ViteUserConfig = defineConfig({
     },
   },
   resolve: {
-    alias: {
-      "@resolid/di": resolve(import.meta.dirname, "../di/src"),
-      "@resolid/event": resolve(import.meta.dirname, "../event/src"),
-    },
+    tsconfigPaths: true,
   },
 });
 

@@ -17,6 +17,8 @@ yarn add @resolid/app-log-file
 bun add @resolid/app-log-file
 ```
 
+## Usage
+
 ## Acknowledgment
 
 - [logtape](https://github.com/dahlia/logtape)
