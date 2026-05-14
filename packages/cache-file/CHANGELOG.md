@@ -1,5 +1,11 @@
 # @resolid/cache-file
 
+## 1.1.0
+
+### Minor Changes
+
+- feat(cache): add serializer option ([`549beca`](https://github.com/resolid/framework/commit/549becaa5b3adde67ee0b063497587e9098eb9d2))
+
 ## 1.0.1
 
 ### Patch Changes
