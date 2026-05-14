@@ -158,3 +158,31 @@ export async function createApp<E extends ExposeSchema = Record<string, never>>(
 
   return app;
 }
+
+export function loadProviders(modules: Record<string, unknown>[]): Provider[] {
+  const providers: Provider[] = [];
+
+  for (const mod of modules) {
+    for (const value of Object.values(mod)) {
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        "token" in value &&
+        "factory" in value &&
+        typeof (value as Provider).factory === "function"
+      ) {
+        providers.push(value as Provider);
+        continue;
+      }
+
+      if (typeof value === "function" && /^[A-Z]/.test(value.name)) {
+        providers.push({
+          token: value,
+          factory: () => new (value as new () => unknown)(),
+        });
+      }
+    }
+  }
+
+  return providers;
+}

@@ -7,10 +7,9 @@ import {
   type LogTarget,
 } from "@resolid/app-log";
 import { createFileLogExtension, FileLogService } from "@resolid/app-log-file";
-import { createApp, type Extension } from "@resolid/core";
+import { createApp, type Extension, loadProviders } from "@resolid/core";
 import { attachDatabasePool } from "@vercel/functions";
 import { env } from "node:process";
-import { moduleProviders } from "~/modules/providers";
 
 const inNode = import.meta.env.RESOLID_PLATFORM == "node";
 
@@ -54,7 +53,15 @@ export const app = await createApp({
       },
     }),
   ].filter(Boolean) as Extension[],
-  providers: [...moduleProviders],
+  providers: loadProviders(
+    Object.values(
+      import.meta.glob(["./**/repository.server.ts", "./**/service.server.ts"], {
+        base: "../modules",
+        import: "*",
+        eager: true,
+      }),
+    ),
+  ),
   expose: {
     logger: LogService,
   },
