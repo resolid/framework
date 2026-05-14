@@ -23,7 +23,7 @@ bun add @resolid/cache @resolid/cache-file
 
 ```ts
 import { Cacher } from "@resolid/cache";
-import { FileCache } from "@resolid/cache";
+import { FileCache } from "@resolid/cache-file";
 
 const cache = new Cacher({ store: new FileCache("./.tmp/cache"), defaultTtl: 1000 });
 ```

@@ -8,7 +8,7 @@ describe("createCache with fake store", () => {
 
   beforeEach(() => {
     fakeStore = {
-      get: vi.fn().mockResolvedValue("value"),
+      get: vi.fn().mockResolvedValue(JSON.stringify("value")),
       set: vi.fn().mockResolvedValue(true),
       del: vi.fn().mockResolvedValue(true),
       clear: vi.fn().mockResolvedValue(true),

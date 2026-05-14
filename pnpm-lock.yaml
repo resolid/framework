@@ -150,9 +150,6 @@ importers:
 
   packages/cache:
     dependencies:
-      destr:
-        specifier: ^2.0.5
-        version: 2.0.5
       quick-lru:
         specifier: ^7.3.0
         version: 7.3.0
@@ -1996,9 +1993,6 @@ packages:
   denque@2.1.0:
     resolution: {integrity: sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw==}
     engines: {node: '>=0.10'}
-
-  destr@2.0.5:
-    resolution: {integrity: sha512-ugFTXCtDZunbzasqBxrK93Ik/DRYsO6S/fedkWEMKqt04xZ4csmnmwGDBAb07QWNaGMAmnTIemsYZCksjATwsA==}
 
   detect-indent@6.1.0:
     resolution: {integrity: sha512-reYkTUJAZb9gUuZ2RvVCNhVHdg62RHnJ7WJl8ftMi4diZ6NWlciOzQN88pUhSELEwflJht4oQDv0F0BMlwaYtA==}
@@ -5005,8 +4999,6 @@ snapshots:
   defu@6.1.7: {}
 
   denque@2.1.0: {}
-
-  destr@2.0.5: {}
 
   detect-indent@6.1.0: {}
 

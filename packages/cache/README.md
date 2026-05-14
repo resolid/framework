@@ -65,6 +65,11 @@ await cache.dispose();
 ```ts
 export interface CacheOptions {
   store?: CacheStore;
+
+  // A custom serializer to use when storing and retrieving values from the cache.
+  // For example, you could use superjson to serialize and deserialize your values instead of JSON.stringify and JSON.parse.
+  serializer?: Serializer;
+
   defaultTtl?: number;
 }
 ```
