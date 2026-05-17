@@ -1,0 +1,62 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - 6379:6379
+
+  redis-1:
+    image: redis:latest
+    container_name: redis-cluster-1
+    command: >
+      redis-server
+      --port 7001
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
+      --cluster-node-timeout 5000
+      --cluster-announce-ip 127.0.0.1
+      --cluster-announce-port 7001
+      --cluster-announce-bus-port 17001
+    network_mode: host
+
+  redis-2:
+    image: redis:latest
+    container_name: redis-cluster-2
+    command: >
+      redis-server
+      --port 7002
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
+      --cluster-node-timeout 5000
+      --cluster-announce-ip 127.0.0.1
+      --cluster-announce-port 7002
+      --cluster-announce-bus-port 17002
+    network_mode: host
+
+  redis-3:
+    image: redis:latest
+    container_name: redis-cluster-3
+    command: >
+      redis-server
+      --port 7003
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
+      --cluster-node-timeout 5000
+      --cluster-announce-ip 127.0.0.1
+      --cluster-announce-port 7003
+      --cluster-announce-bus-port 17003
+    network_mode: host
+
+  redis-cluster-init:
+    image: redis:latest
+    container_name: redis-cluster-init
+    network_mode: host
+    depends_on:
+      - redis-1
+      - redis-2
+      - redis-3
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "until redis-cli -p 7001 ping && redis-cli -p 7002 ping && redis-cli -p 7003 ping; do sleep 1; done && \
+      redis-cli --cluster create 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 --cluster-replicas 0 --cluster-yes && \
+      redis-cli -p 7001 cluster info"

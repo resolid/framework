@@ -1,0 +1,60 @@
+{
+  "name": "@resolid/cache-redis",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Redis Cache store for @resolid/cache",
+  "keywords": [
+    "cache",
+    "cache manager",
+    "redis",
+    "resolid"
+  ],
+  "homepage": "https://www.resolid.tech",
+  "license": "MIT",
+  "author": {
+    "name": "Huijie Wei",
+    "email": "hello@resolid.tech"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/resolid/framework.git",
+    "directory": "packages/cache-redis"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsdown",
+    "lint": "oxlint",
+    "test": "vitest run --reporter=hanging-process",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@redis/client": "^5.12.1",
+    "cluster-key-slot": "^1.1.2"
+  },
+  "devDependencies": {
+    "@resolid/utils": "^1.3.8",
+    "tsdown": "^0.22.0"
+  },
+  "peerDependencies": {
+    "@resolid/cache": "workspace:^"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24"
+  }
+}
