@@ -1,12 +1,12 @@
 services:
   redis:
-    image: redis:latest
+    image: redis:alpine
     container_name: redis
     ports:
       - 6379:6379
 
   redis-1:
-    image: redis:latest
+    image: redis:alpine
     container_name: redis-cluster-1
     command: >
       redis-server
@@ -20,7 +20,7 @@ services:
     network_mode: host
 
   redis-2:
-    image: redis:latest
+    image: redis:alpine
     container_name: redis-cluster-2
     command: >
       redis-server
@@ -34,7 +34,7 @@ services:
     network_mode: host
 
   redis-3:
-    image: redis:latest
+    image: redis:alpine
     container_name: redis-cluster-3
     command: >
       redis-server
@@ -48,7 +48,7 @@ services:
     network_mode: host
 
   redis-cluster-init:
-    image: redis:latest
+    image: redis:alpine
     container_name: redis-cluster-init
     network_mode: host
     depends_on:
