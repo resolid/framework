@@ -1,5 +1,11 @@
 # @resolid/cache
 
+## 1.2.0
+
+### Minor Changes
+
+- feat: add getOrSet method ([`010b1a9`](https://github.com/resolid/framework/commit/010b1a94e82ee23cda1edc104010c098a2d35e51))
+
 ## 1.1.0
 
 ### Minor Changes
