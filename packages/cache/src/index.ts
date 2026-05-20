@@ -42,6 +42,20 @@ export class Cacher {
     );
   }
 
+  async getOrSet<T>(key: string, factory: () => T | Promise<T>, ttl?: number): Promise<T> {
+    const cached = await this.get<T>(key);
+
+    if (cached !== undefined) {
+      return cached;
+    }
+
+    const value = await factory();
+
+    await this.set(key, value, ttl);
+
+    return value;
+  }
+
   del(key: string): Promise<boolean> {
     return this._store.del(normalizeKey(key));
   }

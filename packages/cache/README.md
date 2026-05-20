@@ -12,7 +12,7 @@ Designed for libraries, frameworks, and applications needing predictable async c
 ## Feature
 
 - Fully typed with TypeScript — no `any`.
-- Supports get/set/del/clear operations.
+- Supports get/getOrSet/set/del/clear operations.
 - Supports batch operations: getMultiple, setMultiple, delMultiple.
 - Optional TTL for automatic expiration.
 - Pluggable store backend (default is `nullCache`).
@@ -41,6 +41,9 @@ const cache = new Cacher({ defaultTtl: 1000 });
 // Single set/get
 await cache.set("foo", { a: 1 });
 const value = await cache.get("foo"); // -> { a: 1 }
+
+// Get or set with factory
+const user = await cache.getOrSet("user:1", () => fetchUser(1), 60);
 
 // Check existence
 const exists = await cache.has("foo"); // -> true

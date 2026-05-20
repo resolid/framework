@@ -28,6 +28,22 @@ describe("createCache with fake store", () => {
     expect(fakeStore.get).toHaveBeenCalled();
   });
 
+  it("getOrSet returns cached value if exists", async () => {
+    const factory = vi.fn();
+    const value = await cache.getOrSet("key", factory);
+    expect(value).toBe("value");
+    expect(factory).not.toHaveBeenCalled();
+  });
+
+  it("getOrSet calls factory and sets value on miss", async () => {
+    vi.mocked(fakeStore.get).mockResolvedValueOnce(undefined);
+    const factory = vi.fn().mockResolvedValue(42);
+    const value = await cache.getOrSet("key", factory, 5);
+    expect(value).toBe(42);
+    expect(factory).toHaveBeenCalledOnce();
+    expect(fakeStore.set).toHaveBeenCalledWith("key", "42", 5);
+  });
+
   it("set calls store.set with normalized key", async () => {
     await cache.set("/my/key", 42, 5);
     expect(fakeStore.set).toHaveBeenCalledWith("my:key", "42", 5);
