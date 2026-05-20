@@ -171,11 +171,16 @@ describe("RedisCache", () => {
 
   describe("connectionTimeout", () => {
     it("throws when timeout is exceeded", async () => {
-      const slow = new RedisCache("redis://192.0.2.1:6379", {
-        connectionTimeout: 100,
-      });
+      const slow = new RedisCache(
+        { url: "redis://192.0.2.1:6379", socket: { reconnectStrategy: false } },
+        {
+          connectionTimeout: 100,
+        },
+      );
 
       await expect(slow.has("k")).rejects.toThrow(/timed out/);
+
+      await slow.dispose();
     });
   });
 });

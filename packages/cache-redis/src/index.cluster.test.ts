@@ -22,7 +22,7 @@ describe("RedisCache Cluster", () => {
   });
 
   afterEach(async () => {
-    //await cache.clear();
+    await cache.clear();
   });
 
   afterAll(async () => {

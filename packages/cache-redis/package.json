@@ -40,7 +40,7 @@
   "scripts": {
     "build": "tsdown",
     "lint": "oxlint",
-    "test": "vitest run",
+    "test": "vitest run --reporter=hanging-process",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -1,5 +1,5 @@
 import { createClient, createCluster } from "@redis/client";
-import { retry, timeout } from "@resolid/utils";
+import { retry } from "@resolid/utils";
 import { execSync } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,45 +14,43 @@ export default async function (): Promise<() => Promise<void>> {
     stdio: "inherit",
   });
 
-  await Promise.race([
-    retry(
-      async () => {
-        const client = createClient({ url: "redis://localhost:6379" });
+  await retry(
+    async () => {
+      const client = createClient({ url: "redis://localhost:6379" });
 
-        await client.connect();
-        await client.ping();
-        await client.close();
+      await client.connect();
+      await client.ping();
+      await client.close();
 
-        const clusterClient = createCluster({
-          rootNodes: [
-            {
-              url: "redis://localhost:7001",
-            },
-            {
-              url: "redis://localhost:7002",
-            },
-            {
-              url: "redis://localhost:7003",
-            },
-          ],
-          useReplicas: true,
-        });
-        await clusterClient.connect();
+      const clusterClient = createCluster({
+        rootNodes: [
+          {
+            url: "redis://localhost:7001",
+          },
+          {
+            url: "redis://localhost:7002",
+          },
+          {
+            url: "redis://localhost:7003",
+          },
+        ],
+        useReplicas: true,
+      });
+      await clusterClient.connect();
 
-        const ok = (await clusterClient.clusterInfo()).includes("cluster_state:ok");
+      const ok = (await clusterClient.clusterInfo()).includes("cluster_state:ok");
 
-        await clusterClient.close();
+      await clusterClient.close();
 
-        if (!ok) {
-          throw new Error("cluster not ready");
-        }
-      },
-      {
-        delay: 200,
-      },
-    ),
-    timeout(10000),
-  ]);
+      if (!ok) {
+        throw new Error("cluster not ready");
+      }
+    },
+    {
+      retries: 60,
+      delay: 500,
+    },
+  );
 
   return async () => {
     execSync(`docker compose -f ${composeFile} --project-name resolid down -v --remove-orphans`, {
