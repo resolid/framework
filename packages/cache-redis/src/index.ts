@@ -109,7 +109,7 @@ export class RedisCache implements CacheStore {
         }
       }
     } catch (e) {
-      await this._client.destroy();
+      await this._dispose(true);
 
       throw e;
     }
@@ -393,13 +393,17 @@ export class RedisCache implements CacheStore {
     }
   }
 
-  async dispose(): Promise<void> {
+  private async _dispose(forceClose: boolean): Promise<void> {
     if (this._client.isOpen) {
-      if (this._options.forceClose) {
+      if (forceClose) {
         await this._client.destroy();
       } else {
         await this._client.close();
       }
     }
+  }
+
+  async dispose(): Promise<void> {
+    await this._dispose(this._options.forceClose);
   }
 }
