@@ -67,16 +67,16 @@
   },
   "dependencies": {
     "@hono/node-server": "^2.0.3",
-    "@resolid/utils": "^1.4.0",
+    "@resolid/utils": "^1.5.0",
     "@vercel/nft": "^1.5.0",
     "fast-glob": "^3.3.3",
-    "hono": "^4.12.19",
+    "hono": "^4.12.22",
     "minimatch": "^10.2.5",
-    "rolldown": "^1.0.1"
+    "rolldown": "^1.0.2"
   },
   "devDependencies": {
     "@react-router/dev": "^7.15.1",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
@@ -90,7 +90,7 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router": "^7.15.1",
-    "vite": "^8.0.13"
+    "vite": "^8.0.14"
   },
   "engines": {
     "node": "^22.13.0 || >=24"

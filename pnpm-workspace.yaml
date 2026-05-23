@@ -13,3 +13,7 @@ allowBuilds:
   "@tailwindcss/oxide": true
   esbuild: true
   lefthook: true
+minimumReleaseAgeExclude:
+  - "@resolid/config"
+  - "@resolid/utils"
+  - "vite"

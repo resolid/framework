@@ -3,4 +3,4 @@ pre-commit:
   commands:
     lint:
       glob: "*.{js,jsx,ts,tsx}"
-      run: npx --no -- oxlint --fix {staged_files}
+      run: pnpm exec oxlint --fix {staged_files}
