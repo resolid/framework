@@ -1,4 +1,4 @@
-import type { ExtensionCreator, Token } from "@resolid/core";
+import type { AppContext, ExtensionCreator } from "@resolid/core";
 import {
   type Config,
   configure,
@@ -32,8 +32,6 @@ export class LogService {
 
   constructor(config: LogConfig = {}) {
     this._config = config;
-
-    /* istanbul ignore next -- @preserve */
     this._defaultCategory = config.defaultCategory ?? "app";
   }
 
@@ -41,12 +39,14 @@ export class LogService {
     await configure({
       reset: true,
       sinks: {
+        console: getConsoleSink(),
         default: this._defaultSink ?? getConsoleSink(),
         ...this._config.sinks,
       },
       filters: this._config.filters,
       loggers: [
-        { category: ["logtape", "meta"], sinks: [] },
+        { category: [], sinks: ["console"], lowestLevel: "info" },
+        { category: ["logtape", "meta"], sinks: [], parentSinks: "override" },
         { category: this._defaultCategory, sinks: ["default"] },
         ...(this._config.loggers ?? []),
       ],
@@ -80,52 +80,39 @@ export class LogService {
   withFilter: typeof withFilter = withFilter;
 
   async dispose(): Promise<void> {
-    /* istanbul ignore next -- @preserve */
     await dispose();
   }
 }
 
-export interface LogTarget {
-  ref: Token;
-  sinks: (service: unknown) => Record<string, Sink>;
-}
+export type LogExtensionConfig = Omit<LogConfig, "sinks"> & {
+  targets?: Record<string, (ctx: AppContext) => Sink>;
+};
 
-/* istanbul ignore next -- @preserve */
-export function createLogTarget<T>(target: {
-  ref: Token<T>;
-  sinks: (service: T) => Record<string, Sink>;
-}): LogTarget {
-  return {
-    ref: target.ref as Token,
-    sinks: target.sinks as (service: unknown) => Record<string, Sink>,
-  };
-}
-
-export function createLogExtension(
-  targets: readonly LogTarget[] = [],
-  config: Omit<LogConfig, "sinks"> = {},
-): ExtensionCreator {
-  return ({ name, container }) => ({
+export function createLogExtension(config: LogExtensionConfig = {}): ExtensionCreator {
+  return (ctx) => ({
     name: "resolid-log-module",
     providers: [
       {
         token: LogService,
         factory() {
-          /* istanbul ignore next -- @preserve */
-          const sinks = targets.reduce<Record<string, Sink>>((acc, target) => {
-            return Object.assign(acc, target.sinks(container.get(target.ref)));
-          }, {});
+          const { targets = {}, defaultCategory = ctx.name, ...rest } = config;
+
+          const sinks: Record<string, Sink> = {};
+
+          for (const [key, v] of Object.entries(targets)) {
+            sinks[key] = v(ctx);
+          }
 
           return new LogService({
             sinks,
-            ...config,
-            defaultCategory: config.defaultCategory ?? name,
+            ...rest,
+            defaultCategory,
           });
         },
       },
     ],
     async bootstrap() {
-      await container.get(LogService).configure();
+      await ctx.container.get(LogService).configure();
     },
   });
 }

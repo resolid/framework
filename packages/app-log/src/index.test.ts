@@ -1,6 +1,12 @@
 import { createApp } from "@resolid/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createLogExtension, LogService } from "./index";
+import {
+  fileTarget,
+  rotatingFileTarget,
+  streamFileTarget,
+  timeRotatingFileTarget,
+} from "./targets/file-target";
 
 describe("logExtension", () => {
   let log: LogService;
@@ -9,7 +15,17 @@ describe("logExtension", () => {
     const app = await createApp({
       name: "TestApp",
       debug: true,
-      extensions: [createLogExtension([])],
+      extensions: [
+        createLogExtension({
+          targets: {
+            file: (ctx) => fileTarget(ctx, "file"),
+            streamFile: (ctx) => streamFileTarget(ctx, "stream-file"),
+            rotatingFile: (ctx) => rotatingFileTarget(ctx, "rotating-file"),
+            timeRotatingFile: (ctx) =>
+              timeRotatingFileTarget(ctx, { directory: "time-rotating-file" }),
+          },
+        }),
+      ],
       expose: {
         logger: LogService,
       },

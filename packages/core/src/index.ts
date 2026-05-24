@@ -144,7 +144,6 @@ class App<E extends Record<string, unknown>> {
 
   async dispose(): Promise<void> {
     await this._container.dispose();
-
     this.emitter.offAll();
   }
 }

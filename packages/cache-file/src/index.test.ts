@@ -9,7 +9,7 @@ describe("FileCache", () => {
   let cache: FileCache;
 
   beforeEach(async () => {
-    cacheDir = join(cwd(), ".temp", "file-cache-tests");
+    cacheDir = join(cwd(), "runtime", "file-cache-tests");
     cache = new FileCache(cacheDir);
   });
 

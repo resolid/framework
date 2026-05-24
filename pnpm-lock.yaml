@@ -105,25 +105,12 @@ importers:
 
   packages/app-log:
     dependencies:
-      '@logtape/logtape':
-        specifier: ^2.1.1
-        version: 2.1.1
-      '@resolid/core':
-        specifier: workspace:^
-        version: link:../core
-    devDependencies:
-      tsdown:
-        specifier: ^0.22.0
-        version: 0.22.0(typescript@6.0.3)
-
-  packages/app-log-file:
-    dependencies:
       '@logtape/file':
         specifier: ^2.1.1
         version: 2.1.1(@logtape/logtape@2.1.1)
-      '@resolid/app-log':
-        specifier: workspace:^
-        version: link:../app-log
+      '@logtape/logtape':
+        specifier: ^2.1.1
+        version: 2.1.1
       '@resolid/core':
         specifier: workspace:^
         version: link:../core
@@ -272,6 +259,9 @@ importers:
 
   website:
     dependencies:
+      '@logtape/file':
+        specifier: ^2.1.1
+        version: 2.1.1(@logtape/logtape@2.1.1)
       '@react-router/node':
         specifier: ^7.15.1
         version: 7.15.1(react-router@7.15.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(typescript@6.0.3)
@@ -281,9 +271,6 @@ importers:
       '@resolid/app-log':
         specifier: workspace:^
         version: link:../packages/app-log
-      '@resolid/app-log-file':
-        specifier: workspace:^
-        version: link:../packages/app-log-file
       '@resolid/core':
         specifier: workspace:^
         version: link:../packages/core
@@ -1771,8 +1758,8 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
-  baseline-browser-mapping@2.10.31:
-    resolution: {integrity: sha512-MujYO3eP72uvmSE0i4wltsodRfIpZATP3jvzRNRGGxgzId7aVocVJJV3nf01qnzzKFGxQVC9bpWxl5cjxTr/7Q==}
+  baseline-browser-mapping@2.10.32:
+    resolution: {integrity: sha512-wbPvpyjJPC0zdfdKXxqEL3Ea+bOMD/87X4lftiJkkaBiuG6ALQy1SLmEd7BSmVCuwCQsBrCamgBoLyfFDD1EPg==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -4704,7 +4691,7 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  baseline-browser-mapping@2.10.31: {}
+  baseline-browser-mapping@2.10.32: {}
 
   better-path-resolve@1.0.0:
     dependencies:
@@ -4726,7 +4713,7 @@ snapshots:
 
   browserslist@4.28.2:
     dependencies:
-      baseline-browser-mapping: 2.10.31
+      baseline-browser-mapping: 2.10.32
       caniuse-lite: 1.0.30001793
       electron-to-chromium: 1.5.361
       node-releases: 2.0.46

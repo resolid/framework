@@ -1,13 +1,7 @@
 import { createMySQLDatabaseExtension } from "@resolid/app-db-mysql";
-import {
-  createLogExtension,
-  createLogTarget,
-  type LoggerEntity,
-  LogService,
-  type LogTarget,
-} from "@resolid/app-log";
-import { createFileLogExtension, FileLogService } from "@resolid/app-log-file";
-import { createApp, type Extension, loadProviders } from "@resolid/core";
+import { createLogExtension, type LoggerEntity, LogService } from "@resolid/app-log";
+import { rotatingFileTarget } from "@resolid/app-log/targets";
+import { createApp, loadProviders } from "@resolid/core";
 import { attachDatabasePool } from "@vercel/functions";
 import { env } from "node:process";
 
@@ -16,28 +10,17 @@ const inNode = import.meta.env.RESOLID_PLATFORM == "node";
 export const app = await createApp({
   name: "resolid",
   extensions: [
-    createLogExtension(
-      [
-        inNode &&
-          createLogTarget({
-            ref: FileLogService,
-            sinks(service) {
-              return {
-                app: service.rotatingFileSink("app"),
-              };
-            },
-          }),
-      ].filter(Boolean) as LogTarget[],
-      {
-        loggers: [
-          inNode && {
-            category: "app",
-            sinks: ["app"],
-          },
-        ].filter(Boolean) as LoggerEntity[],
+    createLogExtension({
+      targets: {
+        ...(inNode && { app: (ctx) => rotatingFileTarget(ctx, "app") }),
       },
-    ),
-    inNode && createFileLogExtension(),
+      loggers: [
+        inNode && {
+          category: "app",
+          sinks: ["app"],
+        },
+      ].filter(Boolean) as LoggerEntity[],
+    }),
     createMySQLDatabaseExtension({
       connection: {
         uri: env.RX_DB_URI,
@@ -52,7 +35,7 @@ export const app = await createApp({
         }
       },
     }),
-  ].filter(Boolean) as Extension[],
+  ],
   providers: loadProviders(
     Object.values(
       import.meta.glob(["./**/repository.server.ts", "./**/service.server.ts"], {
@@ -68,5 +51,5 @@ export const app = await createApp({
 });
 
 app.emitter.on("app:ready", () => {
-  app.$.logger.info("Resolid application started.");
+  app.$.logger.category("app").info("Resolid application started.");
 });

@@ -31,6 +31,10 @@
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     },
+    "./targets": {
+      "types": "./dist/targets.d.mts",
+      "import": "./dist/targets.mjs"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -49,6 +53,14 @@
   },
   "devDependencies": {
     "tsdown": "^0.22.0"
+  },
+  "peerDependencies": {
+    "@logtape/file": "^2.1.1"
+  },
+  "peerDependenciesMeta": {
+    "@logtape/file": {
+      "optional": true
+    }
   },
   "engines": {
     "node": "^22.13.0 || >=24"
