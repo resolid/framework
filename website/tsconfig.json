@@ -7,9 +7,9 @@
       "~/*": ["./src/*"],
       "@resolid/core": ["../packages/core/src"],
       "@resolid/app-db": ["../packages/app-db/src"],
-      "@resolid/app-db-mysql": ["../packages/app-db-mysql/src"],
+      "@resolid/app-db/adapters/*": ["../packages/app-db/src/adapters/*"],
       "@resolid/app-log": ["../packages/app-log/src"],
-      "@resolid/app-log-file": ["../packages/app-log-file/src"]
+      "@resolid/app-log/targets": ["../packages/app-log/src/targets.ts"]
     }
   }
 }

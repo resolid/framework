@@ -1,4 +1,5 @@
-import { createMySQLDatabaseExtension } from "@resolid/app-db-mysql";
+import { createDatabaseExtension } from "@resolid/app-db";
+import { MySqlConnection, type MySqlDatabase } from "@resolid/app-db/adapters/mysql";
 import { createLogExtension, type LoggerEntity, LogService } from "@resolid/app-log";
 import { rotatingFileTarget } from "@resolid/app-log/targets";
 import { createApp, loadProviders } from "@resolid/core";
@@ -21,19 +22,19 @@ export const app = await createApp({
         },
       ].filter(Boolean) as LoggerEntity[],
     }),
-    createMySQLDatabaseExtension({
-      connection: {
+    createDatabaseExtension<MySqlDatabase>({
+      connection: new MySqlConnection({
         uri: env.RX_DB_URI,
         ssl: {
           rejectUnauthorized: true,
           ca: env.RX_DB_SSL_CA.replace(/\\n/gm, "\n"),
         },
-      },
-      enhancer: (pool) => {
-        if (import.meta.env.RESOLID_PLATFORM == "vercel") {
-          attachDatabasePool(pool);
-        }
-      },
+        enhancer: (pool) => {
+          if (import.meta.env.RESOLID_PLATFORM == "vercel") {
+            attachDatabasePool(pool);
+          }
+        },
+      }),
     }),
   ],
   providers: loadProviders(

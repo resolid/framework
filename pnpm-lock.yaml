@@ -27,7 +27,7 @@ importers:
         version: 21.0.1
       '@resolid/config':
         specifier: ^5.3.20
-        version: 5.3.20(eslint-plugin-react-hooks@7.1.1(eslint@10.4.0(jiti@2.7.0)))(eslint-plugin-react-you-might-not-need-an-effect@0.10.1(eslint@10.4.0(jiti@2.7.0)))(oxfmt@0.51.0)(oxlint-tsgolint@0.23.0)(oxlint@1.66.0(oxlint-tsgolint@0.23.0))(typescript@6.0.3)
+        version: 5.3.20(eslint-plugin-react-hooks@7.1.1(eslint@10.4.0(jiti@2.7.0)))(eslint-plugin-react-you-might-not-need-an-effect@0.10.2(eslint@10.4.0(jiti@2.7.0)))(oxfmt@0.51.0)(oxlint-tsgolint@0.23.0)(oxlint@1.66.0(oxlint-tsgolint@0.23.0))(typescript@6.0.3)
       '@svitejs/changesets-changelog-github-compact':
         specifier: ^1.2.0
         version: 1.2.0
@@ -44,8 +44,8 @@ importers:
         specifier: ^7.1.1
         version: 7.1.1(eslint@10.4.0(jiti@2.7.0))
       eslint-plugin-react-you-might-not-need-an-effect:
-        specifier: ^0.10.1
-        version: 0.10.1(eslint@10.4.0(jiti@2.7.0))
+        specifier: ^0.10.2
+        version: 0.10.2(eslint@10.4.0(jiti@2.7.0))
       lefthook:
         specifier: ^2.1.8
         version: 2.1.8
@@ -77,24 +77,8 @@ importers:
         specifier: workspace:^
         version: link:../core
       drizzle-orm:
-        specifier: ^0.45.2
-        version: 0.45.2(mysql2@3.22.3(@types/node@24.12.4))
-    devDependencies:
-      tsdown:
-        specifier: ^0.22.0
-        version: 0.22.0(typescript@6.0.3)
-
-  packages/app-db-mysql:
-    dependencies:
-      '@resolid/app-db':
-        specifier: workspace:^
-        version: link:../app-db
-      '@resolid/core':
-        specifier: workspace:^
-        version: link:../core
-      drizzle-orm:
-        specifier: ^0.45.2
-        version: 0.45.2(mysql2@3.22.3(@types/node@24.12.4))
+        specifier: rc
+        version: 1.0.0-rc.3(mysql2@3.22.3(@types/node@24.12.4))(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3)
       mysql2:
         specifier: ^3.22.3
         version: 3.22.3(@types/node@24.12.4)
@@ -125,8 +109,8 @@ importers:
         specifier: workspace:^
         version: link:../core
       nodemailer:
-        specifier: ^8.0.7
-        version: 8.0.7
+        specifier: ^8.0.8
+        version: 8.0.8
     devDependencies:
       '@types/nodemailer':
         specifier: ^8.0.0
@@ -265,9 +249,9 @@ importers:
       '@react-router/node':
         specifier: ^7.15.1
         version: 7.15.1(react-router@7.15.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(typescript@6.0.3)
-      '@resolid/app-db-mysql':
+      '@resolid/app-db':
         specifier: workspace:^
-        version: link:../packages/app-db-mysql
+        version: link:../packages/app-db
       '@resolid/app-log':
         specifier: workspace:^
         version: link:../packages/app-log
@@ -1929,11 +1913,12 @@ packages:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
     engines: {node: '>=12'}
 
-  drizzle-orm@0.45.2:
-    resolution: {integrity: sha512-kY0BSaTNYWnoDMVoyY8uxmyHjpJW1geOmBMdSSicKo9CIIWkSxMIj2rkeSR51b8KAPB7m+qysjuHme5nKP+E5Q==}
+  drizzle-orm@1.0.0-rc.3:
+    resolution: {integrity: sha512-akZOa5UxapFbdBG8IDkfBRpSZJpMHaOJtGgp7oi1oHaiU8S3KN92waHo2l5aRuv1D9tMGYpv3BQFOsiGcNjLTQ==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
+      '@effect/sql-pg': '>=4.0.0-beta.58 || >=4.0.0'
       '@electric-sql/pglite': '>=0.2.0'
       '@libsql/client': '>=0.10.0'
       '@libsql/client-wasm': '>=0.10.0'
@@ -1941,30 +1926,39 @@ packages:
       '@op-engineering/op-sqlite': '>=2'
       '@opentelemetry/api': ^1.4.1
       '@planetscale/database': '>=1.13'
-      '@prisma/client': '*'
+      '@sinclair/typebox': '>=0.34.8'
+      '@sqlitecloud/drivers': '>=1.0.653'
       '@tidbcloud/serverless': '*'
+      '@tursodatabase/database': '>=0.2.1'
+      '@tursodatabase/database-common': '>=0.2.1'
+      '@tursodatabase/database-wasm': '>=0.2.1'
       '@types/better-sqlite3': '*'
+      '@types/mssql': ^9.1.4
       '@types/pg': '*'
       '@types/sql.js': '*'
       '@upstash/redis': '>=1.34.7'
       '@vercel/postgres': '>=0.8.0'
       '@xata.io/client': '*'
-      better-sqlite3: '>=7'
+      arktype: '>=2.0.0'
+      better-sqlite3: '>=9.3.0'
       bun-types: '*'
+      effect: '>=4.0.0-beta.58 || >=4.0.0'
       expo-sqlite: '>=14.0.0'
-      gel: '>=2'
-      knex: '*'
-      kysely: '*'
+      mssql: ^11.0.1
       mysql2: '>=2'
       pg: '>=8'
       postgres: '>=3'
-      prisma: '*'
       sql.js: '>=1'
       sqlite3: '>=5'
+      typebox: '>=1.0.0'
+      valibot: '>=1.0.0-beta.7'
+      zod: ^3.25.0 || ^4.0.0
     peerDependenciesMeta:
       '@aws-sdk/client-rds-data':
         optional: true
       '@cloudflare/workers-types':
+        optional: true
+      '@effect/sql-pg':
         optional: true
       '@electric-sql/pglite':
         optional: true
@@ -1980,11 +1974,21 @@ packages:
         optional: true
       '@planetscale/database':
         optional: true
-      '@prisma/client':
+      '@sinclair/typebox':
+        optional: true
+      '@sqlitecloud/drivers':
         optional: true
       '@tidbcloud/serverless':
         optional: true
+      '@tursodatabase/database':
+        optional: true
+      '@tursodatabase/database-common':
+        optional: true
+      '@tursodatabase/database-wasm':
+        optional: true
       '@types/better-sqlite3':
+        optional: true
+      '@types/mssql':
         optional: true
       '@types/pg':
         optional: true
@@ -1996,17 +2000,17 @@ packages:
         optional: true
       '@xata.io/client':
         optional: true
+      arktype:
+        optional: true
       better-sqlite3:
         optional: true
       bun-types:
         optional: true
+      effect:
+        optional: true
       expo-sqlite:
         optional: true
-      gel:
-        optional: true
-      knex:
-        optional: true
-      kysely:
+      mssql:
         optional: true
       mysql2:
         optional: true
@@ -2014,11 +2018,15 @@ packages:
         optional: true
       postgres:
         optional: true
-      prisma:
-        optional: true
       sql.js:
         optional: true
       sqlite3:
+        optional: true
+      typebox:
+        optional: true
+      valibot:
+        optional: true
+      zod:
         optional: true
 
   dts-resolver@3.0.0:
@@ -2078,8 +2086,8 @@ packages:
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0 || ^10.0.0
 
-  eslint-plugin-react-you-might-not-need-an-effect@0.10.1:
-    resolution: {integrity: sha512-IK0s/+ShN0bkur5moKCu/lfx2D/9uIeozje8Wv2/XnYdmswa17pDg02aUuytEPb8Gf0eueiQFf/QsvOHHcvujg==}
+  eslint-plugin-react-you-might-not-need-an-effect@0.10.2:
+    resolution: {integrity: sha512-cqm9DXcsISYZHnFXT5zPH+ITsMx/bYscmq6zIsbtYvei1vj4dZ+BxN9LgoMmjEdm7sTaWxKVRY5IqQRQvau/GQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       eslint: '>=8.40.0'
@@ -2683,8 +2691,8 @@ packages:
     resolution: {integrity: sha512-GYVXHE2KnrzAfsAjl4uP++evGFCrAU1jta4ubEjIG7YWt/64Gqv66a30yKwWczVjA6j3bM4nBwH7Pk1JmDHaxQ==}
     engines: {node: '>=18'}
 
-  nodemailer@8.0.7:
-    resolution: {integrity: sha512-pkjE4mkBzQjdJT4/UmlKl3pX0rC9fZmjh7c6C9o7lv66Ac6w9WCnzPzhbPNxwZAzlF4mdq4CSWB5+FbK6FWCow==}
+  nodemailer@8.0.8:
+    resolution: {integrity: sha512-p+XsnzXGdtIHXUu2ugxdfG+eX2nehsGhMjW9h0CWj1BhE30hrFz0kh0yIM0/VjUgVsRrDj+80ZO+I1nSkGE4tA==}
     engines: {node: '>=6.0.0'}
 
   nopt@8.1.0:
@@ -3030,8 +3038,8 @@ packages:
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
 
-  tinyexec@1.1.2:
-    resolution: {integrity: sha512-dAqSqE/RabpBKI8+h26GfLq6Vb3JVXs30XYQjdMjaj/c2tS8IYYMbIzP599KtRj7c57/wYApb3QjgRgXmrCukA==}
+  tinyexec@1.2.2:
+    resolution: {integrity: sha512-M/Q0B2cp4K7kynaT/vnED1j8TlLY+Pp7C6Wl2bl/7u/F0mUVwdyOpwomQb8JpYLitHUssAJRmLZdMCGsrx7i+g==}
     engines: {node: '>=18'}
 
   tinyglobby@0.2.16:
@@ -3718,7 +3726,7 @@ snapshots:
       '@commitlint/load': 21.0.1(@types/node@24.12.4)(typescript@6.0.3)
       '@commitlint/read': 21.0.1(conventional-commits-parser@6.4.0)
       '@commitlint/types': 21.0.1
-      tinyexec: 1.1.2
+      tinyexec: 1.2.2
       yargs: 18.0.0
     transitivePeerDependencies:
       - '@types/node'
@@ -3788,7 +3796,7 @@ snapshots:
       '@commitlint/top-level': 21.0.1
       '@commitlint/types': 21.0.1
       git-raw-commits: 5.0.1(conventional-commits-parser@6.4.0)
-      tinyexec: 1.1.2
+      tinyexec: 1.2.2
     transitivePeerDependencies:
       - conventional-commits-filter
       - conventional-commits-parser
@@ -4259,13 +4267,13 @@ snapshots:
 
   '@remix-run/node-fetch-server@0.13.3': {}
 
-  '@resolid/config@5.3.20(eslint-plugin-react-hooks@7.1.1(eslint@10.4.0(jiti@2.7.0)))(eslint-plugin-react-you-might-not-need-an-effect@0.10.1(eslint@10.4.0(jiti@2.7.0)))(oxfmt@0.51.0)(oxlint-tsgolint@0.23.0)(oxlint@1.66.0(oxlint-tsgolint@0.23.0))(typescript@6.0.3)':
+  '@resolid/config@5.3.20(eslint-plugin-react-hooks@7.1.1(eslint@10.4.0(jiti@2.7.0)))(eslint-plugin-react-you-might-not-need-an-effect@0.10.2(eslint@10.4.0(jiti@2.7.0)))(oxfmt@0.51.0)(oxlint-tsgolint@0.23.0)(oxlint@1.66.0(oxlint-tsgolint@0.23.0))(typescript@6.0.3)':
     dependencies:
       oxfmt: 0.51.0
       oxlint: 1.66.0(oxlint-tsgolint@0.23.0)
     optionalDependencies:
       eslint-plugin-react-hooks: 7.1.1(eslint@10.4.0(jiti@2.7.0))
-      eslint-plugin-react-you-might-not-need-an-effect: 0.10.1(eslint@10.4.0(jiti@2.7.0))
+      eslint-plugin-react-you-might-not-need-an-effect: 0.10.2(eslint@10.4.0(jiti@2.7.0))
       oxlint-tsgolint: 0.23.0
       typescript: 6.0.3
 
@@ -4823,9 +4831,11 @@ snapshots:
 
   dotenv@16.6.1: {}
 
-  drizzle-orm@0.45.2(mysql2@3.22.3(@types/node@24.12.4)):
+  drizzle-orm@1.0.0-rc.3(mysql2@3.22.3(@types/node@24.12.4))(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3):
     optionalDependencies:
       mysql2: 3.22.3(@types/node@24.12.4)
+      valibot: 1.4.0(typescript@6.0.3)
+      zod: 4.4.3
 
   dts-resolver@3.0.0: {}
 
@@ -4872,7 +4882,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-react-you-might-not-need-an-effect@0.10.1(eslint@10.4.0(jiti@2.7.0)):
+  eslint-plugin-react-you-might-not-need-an-effect@0.10.2(eslint@10.4.0(jiti@2.7.0)):
     dependencies:
       eslint: 10.4.0(jiti@2.7.0)
       globals: 16.5.0
@@ -5390,7 +5400,7 @@ snapshots:
 
   node-releases@2.0.46: {}
 
-  nodemailer@8.0.7: {}
+  nodemailer@8.0.8: {}
 
   nopt@8.1.0:
     dependencies:
@@ -5716,7 +5726,7 @@ snapshots:
 
   tinybench@2.9.0: {}
 
-  tinyexec@1.1.2: {}
+  tinyexec@1.2.2: {}
 
   tinyglobby@0.2.16:
     dependencies:
@@ -5748,7 +5758,7 @@ snapshots:
       rolldown: 1.0.2
       rolldown-plugin-dts: 0.25.1(rolldown@1.0.2)(typescript@6.0.3)
       semver: 7.8.1
-      tinyexec: 1.1.2
+      tinyexec: 1.2.2
       tinyglobby: 0.2.16
       tree-kill: 1.2.2
       unconfig-core: 7.5.0
@@ -5888,7 +5898,7 @@ snapshots:
       picomatch: 4.0.4
       std-env: 4.1.0
       tinybench: 2.9.0
-      tinyexec: 1.1.2
+      tinyexec: 1.2.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
       vite: 8.0.14(@types/node@24.12.4)(jiti@2.7.0)

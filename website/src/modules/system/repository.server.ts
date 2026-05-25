@@ -1,7 +1,7 @@
-import { Repository } from "@resolid/app-db-mysql";
+import { MySqlRepository } from "@resolid/app-db/adapters/mysql";
 import { statusTable } from "./schema.server";
 
-export class SystemRepository extends Repository {
+export class SystemRepository extends MySqlRepository {
   async getFirst() {
     const status = await this.db.select().from(statusTable).limit(1);
 

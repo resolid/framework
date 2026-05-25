@@ -1,7 +1,7 @@
 import { inject } from "@resolid/core";
-import { DatabaseService } from "../service";
+import { DatabaseService } from "./service";
 
-export abstract class BaseRepository<T> {
+export abstract class Repository<T> {
   protected readonly source?: string;
 
   private readonly _database: DatabaseService<T>;
@@ -11,6 +11,6 @@ export abstract class BaseRepository<T> {
   }
 
   protected get db(): T {
-    return this._database.get(this.source);
+    return this._database.get<T>(this.source);
   }
 }

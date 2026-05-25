@@ -1,7 +1,10 @@
 import { defineConfig, type UserConfig } from "tsdown";
 
 const config: UserConfig = defineConfig({
-  entry: "src/index.ts",
+  entry: {
+    index: "src/index.ts",
+    "adapters/*": "src/adapters/*.ts",
+  },
   format: "esm",
   target: "es2022",
   dts: true,

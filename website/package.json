@@ -21,7 +21,7 @@
   "dependencies": {
     "@logtape/file": "^2.1.1",
     "@react-router/node": "^7.15.1",
-    "@resolid/app-db-mysql": "workspace:^",
+    "@resolid/app-db": "workspace:^",
     "@resolid/app-log": "workspace:^",
     "@resolid/core": "workspace:^",
     "@resolid/react-ui": "^0.3.0",

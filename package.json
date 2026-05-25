@@ -31,7 +31,7 @@
     "@types/node": "^24.12.4",
     "@vitest/coverage-v8": "^4.1.7",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-you-might-not-need-an-effect": "^0.10.1",
+    "eslint-plugin-react-you-might-not-need-an-effect": "^0.10.2",
     "lefthook": "^2.1.8",
     "oxfmt": "^0.51.0",
     "oxlint": "^1.66.0",
@@ -43,5 +43,5 @@
   "engines": {
     "node": "^22.13.0 || >=24"
   },
-  "packageManager": "pnpm@11.2.2"
+  "packageManager": "pnpm@11.3.0"
 }

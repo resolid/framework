@@ -1,7 +1,7 @@
-import { int, varchar } from "@resolid/app-db-mysql/drizzle";
-import { defineTable } from "~/foundation/schema.server";
+import { int, varchar } from "@resolid/app-db/adapters/mysql";
+import { defineMySqlTable } from "~/foundation/schema.server";
 
-export const statusTable = defineTable("status", {
+export const statusTable = defineMySqlTable("status", {
   id: int().primaryKey().autoincrement(),
   message: varchar({ length: 90 }).notNull().default(""),
 });

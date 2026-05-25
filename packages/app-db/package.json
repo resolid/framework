@@ -32,6 +32,10 @@
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     },
+    "./adapters/*": {
+      "types": "./dist/adapters/*.d.ts",
+      "import": "./dist/adapters/*.mjs"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -45,13 +49,19 @@
   },
   "dependencies": {
     "@resolid/core": "workspace:^",
-    "drizzle-orm": "^0.45.2"
+    "drizzle-orm": "rc"
   },
   "devDependencies": {
     "tsdown": "^0.22.0"
   },
   "peerDependencies": {
-    "@resolid/app-log": "workspace:^"
+    "@resolid/app-log": "workspace:^",
+    "mysql2": "^3.22.3"
+  },
+  "peerDependenciesMeta": {
+    "mysql2": {
+      "optional": true
+    }
   },
   "engines": {
     "node": "^22.13.0 || >=24"

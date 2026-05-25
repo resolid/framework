@@ -31,10 +31,7 @@ const app = createApp<{
   name: "App",
   extensions: [createLogExtension(logConfig)],
   expose: {
-    logger: {
-      token: LogService,
-      async: true,
-    },
+    logger: LogService,
   },
 });
 

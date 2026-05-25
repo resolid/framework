@@ -1,4 +1,4 @@
-import { createDefineTable } from "@resolid/app-db-mysql";
+import { createMySqlDefineTable } from "@resolid/app-db/adapters/mysql";
 import { env } from "node:process";
 
-export const defineTable = createDefineTable(env.RX_DB_TABLE_PREFIX);
+export const defineMySqlTable = createMySqlDefineTable(env.RX_DB_TABLE_PREFIX);
