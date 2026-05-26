@@ -1,10 +1,13 @@
+export type EventType = string | symbol;
+
 type Callback<Args extends unknown[] = unknown[]> = (...args: Args) => void;
 
-export class Emitter {
+// oxlint-disable-next-line typescript/no-explicit-any
+export class Emitter<Events extends Record<EventType, any> = Record<EventType, any>> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private readonly _events: Map<string, Callback<any>[]> = new Map();
+  private readonly _events: Map<keyof Events, Callback<any>[]> = new Map();
 
-  on<Args extends unknown[]>(event: string, callback: Callback<Args>): () => void {
+  on<K extends keyof Events>(event: K, callback: Callback<Events[K]>): () => void {
     let callbacks = this._events.get(event);
 
     if (!callbacks) {
@@ -17,7 +20,7 @@ export class Emitter {
     return () => this.off(event, callback);
   }
 
-  off<Args extends unknown[]>(event: string, callback: Callback<Args>): void {
+  off<K extends keyof Events>(event: K, callback: Callback<Events[K]>): void {
     const callbacks = this._events.get(event);
 
     if (!callbacks) {
@@ -36,7 +39,7 @@ export class Emitter {
     }
   }
 
-  offAll(event?: string): void {
+  offAll<K extends keyof Events>(event?: K): void {
     if (event) {
       this._events.delete(event);
     } else {
@@ -44,8 +47,8 @@ export class Emitter {
     }
   }
 
-  once<Args extends unknown[]>(event: string, callback: Callback<Args>): void {
-    const wrapper: Callback<Args> = (...args) => {
+  once<K extends keyof Events>(event: K, callback: Callback<Events[K]>): void {
+    const wrapper: Callback<Events[K]> = (...args) => {
       callback(...args);
       this.off(event, wrapper);
     };
@@ -53,7 +56,7 @@ export class Emitter {
     this.on(event, wrapper);
   }
 
-  emit<Args extends unknown[]>(event: string, ...args: Args): void {
+  emit<K extends keyof Events>(event: K, ...args: Events[K]): void {
     const callbacks = this._events.get(event);
 
     if (!callbacks) {
@@ -61,11 +64,11 @@ export class Emitter {
     }
 
     for (const callback of callbacks) {
-      callback(...args);
+      callback(...(args as unknown[]));
     }
   }
 
-  emitAsync<Args extends unknown[]>(event: string, ...args: Args): void {
+  emitAsync<K extends keyof Events>(event: K, ...args: Events[K]): void {
     const callbacks = this._events.get(event);
 
     /* istanbul ignore if -- @preserve */
@@ -75,7 +78,7 @@ export class Emitter {
 
     queueMicrotask(() => {
       for (const callback of callbacks) {
-        callback(...args);
+        callback(...(args as unknown[]));
       }
     });
   }

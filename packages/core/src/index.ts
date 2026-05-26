@@ -11,10 +11,14 @@ export interface AppConfig {
   readonly timezone?: string;
 }
 
+export interface AppEvents {
+  "app:ready": [Required<AppConfig>];
+}
+
 export type PathResolver = (...paths: string[]) => string;
 
 export type AppContext = AppConfig & {
-  emitter: Emitter;
+  emitter: Emitter<AppEvents>;
   container: Container;
   rootPath: PathResolver;
   runtimePath: PathResolver;
@@ -54,7 +58,7 @@ class App<E extends Record<string, unknown>> {
   public readonly name: string;
   public readonly debug: boolean;
   public readonly timezone: string;
-  public readonly emitter: Emitter;
+  public readonly emitter: Emitter<AppEvents>;
 
   public readonly $: E = Object.create(null);
 
@@ -74,7 +78,7 @@ class App<E extends Record<string, unknown>> {
     this.name = name;
     this.debug = debug;
     this.timezone = timezone;
-    this.emitter = new Emitter();
+    this.emitter = new Emitter<AppEvents>();
 
     this._context = {
       name,
@@ -138,7 +142,7 @@ class App<E extends Record<string, unknown>> {
       this._bootstraps.map((bootstrap) => Promise.resolve(bootstrap(this._context))),
     );
 
-    this.emitter.emit("app:ready");
+    this.emitter.emit("app:ready", { name: this.name, debug: this.debug, timezone: this.timezone });
     this._started = true;
   }
 
