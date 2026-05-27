@@ -1,5 +1,11 @@
 # @resolid/event
 
+## 0.3.0
+
+### Minor Changes
+
+- [`e7dce3c`](https://github.com/resolid/framework/commit/e7dce3c4093d3a7c8aada2fe83841439ff27e816) - feat(event): add generic type support for Emitter
+
 ## 0.2.2
 
 ### Patch Changes
