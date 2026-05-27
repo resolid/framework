@@ -1,10 +1,9 @@
 import { createApp } from "@resolid/core";
-import JSONTransport from "nodemailer/lib/json-transport";
 import { beforeEach, describe, expect, it } from "vitest";
-import { createMailExtension, MailService } from "./index";
+import { createMailExtension, createMailTransport, MailService } from "./index";
 
 describe("mailExtension", () => {
-  let mailer: MailService<{ json: JSONTransport }>;
+  let mailer: MailService;
 
   beforeEach(async () => {
     const app = await createApp({
@@ -13,11 +12,11 @@ describe("mailExtension", () => {
       extensions: [
         createMailExtension({
           from: "info@resolid.tech",
-          transports: { json: new JSONTransport({ jsonTransport: true }) },
+          transporters: { json: createMailTransport({ jsonTransport: true }) },
         }),
       ],
       expose: {
-        mailer: MailService<{ json: JSONTransport }>,
+        mailer: MailService,
       },
     });
 

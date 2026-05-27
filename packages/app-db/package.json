@@ -55,7 +55,6 @@
     "tsdown": "^0.22.0"
   },
   "peerDependencies": {
-    "@resolid/app-log": "workspace:^",
     "mysql2": "^3.22.3"
   },
   "peerDependenciesMeta": {

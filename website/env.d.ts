@@ -10,6 +10,12 @@ declare namespace NodeJS {
     readonly RX_DB_SSL_CA: string;
     readonly RX_DB_TABLE_PREFIX: string;
 
+    readonly RX_MAIL_FROM: string;
+    readonly RX_MAIL_HOST: string;
+    readonly RX_MAIL_PORT: number;
+    readonly RX_MAIL_USER: string;
+    readonly RX_MAIL_PASSWORD: string;
+
     readonly RX_PROXY: number;
     readonly RX_PROXY_COUNT: number;
 

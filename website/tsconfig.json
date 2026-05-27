@@ -9,7 +9,8 @@
       "@resolid/app-db": ["../packages/app-db/src"],
       "@resolid/app-db/adapters/*": ["../packages/app-db/src/adapters/*"],
       "@resolid/app-log": ["../packages/app-log/src"],
-      "@resolid/app-log/targets": ["../packages/app-log/src/targets.ts"]
+      "@resolid/app-log/targets": ["../packages/app-log/src/targets.ts"],
+      "@resolid/app-mail": ["../packages/app-mail/src"]
     }
   }
 }

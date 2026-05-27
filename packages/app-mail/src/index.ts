@@ -1,15 +1,13 @@
-import type { ExtensionCreator, PathResolver } from "@resolid/core";
+import type { Emitter, ExtensionCreator, PathResolver } from "@resolid/core";
 import type { Address, Attachment, Options } from "nodemailer/lib/mailer";
-import nodemailer, { type Transport, type Transporter } from "nodemailer";
+import nodemailer, { createTransport, type Transport, type Transporter } from "nodemailer";
 import { FileTransport } from "./transports/file";
 
-type KnownTransports = Record<string, Transport>;
-
-export type MailConfig<T extends KnownTransports> = {
+export type MailConfig = {
   from: string | Address | (string | Address)[];
   replyTo?: string | Address | (string | Address)[];
-  default?: keyof T | "file";
-  transports: Record<keyof T, Transport>;
+  transporters: Record<string, Transporter>;
+  defaultTransport?: string;
 };
 
 export type MailSendResult =
@@ -26,40 +24,62 @@ export type MailMessage = Options & {
   attachments?: (Attachment & { href?: string })[];
 };
 
-export class MailService<T extends KnownTransports> {
+interface AppMailEvents {
+  "mail:sending": [string, MailMessage];
+  "mail:error": [string];
+  "mail:sent": [string, MailMessage, string];
+}
+
+declare module "@resolid/core" {
+  // oxlint-disable-next-line typescript/no-empty-object-type
+  export interface AppEvents extends AppMailEvents {}
+}
+
+export class MailService {
+  private readonly _emitter: Emitter<AppMailEvents>;
   private readonly _from: string | Address | (string | Address)[];
   private readonly _replyTo: string | Address | (string | Address)[] | undefined;
-  private readonly _transporters: Record<keyof T | "file", Transporter>;
-  private readonly _defaultTransport: keyof T | "file";
+  private readonly _transporters: Record<string, Transporter>;
+  private readonly _defaultTransport: string;
 
-  constructor(config: MailConfig<T>, runtimePath: PathResolver) {
-    const { default: defaultTransport = "file", transports, from, replyTo } = config;
+  constructor(config: MailConfig, runtimePath: PathResolver, emitter: Emitter) {
+    this._emitter = emitter;
+
+    const { defaultTransport = "file", transporters, from, replyTo } = config;
 
     this._from = from;
     this._replyTo = replyTo;
     this._defaultTransport = defaultTransport;
 
-    const transporters: Record<string, Transporter> = {};
-
-    for (const key of Object.keys(transports)) {
-      transporters[key] = nodemailer.createTransport(transports[key]);
-    }
-
     this._transporters = {
       file: nodemailer.createTransport(new FileTransport(runtimePath("mail"))),
-      ...(transporters as Record<keyof T, Transporter>),
+      ...transporters,
     };
   }
 
-  async send(mail: MailMessage, transport?: keyof T | "file"): Promise<MailSendResult> {
-    try {
-      const message = { from: this._from, replyTo: this._replyTo, ...mail };
+  async send(mail: MailMessage, transport?: string): Promise<MailSendResult> {
+    const message = { from: this._from, replyTo: this._replyTo, ...mail };
 
-      const result =
-        await this._transporters[transport ?? this._defaultTransport].sendMail(message);
+    const current = transport ?? this._defaultTransport;
+    const transporter = this._transporters[current];
+
+    this._emitter.emit("mail:sending", current, message);
+
+    if (!transporter) {
+      const errorMessage = `Transporter "${current}" is not exists`;
+      this._emitter.emit("mail:error", errorMessage);
+
+      return { success: false, message: errorMessage };
+    }
+
+    try {
+      const result = await transporter.sendMail(message);
+      this._emitter.emit("mail:sent", current, message, result.messageId);
 
       return { success: true, messageId: result.messageId };
     } catch (e) {
+      this._emitter.emit("mail:error", (e as Error).message);
+
       return { success: false, message: (e as Error).message };
     }
   }
@@ -71,18 +91,20 @@ export class MailService<T extends KnownTransports> {
   }
 }
 
-export function createMailExtension<T extends KnownTransports>(
-  config: MailConfig<T>,
-): ExtensionCreator {
-  return ({ runtimePath }) => ({
+export function createMailExtension(config: MailConfig): ExtensionCreator {
+  return ({ runtimePath, emitter }) => ({
     name: "resolid-mail-module",
     providers: [
       {
         token: MailService,
         factory() {
-          return new MailService(config, runtimePath);
+          return new MailService(config, runtimePath, emitter);
         },
       },
     ],
   });
 }
+
+export type MailTransport = Transport;
+
+export const createMailTransport: typeof createTransport = createTransport;

@@ -3,8 +3,7 @@
   "include": ["src/**/*", "*.config.ts"],
   "compilerOptions": {
     "paths": {
-      "@resolid/core": ["../core/src"],
-      "@resolid/app-log": ["../app-log/src"]
+      "@resolid/core": ["../core/src"]
     }
   }
 }

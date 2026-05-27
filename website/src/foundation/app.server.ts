@@ -2,14 +2,16 @@ import { createDatabaseExtension } from "@resolid/app-db";
 import { MySqlConnection, type MySqlDatabase } from "@resolid/app-db/adapters/mysql";
 import { createLogExtension, type LoggerEntity, LogService } from "@resolid/app-log";
 import { rotatingFileTarget } from "@resolid/app-log/targets";
+import { createMailExtension, createMailTransport } from "@resolid/app-mail";
 import { createApp, loadProviders } from "@resolid/core";
+import { __DEV__ } from "@resolid/utils";
 import { attachDatabasePool } from "@vercel/functions";
 import { env } from "node:process";
 
 const inNode = import.meta.env.RESOLID_PLATFORM == "node";
 
 export const app = await createApp({
-  name: "resolid",
+  name: "Resolid",
   extensions: [
     createLogExtension({
       targets: {
@@ -23,18 +25,34 @@ export const app = await createApp({
       ].filter(Boolean) as LoggerEntity[],
     }),
     createDatabaseExtension<MySqlDatabase>({
-      connection: new MySqlConnection({
-        uri: env.RX_DB_URI,
-        ssl: {
-          rejectUnauthorized: true,
-          ca: env.RX_DB_SSL_CA.replace(/\\n/gm, "\n"),
+      connection: new MySqlConnection(
+        {
+          uri: env.RX_DB_URI,
+          ssl: {
+            rejectUnauthorized: true,
+            ca: env.RX_DB_SSL_CA.replace(/\\n/gm, "\n"),
+          },
         },
-        enhancer: (pool) => {
-          if (import.meta.env.RESOLID_PLATFORM == "vercel") {
-            attachDatabasePool(pool);
-          }
-        },
-      }),
+        import.meta.env.RESOLID_PLATFORM == "vercel" && attachDatabasePool,
+      ),
+      drizzleConfig: {
+        logger: __DEV__,
+      },
+    }),
+    createMailExtension({
+      from: env.RX_MAIL_FROM,
+      transporters: {
+        smtp: createMailTransport({
+          pool: true,
+          host: env.RX_MAIL_HOST,
+          port: env.RX_MAIL_PORT,
+          auth: {
+            user: env.RX_MAIL_USER,
+            pass: env.RX_MAIL_PASSWORD,
+          },
+        }),
+      },
+      defaultTransport: "smtp",
     }),
   ],
   providers: loadProviders(
@@ -51,6 +69,6 @@ export const app = await createApp({
   },
 });
 
-app.emitter.on("app:ready", () => {
-  app.$.logger.category("app").info("Resolid application started.");
+app.emitter.on("app:ready", (ctx) => {
+  app.$.logger.category("app").info(`${ctx.name} application started.`);
 });

@@ -1,4 +1,3 @@
-import type { Simplify } from "drizzle-orm";
 import type { AnyRelations, EmptyRelations } from "drizzle-orm/relations";
 import {
   type DrizzleMySqlConfig,
@@ -12,43 +11,28 @@ import { Repository } from "../core/repository";
 
 type Enhancer = (pool: Pool) => Pool | void;
 
-export type MySqlConfig = {
-  enhancer?: Enhancer;
-  uri: string;
-} & Simplify<
-  Omit<
-    ConnectionOptions,
-    | "host"
-    | "port"
-    | "user"
-    | "password"
-    | "password1"
-    | "password2"
-    | "password3"
-    | "passwordSha1"
-    | "database"
-    | "uri"
-  >
->;
+export type MySqlConfig = ConnectionOptions;
 
 export class MySqlConnection extends DatabaseConnection<
   MySql2Database & {
     $client: Pool;
   }
 > {
-  private readonly _config: Omit<MySqlConfig, "enhancer">;
-  private readonly _enhancer: Enhancer | undefined;
+  private readonly _config: MySqlConfig;
+  private readonly _enhancer: Enhancer | false | undefined;
 
-  constructor(config: MySqlConfig) {
+  constructor(config: MySqlConfig, enhancer?: Enhancer | false) {
     super();
-    const { enhancer, ...rest } = config;
 
-    this._config = rest;
+    this._config = config;
     this._enhancer = enhancer;
   }
 
   override connect(drizzleConfig: DrizzleMySqlConfig<EmptyRelations>): void {
-    let pool = mysql.createPool(this._config);
+    let pool = mysql.createPool({
+      charsetNumber: mysql.Charsets.UTF8MB4_0900_AI_CI,
+      ...this._config,
+    });
 
     if (this._enhancer) {
       const maybe = this._enhancer(pool);

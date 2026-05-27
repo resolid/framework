@@ -1,6 +1,9 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.1.2/schema.json",
-  "changelog": ["@svitejs/changesets-changelog-github-compact", { "repo": "resolid/framework" }],
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "resolid/framework", "disableThanks": true }
+  ],
   "commit": false,
   "fixed": [],
   "linked": [],

@@ -1,7 +1,6 @@
-import type { DrizzleConfig } from "drizzle-orm";
+import type { AppContext, Emitter, ExtensionCreator } from "@resolid/core";
 import type { AnyRelations, EmptyRelations } from "drizzle-orm/relations";
-import { LogService } from "@resolid/app-log";
-import { type Emitter, type ExtensionCreator, inject } from "@resolid/core";
+import { DefaultLogger, type DrizzleConfig, type Logger } from "drizzle-orm";
 import type { DatabaseConnection } from "./connection";
 
 export type DatabaseConfig<
@@ -17,15 +16,23 @@ export type DatabaseConfig<
   drizzleConfig?: DrizzleConfig<TSchema, TRelationConfigs>;
 };
 
+interface AppDbEvents {
+  "db:query": [string, unknown[]];
+}
+
+declare module "@resolid/core" {
+  // oxlint-disable-next-line typescript/no-empty-object-type
+  export interface AppEvents extends AppDbEvents {}
+}
+
 export class DatabaseService<
   C,
   TSchema extends Record<string, unknown> = Record<string, never>,
   TRelationConfigs extends AnyRelations = EmptyRelations,
 > {
-  protected readonly config: DatabaseConfig<C, TSchema, TRelationConfigs>;
-  protected readonly emitter: Emitter;
-  protected readonly logger?: LogService;
-  protected readonly connections: Map<
+  private readonly _emitter: Emitter<AppDbEvents>;
+  private readonly _config: DatabaseConfig<C, TSchema, TRelationConfigs>;
+  private readonly _connections: Map<
     string,
     C extends Record<string, infer T>
       ? DatabaseConnection<T, TSchema, TRelationConfigs>
@@ -34,19 +41,14 @@ export class DatabaseService<
 
   private readonly _defaultSource = "main";
 
-  constructor(
-    config: DatabaseConfig<C, TSchema, TRelationConfigs>,
-    emitter: Emitter,
-    logger: LogService | undefined = inject(LogService, { optional: true }),
-  ) {
-    this.config = config;
-    this.emitter = emitter;
-    this.logger = logger;
+  constructor(config: DatabaseConfig<C, TSchema, TRelationConfigs>, context: AppContext) {
+    this._config = config;
+    this._emitter = context.emitter;
   }
 
   async connect(): Promise<void> {
-    const connections = (this.config.connections ?? {
-      [this._defaultSource]: this.config.connection,
+    const connections = (this._config.connections ?? {
+      [this._defaultSource]: this._config.connection,
     }) as Record<
       string,
       C extends Record<string, infer T>
@@ -54,25 +56,43 @@ export class DatabaseService<
         : DatabaseConnection<C, TSchema, TRelationConfigs>
     >;
 
+    const { logger, jit = true, ...rest } = this._config.drizzleConfig ?? {};
+
+    const queryEmit = (query: string, params: unknown[]) => {
+      this._emitter.emit("db:query", query, params);
+    };
+
+    const drizzleLogger: Logger = {
+      logQuery(query, params) {
+        queryEmit(query, params);
+
+        if (logger === true) {
+          new DefaultLogger().logQuery(query, params);
+        } else if (logger !== false) {
+          logger?.logQuery(query, params);
+        }
+      },
+    };
+
     for (const [key, conn] of Object.entries(connections)) {
       // oxlint-disable-next-line no-await-in-loop
-      await conn.connect(this.config.drizzleConfig ?? {});
+      await conn.connect({ logger: drizzleLogger, jit, ...rest });
 
-      this.connections.set(key, conn);
+      this._connections.set(key, conn);
     }
   }
 
   async dispose(): Promise<void> {
-    for (const conn of this.connections.values()) {
+    for (const conn of this._connections.values()) {
       // oxlint-disable-next-line no-await-in-loop
       await conn.close();
     }
 
-    this.connections.clear();
+    this._connections.clear();
   }
 
   get<T>(name: string = this._defaultSource) {
-    const conn = this.connections.get(name);
+    const conn = this._connections.get(name);
 
     if (!conn) {
       throw new Error(`Connection with name ${String(name)} does not exist.`);
@@ -87,18 +107,18 @@ export function createDatabaseExtension<
   TSchema extends Record<string, unknown> = Record<string, never>,
   TRelationConfigs extends AnyRelations = EmptyRelations,
 >(config: DatabaseConfig<C, TSchema, TRelationConfigs>): ExtensionCreator {
-  return ({ emitter, container }) => ({
+  return (context) => ({
     name: "resolid-db-module",
     providers: [
       {
         token: DatabaseService,
         factory() {
-          return new DatabaseService(config, emitter);
+          return new DatabaseService(config, context);
         },
       },
     ],
     async bootstrap() {
-      await container.get(DatabaseService).connect();
+      await context.container.get(DatabaseService).connect();
     },
   });
 }
