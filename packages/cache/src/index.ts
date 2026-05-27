@@ -34,24 +34,34 @@ export class Cacher {
     return value === undefined ? defaultValue : this._serializer.deserialize<T>(value);
   }
 
-  set<T>(key: string, value: T, ttl?: number): Promise<boolean> {
-    return this._store.set(
-      normalizeKey(key),
-      this._serializer.serialize(value),
-      ttl ?? this._defaultTtl,
-    );
+  private _set<T>(key: string, value: T, ttl: number | undefined): Promise<boolean> {
+    return this._store.set(normalizeKey(key), this._serializer.serialize(value), ttl);
   }
 
-  async getOrSet<T>(key: string, factory: () => T | Promise<T>, ttl?: number): Promise<T> {
+  set<T>(key: string, value: T, ttl?: number): Promise<boolean> {
+    return this._set(key, value, ttl ?? this._defaultTtl);
+  }
+
+  async getOrSet<T>(
+    key: string,
+    factory: (ctx: { setTtl: (ttl: number | undefined) => void }) => T | Promise<T>,
+    ttl?: number,
+  ): Promise<T> {
     const cached = await this.get<T>(key);
 
     if (cached !== undefined) {
       return cached;
     }
 
-    const value = await factory();
+    let resolvedTtl = ttl ?? this._defaultTtl;
 
-    await this.set(key, value, ttl);
+    const value = await factory({
+      setTtl: (t) => {
+        resolvedTtl = t;
+      },
+    });
+
+    await this._set(key, value, resolvedTtl);
 
     return value;
   }

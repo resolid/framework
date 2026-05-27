@@ -44,6 +44,35 @@ describe("createCache with fake store", () => {
     expect(fakeStore.set).toHaveBeenCalledWith("key", "42", 5);
   });
 
+  it("getOrSet should use ttl set by factory", async () => {
+    vi.mocked(fakeStore.get).mockResolvedValueOnce(undefined);
+    const value = await cache.getOrSet(
+      "key",
+      (ctx) => {
+        ctx.setTtl(3000);
+        ctx.setTtl(5000);
+        return 42;
+      },
+      5,
+    );
+    expect(value).toBe(42);
+    expect(fakeStore.set).toHaveBeenCalledWith("key", "42", 5000);
+  });
+
+  it("getOrSet should allow factory ttl override default ttl", async () => {
+    vi.mocked(fakeStore.get).mockResolvedValueOnce(undefined);
+    const value = await cache.getOrSet(
+      "key",
+      (ctx) => {
+        ctx.setTtl(undefined);
+        return 42;
+      },
+      5,
+    );
+    expect(value).toBe(42);
+    expect(fakeStore.set).toHaveBeenCalledWith("key", "42", undefined);
+  });
+
   it("set calls store.set with normalized key", async () => {
     await cache.set("/my/key", 42, 5);
     expect(fakeStore.set).toHaveBeenCalledWith("my:key", "42", 5);
