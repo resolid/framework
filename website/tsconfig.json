@@ -5,7 +5,10 @@
     "rootDirs": [".", "./.react-router/types"],
     "paths": {
       "~/*": ["./src/*"],
+      "@resolid/cache-file": ["../packages/cache-file/src"],
+      "@resolid/cache-redis": ["../packages/cache-redis/src"],
       "@resolid/core": ["../packages/core/src"],
+      "@resolid/app-cache": ["../packages/app-cache/src"],
       "@resolid/app-db": ["../packages/app-db/src"],
       "@resolid/app-db/adapters/*": ["../packages/app-db/src/adapters/*"],
       "@resolid/app-log": ["../packages/app-log/src"],

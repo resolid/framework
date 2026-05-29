@@ -16,4 +16,4 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - "@resolid/config"
   - "@resolid/utils"
-  - "vite"
+  - "@resolid/react-ui"

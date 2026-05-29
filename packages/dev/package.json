@@ -68,11 +68,11 @@
   "dependencies": {
     "@hono/node-server": "^2.0.4",
     "@resolid/utils": "^1.5.0",
-    "@vercel/nft": "^1.5.0",
+    "@vercel/nft": "^1.10.2",
     "fast-glob": "^3.3.3",
     "hono": "^4.12.23",
     "minimatch": "^10.2.5",
-    "rolldown": "^1.0.2"
+    "rolldown": "^1.0.3"
   },
   "devDependencies": {
     "@react-router/dev": "^7.15.1",

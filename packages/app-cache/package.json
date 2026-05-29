@@ -1,13 +1,10 @@
 {
-  "name": "@resolid/app-db",
+  "name": "@resolid/app-cache",
   "version": "0.0.0",
   "private": true,
-  "description": "Database module for Resolid applications",
+  "description": "Cache module for Resolid applications",
   "keywords": [
-    "database",
-    "db",
-    "drizzle-orm",
-    "orm",
+    "cache",
     "resolid"
   ],
   "homepage": "https://www.resolid.tech",
@@ -19,7 +16,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/resolid/framework.git",
-    "directory": "packages/app-db"
+    "directory": "packages/app-cache"
   },
   "files": [
     "dist"
@@ -31,10 +28,6 @@
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
-    },
-    "./adapters/*": {
-      "types": "./dist/adapters/*.d.ts",
-      "import": "./dist/adapters/*.mjs"
     },
     "./package.json": "./package.json"
   },
@@ -48,17 +41,21 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@resolid/core": "workspace:^",
-    "drizzle-orm": "rc"
+    "@resolid/cache": "workspace:^",
+    "@resolid/core": "workspace:^"
   },
   "devDependencies": {
     "tsdown": "^0.22.0"
   },
   "peerDependencies": {
-    "mysql2": "^3.22.4"
+    "@resolid/cache-file": "workspace:^",
+    "@resolid/cache-redis": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "mysql2": {
+    "@resolid/cache-file": {
+      "optional": true
+    },
+    "@resolid/cache-redis": {
       "optional": true
     }
   },
