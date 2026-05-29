@@ -2,20 +2,20 @@ import type { CacheStore } from "./stores/types";
 import { NullCache } from "./stores/null-cache";
 import { normalizeKey } from "./utils";
 
-type Serializer = {
+export type CacheSerializer = {
   serialize: <T = unknown>(value: T) => string;
   deserialize: <T = unknown>(value: string) => T;
 };
 
 export interface CacheOptions {
   store?: CacheStore;
-  serializer?: Serializer;
+  serializer?: CacheSerializer;
   defaultTtl?: number;
 }
 
 export class Cacher {
   private readonly _store: CacheStore;
-  private readonly _serializer: Serializer;
+  private readonly _serializer: CacheSerializer;
   private readonly _defaultTtl?: number;
 
   private readonly _inflight: Map<string, Promise<unknown>> = new Map();
