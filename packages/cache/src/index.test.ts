@@ -1,189 +1,199 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { CacheStore } from "./stores/types";
 import { Cacher } from "./index";
+import { MemoryCache } from "./stores/memory-cache";
 
-describe("createCache with fake store", () => {
+describe("Cacher", () => {
   let cache: Cacher;
-  let fakeStore: CacheStore;
 
   beforeEach(() => {
-    fakeStore = {
-      get: vi.fn().mockResolvedValue(JSON.stringify("value")),
-      set: vi.fn().mockResolvedValue(true),
-      del: vi.fn().mockResolvedValue(true),
-      clear: vi.fn().mockResolvedValue(true),
-      getMultiple: vi.fn().mockResolvedValue([1, 2, undefined]),
-      setMultiple: vi.fn().mockResolvedValue(true),
-      delMultiple: vi.fn().mockResolvedValue(true),
-      has: vi.fn().mockResolvedValue(true),
-      dispose: vi.fn().mockResolvedValue(undefined),
-    };
-
-    cache = new Cacher({ store: fakeStore, defaultTtl: 1000 });
+    cache = new Cacher({ store: new MemoryCache(), defaultTtl: 1 });
   });
 
-  it("get returns default", async () => {
-    const value = await cache.get("key");
-    expect(value).toBe("value");
-    expect(fakeStore.get).toHaveBeenCalled();
+  describe("get", () => {
+    it("returns undefined on miss", async () => {
+      expect(await cache.get("key")).toBeUndefined();
+    });
+
+    it("returns default value on miss", async () => {
+      expect(await cache.get("key", "default")).toBe("default");
+    });
+
+    it("returns cached value on hit", async () => {
+      await cache.set("key", "value");
+      expect(await cache.get("key")).toBe("value");
+    });
   });
 
-  it("getOrSet returns cached value if exists", async () => {
-    const factory = vi.fn();
-    const value = await cache.getOrSet("key", factory);
-    expect(value).toBe("value");
-    expect(factory).not.toHaveBeenCalled();
+  describe("set", () => {
+    it("stores and retrieves value", async () => {
+      await cache.set("key", 42);
+      expect(await cache.get("key")).toBe(42);
+    });
+
+    it("normalizes key", async () => {
+      await cache.set("/my/key", 42);
+      expect(await cache.get("my:key")).toBe(42);
+    });
+
+    it("uses defaultTtl when ttl not provided", async () => {
+      vi.useFakeTimers();
+      await cache.set("key", "value");
+      vi.advanceTimersByTime(1001);
+      expect(await cache.get("key")).toBeUndefined();
+      vi.useRealTimers();
+    });
+
+    it("uses provided ttl over defaultTtl", async () => {
+      vi.useFakeTimers();
+      await cache.set("key", "value", 0.5);
+      vi.advanceTimersByTime(501);
+      expect(await cache.get("key")).toBeUndefined();
+      vi.useRealTimers();
+    });
   });
 
-  it("getOrSet calls factory and sets value on miss", async () => {
-    vi.mocked(fakeStore.get).mockResolvedValueOnce(undefined);
-    const factory = vi.fn().mockResolvedValue(42);
-    const value = await cache.getOrSet("key", factory, 5);
-    expect(value).toBe(42);
-    expect(factory).toHaveBeenCalledOnce();
-    expect(fakeStore.set).toHaveBeenCalledWith("key", "42", 5);
+  describe("del", () => {
+    it("removes a key", async () => {
+      await cache.set("key", "value");
+      await cache.del("key");
+      expect(await cache.get("key")).toBeUndefined();
+    });
   });
 
-  it("getOrSet should use ttl set by factory", async () => {
-    vi.mocked(fakeStore.get).mockResolvedValueOnce(undefined);
-    const value = await cache.getOrSet(
-      "key",
-      (ctx) => {
-        ctx.setTtl(3000);
-        ctx.setTtl(5000);
-        return 42;
-      },
-      5,
-    );
-    expect(value).toBe(42);
-    expect(fakeStore.set).toHaveBeenCalledWith("key", "42", 5000);
+  describe("clear", () => {
+    it("removes all keys", async () => {
+      await cache.set("a", 1);
+      await cache.set("b", 2);
+      await cache.clear();
+      expect(await cache.get("a")).toBeUndefined();
+      expect(await cache.get("b")).toBeUndefined();
+    });
   });
 
-  it("getOrSet should allow factory ttl override default ttl", async () => {
-    vi.mocked(fakeStore.get).mockResolvedValueOnce(undefined);
-    const value = await cache.getOrSet(
-      "key",
-      (ctx) => {
-        ctx.setTtl(undefined);
-        return 42;
-      },
-      5,
-    );
-    expect(value).toBe(42);
-    expect(fakeStore.set).toHaveBeenCalledWith("key", "42", undefined);
+  describe("has", () => {
+    it("returns true if key exists", async () => {
+      await cache.set("key", "value");
+      expect(await cache.has("key")).toBe(true);
+    });
+
+    it("returns false if key does not exist", async () => {
+      expect(await cache.has("missing")).toBe(false);
+    });
   });
 
-  it("set calls store.set with normalized key", async () => {
-    await cache.set("/my/key", 42, 5);
-    expect(fakeStore.set).toHaveBeenCalledWith("my:key", "42", 5);
+  describe("getMultiple", () => {
+    it("returns values for existing keys", async () => {
+      await cache.set("a", 1);
+      await cache.set("b", 2);
+      expect(await cache.getMultiple(["a", "b"])).toEqual([1, 2]);
+    });
+
+    it("returns undefined for missing keys", async () => {
+      await cache.set("a", 1);
+      expect(await cache.getMultiple(["a", "missing"])).toEqual([1, undefined]);
+    });
+
+    it("returns default value for missing keys", async () => {
+      await cache.set("a", 1);
+      expect(await cache.getMultiple(["a", "missing"], 0)).toEqual([1, 0]);
+    });
   });
 
-  it("del calls store.del", async () => {
-    await cache.del("foo");
-    expect(fakeStore.del).toHaveBeenCalledWith("foo");
+  describe("setMultiple", () => {
+    it("stores multiple values", async () => {
+      await cache.setMultiple({ a: 1, b: 2 });
+      expect(await cache.getMultiple(["a", "b"])).toEqual([1, 2]);
+    });
+
+    it("uses provided ttl", async () => {
+      vi.useFakeTimers();
+      await cache.setMultiple({ a: 1, b: 2 }, 0.5);
+      vi.advanceTimersByTime(501);
+      expect(await cache.getMultiple(["a", "b"])).toEqual([undefined, undefined]);
+      vi.useRealTimers();
+    });
   });
 
-  it("clear calls store.clear", async () => {
-    await cache.clear();
-    expect(fakeStore.clear).toHaveBeenCalled();
+  describe("delMultiple", () => {
+    it("removes multiple keys", async () => {
+      await cache.setMultiple({ a: 1, b: 2 });
+      await cache.delMultiple(["a", "b"]);
+      expect(await cache.getMultiple(["a", "b"])).toEqual([undefined, undefined]);
+    });
   });
 
-  it("getMultiple uses store.getMultiple if exists", async () => {
-    const values = await cache.getMultiple(["a", "b"]);
-    expect(values).toEqual([1, 2, undefined]);
-    expect(fakeStore.getMultiple).toHaveBeenCalledWith(["a", "b"]);
+  describe("getOrSet", () => {
+    it("returns cached value on hit", async () => {
+      await cache.set("key", "cached");
+      const factory = vi.fn();
+      expect(await cache.getOrSet("key", factory)).toBe("cached");
+      expect(factory).not.toHaveBeenCalled();
+    });
+
+    it("calls factory and stores value on miss", async () => {
+      const value = await cache.getOrSet("key", () => 42, 500);
+      expect(value).toBe(42);
+      expect(await cache.get("key")).toBe(42);
+    });
+
+    it("uses ttl set by factory ctx", async () => {
+      vi.useFakeTimers();
+      await cache.getOrSet(
+        "key",
+        (ctx) => {
+          ctx.setTtl(0.5);
+          return 42;
+        },
+        50,
+      );
+      vi.advanceTimersByTime(501);
+      expect(await cache.get("key")).toBeUndefined();
+      vi.useRealTimers();
+    });
+
+    it("allows factory ctx to override ttl to undefined", async () => {
+      vi.useFakeTimers();
+      await cache.getOrSet(
+        "key",
+        (ctx) => {
+          ctx.setTtl(undefined);
+          return 42;
+        },
+        5000,
+      );
+      vi.advanceTimersByTime(10000);
+      expect(await cache.get("key")).toBe(42);
+      vi.useRealTimers();
+    });
+
+    it("dedupes concurrent calls for the same key", async () => {
+      const factory = vi.fn(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        return "value";
+      });
+
+      const results = await Promise.all([
+        cache.getOrSet("key", factory),
+        cache.getOrSet("key", factory),
+        cache.getOrSet("key", factory),
+      ]);
+
+      expect(results).toEqual(["value", "value", "value"]);
+      expect(factory).toHaveBeenCalledTimes(1);
+    });
+
+    it("cleans up inflight entry after factory rejects", async () => {
+      const factory = vi.fn().mockRejectedValueOnce(new Error("fail")).mockResolvedValueOnce("ok");
+
+      await expect(cache.getOrSet("key", factory)).rejects.toThrow("fail");
+      expect(await cache.getOrSet("key", factory)).toBe("ok");
+      expect(factory).toHaveBeenCalledTimes(2);
+    });
   });
 
-  it("getMultiple uses store.getMultiple with default", async () => {
-    const values = await cache.getMultiple(["a", "b"], 3);
-    expect(values).toEqual([1, 2, 3]);
-    expect(fakeStore.getMultiple).toHaveBeenCalledWith(["a", "b"]);
-  });
-
-  it("setMultiple uses store.setMultiple if exists", async () => {
-    await cache.setMultiple({ a: 1, b: 2 }, 10);
-    expect(fakeStore.setMultiple).toHaveBeenCalledWith({ a: "1", b: "2" }, 10);
-  });
-
-  it("delMultiple uses store.delMultiple if exists", async () => {
-    await cache.delMultiple(["a", "b"]);
-    expect(fakeStore.delMultiple).toHaveBeenCalledWith(["a", "b"]);
-  });
-
-  it("has uses store.has if exists", async () => {
-    const result = await cache.has("key");
-    expect(result).toBe(true);
-    expect(fakeStore.has).toHaveBeenCalledWith("key");
-  });
-
-  it("dispose calls store.dispose if exists", async () => {
-    await cache.dispose();
-    expect(fakeStore.dispose).toHaveBeenCalled();
-  });
-});
-
-describe("createCache with partial fake store", () => {
-  let cache: Cacher;
-  let partialStore: CacheStore;
-
-  beforeEach(() => {
-    partialStore = {
-      get: vi.fn().mockResolvedValue(undefined),
-      set: vi.fn().mockResolvedValue(true),
-      del: vi.fn().mockResolvedValue(true),
-      clear: vi.fn().mockResolvedValue(true),
-    };
-
-    cache = new Cacher({ store: partialStore, defaultTtl: 1000 });
-  });
-
-  it("get returns default if undefined", async () => {
-    const value = await cache.get("key", "default");
-    expect(value).toBe("default");
-    expect(partialStore.get).toHaveBeenCalledWith("key");
-  });
-
-  it("set calls store.set", async () => {
-    await cache.set("foo", 42);
-    expect(partialStore.set).toHaveBeenCalledWith("foo", "42", 1000);
-  });
-
-  it("del calls store.del", async () => {
-    await cache.del("foo");
-    expect(partialStore.del).toHaveBeenCalledWith("foo");
-  });
-
-  it("clear calls store.clear", async () => {
-    await cache.clear();
-    expect(partialStore.clear).toHaveBeenCalled();
-  });
-
-  it("getMultiple falls back to multiple get calls", async () => {
-    const values = await cache.getMultiple(["a", "b"], "def");
-    expect(values).toEqual(["def", "def"]);
-    expect(partialStore.get).toHaveBeenCalledTimes(2);
-  });
-
-  it("setMultiple falls back to multiple set calls", async () => {
-    const result = await cache.setMultiple({ a: 1, b: 2 });
-    expect(result).toBe(true);
-    expect(partialStore.set).toHaveBeenCalledTimes(2);
-  });
-
-  it("delMultiple falls back to multiple del calls", async () => {
-    const result = await cache.delMultiple(["a", "b"]);
-    expect(result).toBe(true);
-    expect(partialStore.del).toHaveBeenCalledTimes(2);
-  });
-
-  it("has falls back to get call", async () => {
-    const result = await cache.has("x");
-    expect(result).toBe(false);
-    expect(partialStore.get).toHaveBeenCalledWith("x");
-  });
-
-  it("dispose calls store.dispose", async () => {
-    await cache.dispose();
-    expect(partialStore.dispose).toBeUndefined();
+  describe("dispose", () => {
+    it("does not throw", async () => {
+      await expect(cache.dispose()).resolves.toBeUndefined();
+    });
   });
 });

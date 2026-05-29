@@ -18,6 +18,8 @@ export class Cacher {
   private readonly _serializer: Serializer;
   private readonly _defaultTtl?: number;
 
+  private readonly _inflight: Map<string, Promise<unknown>> = new Map();
+
   constructor({
     store = new NullCache(),
     serializer = { serialize: JSON.stringify, deserialize: JSON.parse },
@@ -34,11 +36,11 @@ export class Cacher {
     return value === undefined ? defaultValue : this._serializer.deserialize<T>(value);
   }
 
-  private _set<T>(key: string, value: T, ttl: number | undefined): Promise<boolean> {
+  private async _set<T>(key: string, value: T, ttl: number | undefined): Promise<boolean> {
     return this._store.set(normalizeKey(key), this._serializer.serialize(value), ttl);
   }
 
-  set<T>(key: string, value: T, ttl?: number): Promise<boolean> {
+  async set<T>(key: string, value: T, ttl?: number): Promise<boolean> {
     return this._set(key, value, ttl ?? this._defaultTtl);
   }
 
@@ -53,24 +55,44 @@ export class Cacher {
       return cached;
     }
 
+    const inflight = this._inflight.get(key);
+
+    if (inflight) {
+      return inflight as Promise<T>;
+    }
+
     let resolvedTtl = ttl ?? this._defaultTtl;
 
-    const value = await factory({
-      setTtl: (t) => {
-        resolvedTtl = t;
-      },
-    });
+    const promise = Promise.resolve(
+      factory({
+        setTtl: (t) => {
+          resolvedTtl = t;
+        },
+      }),
+    )
+      .then(async (value) => {
+        await this._set(key, value, resolvedTtl);
 
-    await this._set(key, value, resolvedTtl);
+        this._inflight.delete(key);
 
-    return value;
+        return value;
+      })
+      .catch((err) => {
+        this._inflight.delete(key);
+
+        throw err;
+      });
+
+    this._inflight.set(key, promise);
+
+    return promise;
   }
 
-  del(key: string): Promise<boolean> {
+  async del(key: string): Promise<boolean> {
     return this._store.del(normalizeKey(key));
   }
 
-  clear(): Promise<boolean> {
+  async clear(): Promise<boolean> {
     return this._store.clear();
   }
 
