@@ -1,5 +1,15 @@
 # @resolid/cache
 
+## 1.2.1
+
+### Patch Changes
+
+- [`edeaa53`](https://github.com/resolid/framework/commit/edeaa53477bad361ac6ceb0b6a3cfee9dc312883) - feat: allow overriding ttl in getOrSet factory
+
+- [`61d133f`](https://github.com/resolid/framework/commit/61d133f543adf20ea9873e0e15f97f58ed7f2f4a) - refactor: rename Serializer to CacheSerializer
+
+- [`a442545`](https://github.com/resolid/framework/commit/a44254530454429564997fa7cde4867d5a130c55) - feat: dedupe concurrent getOrSet calls for the same key
+
 ## 1.2.0
 
 ### Minor Changes
