@@ -45,7 +45,7 @@
     "@resolid/core": "workspace:^"
   },
   "devDependencies": {
-    "tsdown": "^0.22.0"
+    "tsdown": "^0.22.1"
   },
   "peerDependencies": {
     "@resolid/cache-file": "workspace:^",

@@ -16,7 +16,11 @@ export type ReactRouterConfig = Simplify<
   Omit<Config, "appDirectory" | "ssr" | "serverModuleFormat" | "future"> & {
     future?: Omit<
       Config["future"],
-      "v8_middleware" | "v8_splitRouteModules" | "v8_viteEnvironmentApi"
+      | "v8_middleware"
+      | "v8_splitRouteModules"
+      | "v8_viteEnvironmentApi"
+      | "v8_passThroughRequests"
+      | "v8_trailingSlashAwareDataRequests"
     >;
   }
 >;
@@ -64,11 +68,12 @@ export const defineDevConfig = ({
       serverModuleFormat: "esm",
       presets: presets ? [...presets, preset] : [preset],
       future: {
-        ...future,
         v8_middleware: true,
         v8_splitRouteModules: true,
         v8_viteEnvironmentApi: true,
         v8_passThroughRequests: true,
+        v8_trailingSlashAwareDataRequests: true,
+        ...future,
       },
     },
   };
