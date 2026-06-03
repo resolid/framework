@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.5.1
+
+### Patch Changes
+
+- [`2aa7390`](https://github.com/resolid/framework/commit/2aa7390c15b317495b54b70dc1ca7a8dcf844344) - feat: enable react-router v8_trailingSlashAwareDataRequests
+
 ## 0.5.0
 
 ### Minor Changes
