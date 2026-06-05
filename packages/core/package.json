@@ -46,7 +46,7 @@
     "@resolid/event": "workspace:^"
   },
   "devDependencies": {
-    "tsdown": "^0.22.1"
+    "tsdown": "^0.22.2"
   },
   "engines": {
     "node": "^22.13.0 || >=24"
