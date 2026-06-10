@@ -103,6 +103,7 @@ export async function buildPreset<BuildContext>({
       const bundleFile = join(buildPath, "server.mjs");
 
       await build({
+        experimental: { lazyBarrel: false },
         input: buildFile,
         output: {
           file: bundleFile,
