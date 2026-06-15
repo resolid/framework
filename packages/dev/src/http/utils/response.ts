@@ -3,7 +3,7 @@ import { data, type UNSAFE_DataWithResponseInit } from "react-router";
 export function httpProblem<E>(errors: E): UNSAFE_DataWithResponseInit<{
   errors: E;
 }> {
-  return data({ errors: errors }, 422);
+  return data({ errors }, 422);
 }
 
 export function httpNotFound(message = "页面未找到"): never {

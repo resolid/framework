@@ -7,10 +7,6 @@ export function useHistoryBack(backTo: string | Partial<Path> = "/") {
   const { state } = useLocation();
 
   return async (): Promise<void> => {
-    if (state?.previous) {
-      await navigate(-1);
-    } else {
-      await navigate(backTo);
-    }
+    await (state?.previous ? navigate(-1) : navigate(backTo));
   };
 }

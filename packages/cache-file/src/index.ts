@@ -2,6 +2,7 @@ import type { CacheStore } from "@resolid/cache/stores";
 import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
+// oxlint-disable-next-line prefer-named-capture-group
 const INVALID_KEY_RE = /(\.\/|\.\.\/)/;
 
 export class FileCache implements CacheStore {

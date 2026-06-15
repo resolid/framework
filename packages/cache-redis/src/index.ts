@@ -248,11 +248,11 @@ export class RedisCache implements CacheStore {
     const client = await this._getClient();
 
     try {
-      if (ttl) {
-        await client.set(this._resolve(key), value, { expiration: { type: "PX", value: ttl } });
-      } else {
-        await client.set(this._resolve(key), value);
-      }
+      await client.set(
+        this._resolve(key),
+        value,
+        ttl ? { expiration: { type: "PX", value: ttl } } : undefined,
+      );
 
       return true;
     } catch {
@@ -333,6 +333,7 @@ export class RedisCache implements CacheStore {
     const namespaceKeys = keys.map((k) => this._resolve(k));
 
     try {
+      // oxlint-disable-next-line unicorn/prefer-ternary
       if (this._isCluster) {
         await Promise.all(
           Array.from(this._getSlotMap(namespaceKeys), async ([slot, slotKeys]) => {
@@ -395,11 +396,7 @@ export class RedisCache implements CacheStore {
 
   private async _dispose(forceClose: boolean): Promise<void> {
     if (this._client.isOpen) {
-      if (forceClose) {
-        await this._client.destroy();
-      } else {
-        await this._client.close();
-      }
+      await (forceClose ? this._client.destroy() : this._client.close());
     }
   }
 

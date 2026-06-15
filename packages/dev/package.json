@@ -67,12 +67,12 @@
   },
   "dependencies": {
     "@hono/node-server": "^2.0.4",
-    "@resolid/utils": "^1.6.0",
+    "@resolid/utils": "^1.6.1",
     "@vercel/nft": "^1.10.2",
     "fast-glob": "^3.3.3",
     "hono": "^4.12.25",
     "minimatch": "^10.2.5",
-    "rolldown": "^1.1.0"
+    "rolldown": "^1.1.1"
   },
   "devDependencies": {
     "@react-router/dev": "^7.17.0",

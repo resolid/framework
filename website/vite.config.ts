@@ -20,13 +20,16 @@ export default defineConfig(({ command }) => {
         output: {
           codeSplitting: {
             groups: [
+              // oxlint-disable-next-line prefer-named-capture-group
               { name: "react", test: /node_modules[\\/](react|react-dom|react-is|scheduler)[\\/]/ },
               {
                 name: "react-router",
+                // oxlint-disable-next-line prefer-named-capture-group
                 test: /node_modules[\\/](@react-router|react-router)[\\/]/,
               },
               {
                 name: "components",
+                // oxlint-disable-next-line prefer-named-capture-group
                 test: /src[\\/]components[\\/](history-link|error-component|sprite-icon)\.tsx/,
               },
             ],
@@ -39,7 +42,7 @@ export default defineConfig(({ command }) => {
     },
     resolve: {
       tsconfigPaths: !isBuild,
-      alias: [isBuild && { find: "~", replacement: join(__dirname, "./src") }].filter(
+      alias: [isBuild && { find: "~", replacement: join(import.meta.dirname, "./src") }].filter(
         Boolean,
       ) as AliasOptions,
     },

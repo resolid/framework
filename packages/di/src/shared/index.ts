@@ -8,11 +8,7 @@ export type Token<T = unknown> =
     };
 
 export function toString<T>(token: Token<T>): string {
-  if (typeof token === "symbol") {
-    return token.description ?? String(token);
-  } else {
-    return token.name;
-  }
+  return typeof token === "symbol" ? (token.description ?? String(token)) : token.name;
 }
 
 export interface Disposable {

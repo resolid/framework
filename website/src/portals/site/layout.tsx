@@ -151,7 +151,7 @@ export const meta = ({ loaderData }: Route.ComponentProps) => {
     "使用 React Router 驱动的全栈网站，展示使用现代 Web 技术构建高性能、可扩展和用户友好的 Web 应用程序的最佳实践。";
 
   return [
-    { title: title },
+    { title },
     {
       name: "description",
       content: description,

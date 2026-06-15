@@ -26,9 +26,9 @@ export function netlifyPreset({ nodeVersion, includeFiles }: NetlifyPresetOption
           }>({
             includeFiles,
             nodeVersion,
-            buildManifest: buildManifest,
-            reactRouterConfig: reactRouterConfig,
-            viteConfig: viteConfig,
+            buildManifest,
+            reactRouterConfig,
+            viteConfig,
             async buildStart() {
               const netlifyRoot = await createDir([viteConfig.root, ".netlify", "v1"], true);
 

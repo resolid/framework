@@ -259,7 +259,7 @@ export function getServerRoutes(buildManifest: BuildManifest | undefined): {
               bundleRoutes[key]!.bundleId == bundleId && path.startsWith(bundleRoutes[key]!.path),
           )
         ) {
-          bundleRoutes[path] = { path: path, bundleId: bundleId };
+          bundleRoutes[path] = { path, bundleId };
         }
       }
     }

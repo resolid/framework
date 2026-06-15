@@ -63,7 +63,7 @@ export function routeManifestToRouteConfig(
       const parentRoute = parentId && routeConfigById[parentId];
 
       if (parentRoute) {
-        parentRoute.children = parentRoute.children ?? [];
+        parentRoute.children ??= [];
         parentRoute.children.push(route);
       }
     }
@@ -106,7 +106,7 @@ export function filesToRouteManifest(routesDirectory: string, files: string[]): 
     const pathname = createRoutePath(segments, raw, index);
 
     routeManifest[routeId] = {
-      file: file,
+      file,
       id: routeId,
       path: pathname,
     };

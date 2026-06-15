@@ -37,7 +37,7 @@ export function resolveReactRouterPluginConfig(
 
   return {
     entryFile: join(appDir, options.entryFile),
-    appDir: appDir,
+    appDir,
     buildDir: relative(rootDirectory, reactRouterConfig.buildDirectory),
     assetsDir: config.build?.assetsDir ?? "assets",
     ssrBuild: environmentBuildContext?.name === "ssr",
