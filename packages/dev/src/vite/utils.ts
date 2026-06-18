@@ -30,7 +30,7 @@ export function resolveReactRouterPluginConfig(
     return undefined;
   }
 
-  const { reactRouterConfig, rootDirectory, buildManifest, environmentBuildContext } =
+  const { reactRouterConfig, rootDirectory, buildManifest } =
     config.__reactRouterPluginContext as ReactRouterPluginContext;
 
   const appDir = relative(rootDirectory, reactRouterConfig.appDirectory);
@@ -40,7 +40,7 @@ export function resolveReactRouterPluginConfig(
     appDir,
     buildDir: relative(rootDirectory, reactRouterConfig.buildDirectory),
     assetsDir: config.build?.assetsDir ?? "assets",
-    ssrBuild: environmentBuildContext?.name === "ssr",
+    ssrBuild: reactRouterConfig.ssr,
     basename: reactRouterConfig.basename,
     future: reactRouterConfig.future,
     buildManifest,

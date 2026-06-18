@@ -7,6 +7,7 @@ import { createRequestHandler, RouterContextProvider, type ServerBuild } from "r
 import * as build from "virtual:react-router/server-build";
 
 export type NodeEnv = {
+  // oxlint-disable-next-line typescript/no-redundant-type-constituents
   Bindings: HttpBindings | Http2Bindings;
 };
 
