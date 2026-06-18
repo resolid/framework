@@ -8,11 +8,14 @@ import { FileCache } from "@resolid/cache-file";
 import { RedisCache } from "@resolid/cache-redis";
 import { createApp, loadProviders } from "@resolid/core";
 import { __DEV__ } from "@resolid/utils";
-import { attachDatabasePool } from "@vercel/functions";
 import { env } from "node:process";
 
 const inNode = import.meta.env.RESOLID_PLATFORM == "node";
 const inVercel = import.meta.env.RESOLID_PLATFORM == "vercel";
+
+const attachDatabasePool = inVercel
+  ? (await import("@vercel/functions")).attachDatabasePool
+  : undefined;
 
 export const app = await createApp({
   name: "Resolid",
@@ -44,7 +47,7 @@ export const app = await createApp({
             ca: env.RX_DB_SSL_CA.replace(/\\n/gm, "\n"),
           },
         },
-        inVercel && attachDatabasePool,
+        attachDatabasePool,
       ),
       drizzleConfig: {
         logger: __DEV__,
@@ -79,6 +82,8 @@ export const app = await createApp({
     logger: LogService,
   },
 });
+
+export type App = typeof app;
 
 app.emitter.on("app:ready", (ctx) => {
   app.$.logger.category("app").info(`${ctx.name} application started.`);

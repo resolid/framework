@@ -24,8 +24,9 @@ export function netlifyPreset({ nodeVersion, includeFiles }: NetlifyPresetOption
             serverRoutes: { path: string; bundleId: string }[];
             nftCache: object;
           }>({
-            includeFiles,
             nodeVersion,
+            serverPlatform: "netlify",
+            includeFiles,
             buildManifest,
             reactRouterConfig,
             viteConfig,

@@ -1,5 +1,4 @@
 /// <reference types="vite/client" />
-/// <reference types="@react-router/node" />
 /// <reference types="@resolid/dev/env" />
 
 declare namespace NodeJS {

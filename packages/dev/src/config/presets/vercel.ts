@@ -18,8 +18,9 @@ export function vercelPreset({ nodeVersion, includeFiles }: VercelPresetOptions)
       return {
         buildEnd: async ({ buildManifest, reactRouterConfig, viteConfig }) => {
           await buildPreset<{ vercelOutput: string; nftCache: object }>({
-            includeFiles,
             nodeVersion,
+            serverPlatform: "vercel",
+            includeFiles,
             buildManifest,
             reactRouterConfig,
             viteConfig,

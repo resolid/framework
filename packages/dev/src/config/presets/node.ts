@@ -10,8 +10,9 @@ export function nodePreset({ nodeVersion, includeFiles }: NodePresetOptions): Pr
       return {
         async buildEnd({ buildManifest, reactRouterConfig, viteConfig }) {
           await buildPreset({
-            includeFiles,
             nodeVersion,
+            serverPlatform: "node",
+            includeFiles,
             buildManifest,
             reactRouterConfig,
             viteConfig,

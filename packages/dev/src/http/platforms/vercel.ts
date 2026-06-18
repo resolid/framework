@@ -1,8 +1,8 @@
 import type { Hono } from "hono";
 import { env } from "node:process";
-import type { ClientIpGetter } from "../middlewares/client-ip";
-import type { RequestIdGenerator } from "../middlewares/request-id";
-import type { RequestOriginGetter } from "../middlewares/request-origin";
+import { clientIp } from "../middlewares/client-ip";
+import { requestId } from "../middlewares/request-id";
+import { requestOrigin } from "../middlewares/request-origin";
 import { createHonoServer, type HonoServerOptions, type NodeEnv } from "../utils/server";
 
 export type HonoVercelServerOptions = HonoServerOptions<NodeEnv>;
@@ -14,19 +14,18 @@ export async function createHonoVercelServer(
 ): Promise<HonoVercelServer> {
   const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
 
+  const { configure, ...rest } = options;
+
   return await createHonoServer<NodeEnv>(mode, {
-    ...options,
+    configure: async (hono) => {
+      hono.use(
+        clientIp((ctx) => ctx.req.raw.headers.get("x-real-ip") ?? ""),
+        requestId((ctx) => ctx.req.raw.headers.get("x-vercel-id") ?? ""),
+        requestOrigin(() => `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`),
+      );
+
+      await configure?.(hono);
+    },
+    ...rest,
   });
-}
-
-export function vercelClientIpGetter(): ClientIpGetter {
-  return (ctx) => ctx.req.raw.headers.get("x-real-ip") ?? "";
-}
-
-export function vercelRequestIdGenerator(): RequestIdGenerator {
-  return (ctx) => ctx.req.raw.headers.get("x-vercel-id") ?? "";
-}
-
-export function vercelRequestOriginGetter(): RequestOriginGetter {
-  return () => `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`;
 }

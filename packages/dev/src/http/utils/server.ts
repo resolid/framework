@@ -2,12 +2,7 @@ import type { Http2Bindings, HttpBindings } from "@hono/node-server";
 import type { HonoOptions } from "hono/hono-base";
 import type { BlankEnv } from "hono/types";
 import { type Context, type Env, Hono } from "hono";
-import {
-  type AppLoadContext,
-  createRequestHandler,
-  RouterContextProvider,
-  type ServerBuild,
-} from "react-router";
+import { createRequestHandler, RouterContextProvider, type ServerBuild } from "react-router";
 // @ts-expect-error - Virtual module provided by React Router at build time
 import * as build from "virtual:react-router/server-build";
 
@@ -51,9 +46,7 @@ export async function createHonoServer<E extends Env = BlankEnv>(
         (getLoadContext instanceof Promise ? await getLoadContext : getLoadContext) ??
         new RouterContextProvider();
 
-      Object.assign(loadContext, { hono: ctx });
-
-      return requestHandler(ctx.req.raw, loadContext as unknown as AppLoadContext);
+      return requestHandler(ctx.req.raw, loadContext);
     })(c);
   });
 

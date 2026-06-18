@@ -46,7 +46,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
         },
       };
 
-      if (!reactRouterConfig.future?.v8_viteEnvironmentApi && !reactRouterConfig.ssrBuild) {
+      if (!reactRouterConfig.ssrBuild) {
         return baseConfig;
       }
 
@@ -68,18 +68,11 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
         },
       };
 
-      if (reactRouterConfig.future?.v8_viteEnvironmentApi) {
-        return {
-          ...baseConfig,
-          environments: {
-            ssr: ssrConfig,
-          },
-        };
-      }
-
       return {
         ...baseConfig,
-        ...ssrConfig,
+        environments: {
+          ssr: ssrConfig,
+        },
       };
     },
 
@@ -128,10 +121,9 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
 
           const entry = reactRouterConfig!.entryFile;
 
-          const app = reactRouterConfig!.future?.v8_viteEnvironmentApi
-            ? (await (devServer.environments.ssr as RunnableDevEnvironment).runner.import(entry))
-                .default
-            : (await devServer.ssrLoadModule(entry)).default;
+          const app = (
+            await (devServer.environments.ssr as RunnableDevEnvironment).runner.import(entry)
+          ).default;
 
           if (!app) {
             return next(new Error(`Failed to find default export from ${entry}`));

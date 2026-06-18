@@ -15,6 +15,9 @@ import { HistoryLink, HistoryNavLink } from "~/components/history-link";
 import { ResolidLogo } from "~/components/resolid-logo";
 import { ResolidUiLogo } from "~/components/resolid-ui-logo";
 import { SpriteIcon } from "~/components/sprite-icon";
+import { VercelAnalytics } from "~/extensions/vercel/vercel-analytics";
+import { VercelSpeedInsights } from "~/extensions/vercel/vercel-speed-insights";
+import { honoContext } from "~/foundation/context.server";
 import type { Route } from "./+types/layout";
 
 const NavMenu = ({ onClick }: { onClick?: MouseEventHandler<HTMLAnchorElement> }) => (
@@ -138,7 +141,7 @@ const NavBar = () => {
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   return {
-    requestOrigin: context.hono.get("requestOrigin") ?? request.url,
+    requestOrigin: context.get(honoContext).get("requestOrigin") ?? request.url,
   };
 }
 
@@ -234,6 +237,15 @@ export default function SiteLayout() {
           </p>
         </div>
       </footer>
+      {import.meta.env.RESOLID_PLATFORM == "vercel" && (
+        <>
+          <VercelAnalytics endpoint="/growth" scriptSrc="/growth/script.js" />
+          <VercelSpeedInsights
+            endpoint="/speed-growth/vitals"
+            scriptSrc="/speed-growth/script.js"
+          />
+        </>
+      )}
     </>
   );
 }

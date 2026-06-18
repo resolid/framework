@@ -16,7 +16,7 @@ import { basename, dirname, join, relative } from "node:path";
 import { build } from "rolldown";
 import { esmExternalRequirePlugin } from "rolldown/plugins";
 import { type ResolvedConfig, searchForWorkspaceRoot } from "vite";
-import type { NodeVersion } from "../types";
+import type { NodeVersion, ServerPlatform } from "../types";
 
 type OptionalToUndefined<T> = {
   [K in keyof T]: T[K] | undefined;
@@ -37,6 +37,7 @@ export interface PresetBaseOptions {
 
 type BuildPresetOptions<BuildContext> = OptionalToUndefined<PresetBaseOptions> & {
   nodeVersion: NodeVersion;
+  serverPlatform: ServerPlatform;
   buildManifest: BuildManifest | undefined;
   reactRouterConfig: Readonly<{
     appDirectory: string;
@@ -57,6 +58,7 @@ type BuildPresetOptions<BuildContext> = OptionalToUndefined<PresetBaseOptions> &
 export async function buildPreset<BuildContext>({
   includeFiles = [],
   nodeVersion,
+  serverPlatform,
   buildManifest,
   reactRouterConfig,
   viteConfig,
@@ -109,15 +111,14 @@ export async function buildPreset<BuildContext>({
           file: bundleFile,
           codeSplitting: false,
           minify: "dce-only",
-          comments: {
-            legal: false,
-          },
+          comments: false,
         },
         platform: "node",
         transform: {
           define: {
             "process.env.NODE_ENV": JSON.stringify("production"),
             "import.meta.env.NODE_ENV": JSON.stringify("production"),
+            "import.meta.env.RESOLID_PLATFORM": JSON.stringify(serverPlatform),
           },
           target: `node${nodeVersion}`,
         },
@@ -151,7 +152,6 @@ function getPackageDependencies(
         (id) =>
           ![
             "react-router",
-            "react-router-dom",
             "@react-router/architect",
             "@react-router/cloudflare",
             "@react-router/dev",

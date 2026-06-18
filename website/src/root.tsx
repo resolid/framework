@@ -4,8 +4,6 @@ import zhCN from "@resolid/react-ui/locales/zh-CN";
 import { Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { ErrorComponent } from "~/components/error-component";
 import { RouteProcessBar } from "~/components/route-process-bar";
-import { VercelAnalytics } from "~/extensions/vercel/vercel-analytics";
-import { VercelSpeedInsights } from "~/extensions/vercel/vercel-speed-insights";
 
 import style from "./root.css?url";
 
@@ -31,15 +29,6 @@ export function Layout({ children }: PropsWithChildren) {
         </ConfigProvider>
         <ScrollRestoration />
         <Scripts />
-        {import.meta.env.RESOLID_PLATFORM == "vercel" && (
-          <>
-            <VercelAnalytics endpoint="/growth" scriptSrc="/growth/script.js" />
-            <VercelSpeedInsights
-              endpoint="/speed-growth/vitals"
-              scriptSrc="/speed-growth/script.js"
-            />
-          </>
-        )}
       </body>
     </html>
   );

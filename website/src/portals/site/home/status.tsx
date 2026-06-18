@@ -3,6 +3,7 @@ import { Alert, AlertDescription, AlertTitle, ClientOnly } from "@resolid/react-
 import { deviceTimezone } from "@resolid/utils";
 import { formatDate } from "@resolid/utils/date";
 import { Suspense, useMemo } from "react";
+import { appContext, honoContext } from "~/foundation/context.server";
 import { SystemRepository } from "~/modules/system/repository.server";
 import type { Route } from "./+types/status";
 
@@ -17,10 +18,11 @@ export async function loader({ context }: Route.LoaderArgs) {
     ssr: {
       message: "服务器渲染正常",
       datetime: new Date().toISOString(),
-      requestId: context.hono.get("requestId"),
-      remoteAddress: context.hono.get("clientIp"),
+      requestId: context.get(honoContext).get("requestId"),
+      remoteAddress: context.get(honoContext).get("clientIp"),
     },
-    db: context.app
+    db: context
+      .get(appContext)
       .get(SystemRepository)
       .getFirst()
       .then(() => ({ success: true, message: "数据库访问正常" }))

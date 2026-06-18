@@ -1,7 +1,7 @@
 import { isbot } from "isbot";
 import { PassThrough, Readable } from "node:stream";
 import { type RenderToPipeableStreamOptions, renderToPipeableStream } from "react-dom/server";
-import { type AppLoadContext, type EntryContext, ServerRouter } from "react-router";
+import { type EntryContext, type RouterContextProvider, ServerRouter } from "react-router";
 
 export const streamTimeout = 9_000;
 
@@ -10,7 +10,7 @@ export default function handleRequest(
   responseStatusCode: number,
   responseHeaders: Headers,
   routerContext: EntryContext,
-  _loadContext: AppLoadContext,
+  _loadContext: RouterContextProvider,
 ): Response | Promise<unknown> {
   if (request.method.toUpperCase() === "HEAD") {
     return new Response(null, {

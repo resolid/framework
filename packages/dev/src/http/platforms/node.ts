@@ -5,9 +5,10 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { logger } from "hono/logger";
 import { networkInterfaces } from "node:os";
 import { env } from "node:process";
-import type { ClientIpGetter } from "../middlewares/client-ip";
-import type { RequestOriginGetter } from "../middlewares/request-origin";
-import { type GetClientIpOptions, getRemoteAddr, getRequestOrigin } from "../utils/request";
+import { clientIp } from "../middlewares/client-ip";
+import { requestId } from "../middlewares/request-id";
+import { requestOrigin } from "../middlewares/request-origin";
+import { getRemoteAddr, getRequestOrigin } from "../utils/request";
 import { createHonoServer, type HonoServerOptions, type NodeEnv } from "../utils/server";
 
 export type { NodeEnv };
@@ -17,6 +18,9 @@ export type HonoNodeServerOptions = HonoServerOptions<NodeEnv> & {
   defaultLogger?: boolean;
   listeningListener?: (info: AddressInfo) => void;
   onShutdown?: () => Promise<void> | void;
+  proxy?: boolean;
+  proxyCount?: number;
+  ipHeaders?: string;
 };
 
 export type HonoNodeServer = Hono<NodeEnv>;
@@ -28,8 +32,10 @@ export async function createHonoNodeServer(
   const isProduction = mode == "production";
   const basename = import.meta.env.RESOLID_BASENAME;
 
+  const { port, defaultLogger, proxy, proxyCount, ipHeaders, ...restOptions } = options;
+
   const mergedOptions: HonoNodeServerOptions = {
-    port: options.port ?? 3000,
+    port: port ?? 3000,
     listeningListener: (info) => {
       console.log(`🚀 Server started on port ${info.port}`);
 
@@ -41,8 +47,8 @@ export async function createHonoNodeServer(
         `[resolid] http://localhost:${info.port}${basename}${env.SERVER_PATH ?? ""}${address && ` (http://${address}:${info.port})`}`,
       );
     },
-    ...options,
-    defaultLogger: options.defaultLogger ?? !isProduction,
+    defaultLogger: defaultLogger ?? !isProduction,
+    ...restOptions,
   };
 
   let server: ServerType | null = null;
@@ -65,6 +71,16 @@ export async function createHonoNodeServer(
       if (mergedOptions.defaultLogger) {
         hono.use("*", logger());
       }
+
+      hono.use(
+        clientIp((ctx: Context<NodeEnv>) =>
+          getRemoteAddr(ctx.req.raw, ctx.env.incoming.socket, { proxy, proxyCount, ipHeaders }),
+        ),
+        requestId(),
+        requestOrigin((ctx: Context<NodeEnv>) =>
+          getRequestOrigin(ctx.req.raw, ctx.env.incoming.socket, proxy),
+        ),
+      );
 
       await mergedOptions.configure?.(hono);
     },
@@ -120,13 +136,4 @@ export function cacheControl(seconds: number, immutable = false): MiddlewareHand
 
     c.header("Cache-Control", `public, max-age=${seconds}${immutable ? ", immutable" : ""}`);
   };
-}
-
-export function nodeClientIpGetter(getClientIpOptions: GetClientIpOptions = {}): ClientIpGetter {
-  return (ctx: Context<NodeEnv>) =>
-    getRemoteAddr(ctx.req.raw, ctx.env.incoming.socket, getClientIpOptions);
-}
-
-export function nodeRequestOriginGetter(proxy: boolean = false): RequestOriginGetter {
-  return (ctx: Context<NodeEnv>) => getRequestOrigin(ctx.req.raw, ctx.env.incoming.socket, proxy);
 }

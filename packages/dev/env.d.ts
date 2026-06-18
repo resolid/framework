@@ -1,4 +1,4 @@
-import type { Context } from "hono";
+import type { RequestIdVariables } from "hono/request-id";
 
 interface ImportMetaEnv {
   readonly RESOLID_PLATFORM: "node" | "vercel" | "netlify";
@@ -8,11 +8,12 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
-type HonoContext = {
-  hono: Context;
-};
+type ClientVariables = {
+  clientIp: string;
+  requestOrigin: string | undefined;
+} & RequestIdVariables;
 
-declare module "react-router" {
+declare module "hono" {
   // oxlint-disable-next-line typescript/no-empty-object-type
-  interface RouterContextProvider extends HonoContext {}
+  interface ContextVariableMap extends ClientVariables {}
 }
