@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.6.1
+
+### Patch Changes
+
+- [`d11caa8`](https://github.com/resolid/framework/commit/d11caa82b0a02c3834fd5e0368d7fddee350be50) - fix: fix ssr build
+
 ## 0.6.0
 
 ### Minor Changes
