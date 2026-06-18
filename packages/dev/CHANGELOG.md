@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.6.0
+
+### Minor Changes
+
+- [`90ceea9`](https://github.com/resolid/framework/commit/90ceea9b2e6547d36afd28fc478112440ce6c625) - feat: upgrade react-router to v8
+
 ## 0.5.1
 
 ### Patch Changes
