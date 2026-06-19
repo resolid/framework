@@ -85,7 +85,7 @@ export async function createHonoNodeServer(
       await mergedOptions.configure?.(hono);
     },
     honoOptions: mergedOptions.honoOptions,
-    getLoadContext: mergedOptions.getLoadContext,
+    configureLoadContext: mergedOptions.configureLoadContext,
   });
 
   if (isProduction) {

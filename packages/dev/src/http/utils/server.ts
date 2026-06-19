@@ -1,26 +1,26 @@
 import type { Http2Bindings, HttpBindings } from "@hono/node-server";
+import type { MaybePromise } from "@resolid/utils";
 import type { HonoOptions } from "hono/hono-base";
 import type { BlankEnv } from "hono/types";
 import { type Context, type Env, Hono } from "hono";
-import { createRequestHandler, RouterContextProvider, type ServerBuild } from "react-router";
-// @ts-expect-error - Virtual module provided by React Router at build time
-import * as build from "virtual:react-router/server-build";
+import { createRequestHandler, RouterContextProvider } from "react-router";
+import { honoContext } from "./context";
 
 export type NodeEnv = {
   // oxlint-disable-next-line typescript/no-redundant-type-constituents
   Bindings: HttpBindings | Http2Bindings;
 };
 
+export type ConfigureLoadContext<E extends Env = BlankEnv> = (
+  loadContext: RouterContextProvider,
+  context: Context<E>,
+  mode?: string,
+) => MaybePromise<void>;
+
 export interface HonoServerOptions<E extends Env = BlankEnv> {
   configure?: <E extends Env = BlankEnv>(app: Hono<E>) => Promise<void> | void;
   honoOptions?: HonoOptions<E>;
-  getLoadContext?: (
-    c: Context<E>,
-    options: {
-      build: ServerBuild;
-      mode?: string;
-    },
-  ) => Promise<RouterContextProvider> | RouterContextProvider;
+  configureLoadContext?: ConfigureLoadContext<E>;
 }
 
 export async function createHonoServer<E extends Env = BlankEnv>(
@@ -41,11 +41,14 @@ export async function createHonoServer<E extends Env = BlankEnv>(
 
   routeApp.use(async (c) => {
     return (async (ctx) => {
-      const requestHandler = createRequestHandler(build, mode);
-      const getLoadContext = options.getLoadContext?.(ctx, { build, mode });
-      const loadContext =
-        (getLoadContext instanceof Promise ? await getLoadContext : getLoadContext) ??
-        new RouterContextProvider();
+      const requestHandler = createRequestHandler(
+        // @ts-expect-error - Virtual module provided by React Router at build time
+        await import("virtual:react-router/server-build"),
+        mode,
+      );
+      const loadContext = new RouterContextProvider();
+      loadContext.set(honoContext, ctx);
+      await options.configureLoadContext?.(loadContext, ctx, mode);
 
       return requestHandler(ctx.req.raw, loadContext);
     })(c);
