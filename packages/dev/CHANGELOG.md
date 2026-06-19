@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.7.0
+
+### Minor Changes
+
+- [`b8d662d`](https://github.com/resolid/framework/commit/b8d662db670fa46b24fd6e23e22fee2285dbfe06) - refactor: simplify load context configuration
+
 ## 0.6.1
 
 ### Patch Changes
