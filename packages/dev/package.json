@@ -74,7 +74,7 @@
     "fast-glob": "^3.3.3",
     "hono": "^4.12.26",
     "minimatch": "^10.2.5",
-    "rolldown": "^1.1.1"
+    "rolldown": "^1.1.2"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
