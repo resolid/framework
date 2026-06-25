@@ -5,6 +5,7 @@ import {
   dispose,
   getConsoleSink,
   getLogger,
+  lazy,
   type Logger,
   type LoggerConfig,
   type Sink,
@@ -21,7 +22,7 @@ export type LogConfig = { defaultTarget?: string; defaultCategory?: string } & O
     loggers?: LoggerEntity[];
   };
 
-export type { Sink };
+export { type Sink, withContext, withFilter, lazy };
 
 type LogCategory = Pick<Logger, "debug" | "info" | "warn" | "error" | "fatal">;
 
@@ -75,9 +76,6 @@ export class LogService {
   getLogger(category: string = this._defaultCategory): Logger {
     return getLogger(category);
   }
-
-  withContext: typeof withContext = withContext;
-  withFilter: typeof withFilter = withFilter;
 
   async dispose(): Promise<void> {
     await dispose();
