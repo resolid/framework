@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@resolid/core": "workspace:^",
-    "nodemailer": "^8.0.11"
+    "nodemailer": "^9.0.3"
   },
   "devDependencies": {
     "@types/nodemailer": "^8.0.1",

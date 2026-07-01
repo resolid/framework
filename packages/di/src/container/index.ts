@@ -75,7 +75,7 @@ export class Container implements Resolver, Disposable {
       return () => this.get(token, { ...options, lazy: false });
     }
 
-    return this._resolve(token, options?.optional ?? false) as unknown as T | undefined;
+    return this._resolve(token, options?.optional ?? false);
   }
 
   async dispose(): Promise<void> {

@@ -1,18 +1,13 @@
 import type { CacheStore } from "@resolid/cache/stores";
 import {
   createClient,
-  type RedisSentinelOptions,
-  type RedisClientOptions,
-  type RedisClusterOptions,
-  createSentinel,
   createCluster,
-  type RedisClusterType,
-  type RedisModules,
-  type RedisFunctions,
-  type RedisScripts,
-  type RespVersions,
-  type TypeMapping,
+  createSentinel,
+  type RedisClientOptions,
   type RedisClientType,
+  type RedisClusterOptions,
+  type RedisClusterType,
+  type RedisSentinelOptions,
   type RedisSentinelType,
 } from "@redis/client";
 import calculateSlot from "cluster-key-slot";
@@ -25,17 +20,18 @@ export type RedisCacheOptions = {
 };
 
 export class RedisCache implements CacheStore {
-  private readonly _client:
-    | RedisClientType
-    | RedisClusterType<RedisModules, RedisFunctions, RedisScripts, RespVersions, TypeMapping>
-    | RedisSentinelType<RedisModules, RedisFunctions, RedisScripts, RespVersions, TypeMapping>;
+  private readonly _client: RedisClientType | RedisClusterType | RedisSentinelType;
   private readonly _options: Required<RedisCacheOptions>;
   private readonly _isCluster: boolean = false;
 
   private _connectPromise?: Promise<void>;
 
   constructor(
-    connect?: string | RedisClientOptions | RedisClusterOptions | RedisSentinelOptions,
+    connect?:
+      | string
+      | Omit<RedisClientOptions, "RESP">
+      | Omit<RedisClusterOptions, "RESP">
+      | Omit<RedisSentinelOptions, "RESP">,
     options?: RedisCacheOptions,
   ) {
     const socket = {
@@ -57,7 +53,7 @@ export class RedisCache implements CacheStore {
               ...socket,
             },
           },
-        });
+        }) as unknown as RedisClusterType;
         this._isCluster = true;
       } else {
         this._client = createClient({
@@ -66,10 +62,10 @@ export class RedisCache implements CacheStore {
             ...connect.socket,
             ...socket,
           },
-        }) as RedisClientType;
+        });
       }
     } else {
-      this._client = createClient({ url: connect, socket }) as RedisClientType;
+      this._client = createClient({ url: connect, socket });
     }
 
     this._options = {
@@ -133,13 +129,7 @@ export class RedisCache implements CacheStore {
     const client = await this._getClient();
 
     if (this._isCluster) {
-      const cluster = client as RedisClusterType<
-        RedisModules,
-        RedisFunctions,
-        RedisScripts,
-        RespVersions,
-        TypeMapping
-      >;
+      const cluster = client as RedisClusterType;
 
       const nodes = cluster.masters.map(async (main) => cluster.nodeClient(main));
 
@@ -172,13 +162,7 @@ export class RedisCache implements CacheStore {
     const client = await this._getClient();
 
     if (this._isCluster) {
-      const cluster = client as RedisClusterType<
-        RedisModules,
-        RedisFunctions,
-        RedisScripts,
-        RespVersions,
-        TypeMapping
-      >;
+      const cluster = client as RedisClusterType;
 
       return (await cluster.nodeClient(cluster.slots[slot]!.master)) as RedisClientType;
     }
