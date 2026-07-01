@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.7.3
+
+### Patch Changes
+
+- [`f3b1fae`](https://github.com/resolid/framework/commit/f3b1fae0c27e7a752481dd5fa24161f7f775942a) - fix: fix types
+
 ## 0.7.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.7.1
+
+### Patch Changes
+
+- [`f3b1fae`](https://github.com/resolid/framework/commit/f3b1fae0c27e7a752481dd5fa24161f7f775942a) - chore: upgrade react-router
+
 ## 0.7.0
 
 ### Minor Changes
