@@ -1,5 +1,11 @@
 # @resolid/cache-redis
 
+## 1.1.0
+
+### Minor Changes
+
+- [`f3b1fae`](https://github.com/resolid/framework/commit/f3b1fae0c27e7a752481dd5fa24161f7f775942a) - feat: upgrade @redis/client to v6
+
 ## 1.0.1
 
 ### Patch Changes
