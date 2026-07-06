@@ -35,12 +35,12 @@
     "oxfmt": "^0.57.0",
     "oxlint": "^1.72.0",
     "oxlint-tsgolint": "^0.24.0",
-    "turbo": "^2.10.2",
+    "turbo": "^2.10.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
   },
   "engines": {
     "node": "^22.22.0 || >=24"
   },
-  "packageManager": "pnpm@11.9.0"
+  "packageManager": "pnpm@11.10.0"
 }
