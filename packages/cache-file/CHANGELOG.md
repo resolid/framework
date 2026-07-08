@@ -1,5 +1,11 @@
 # @resolid/cache-file
 
+## 1.1.1
+
+### Patch Changes
+
+- [`8556218`](https://github.com/resolid/framework/commit/8556218aa141a7b8db451877e1d0f5cb49fc4c20) - fix: fix lint error
+
 ## 1.1.0
 
 ### Minor Changes
