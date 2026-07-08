@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.7.4
+
+### Patch Changes
+
+- [`8556218`](https://github.com/resolid/framework/commit/8556218aa141a7b8db451877e1d0f5cb49fc4c20) - fix: fix lint error
+
 ## 0.7.3
 
 ### Patch Changes
