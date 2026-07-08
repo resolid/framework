@@ -14,7 +14,7 @@ const inNode = import.meta.env.RESOLID_PLATFORM == "node";
 const inVercel = import.meta.env.RESOLID_PLATFORM == "vercel";
 
 const attachDatabasePool = inVercel
-  ? (await import("@vercel/functions")).attachDatabasePool
+  ? (({ attachDatabasePool }) => attachDatabasePool)(await import("@vercel/functions"))
   : undefined;
 
 export const app = await createApp({
@@ -44,7 +44,7 @@ export const app = await createApp({
           uri: env.RX_DB_URI,
           ssl: {
             rejectUnauthorized: true,
-            ca: env.RX_DB_SSL_CA.replace(/\\n/gm, "\n"),
+            ca: env.RX_DB_SSL_CA.replaceAll(/\\n/gm, "\n"),
           },
         },
         attachDatabasePool,

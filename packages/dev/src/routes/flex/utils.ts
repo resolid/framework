@@ -1,22 +1,22 @@
 import type { RouteConfigEntry } from "@react-router/dev/routes";
 import { readdir } from "node:fs/promises";
-import { extname, join, relative, win32 } from "node:path";
+import nodePath from "node:path";
 
 export async function visitFiles(
   dir: string,
   visitor: (file: string) => void,
   base: string = dir,
 ): Promise<void> {
-  const entries = await readdir(dir, { withFileTypes: true, encoding: "utf8" });
+  const entries = await readdir(dir, { withFileTypes: true, encoding: "utf-8" });
 
   await Promise.all(
     entries.map(async (entry) => {
-      const filePath = join(dir, entry.name);
+      const filePath = nodePath.join(dir, entry.name);
 
       if (entry.isDirectory()) {
         return visitFiles(filePath, visitor, base);
       } else if (entry.isFile()) {
-        visitor(relative(base, filePath));
+        visitor(nodePath.relative(base, filePath));
       }
     }),
   );
@@ -78,8 +78,8 @@ export function filesToRouteManifest(routesDirectory: string, files: string[]): 
   const routeIdConflicts: Map<string, string[]> = new Map();
 
   for (const file of files) {
-    const normalizedFile = normalizeSlashes(join(routesDirectory, file));
-    const normalizedFileName = normalizedFile.slice(0, -extname(normalizedFile).length);
+    const normalizedFile = normalizeSlashes(nodePath.join(routesDirectory, file));
+    const normalizedFileName = normalizedFile.slice(0, -nodePath.extname(normalizedFile).length);
     const routeId =
       normalizedFileName.slice(-7) == "_layout"
         ? normalizedFileName.slice(0, -"_layout".length - 1)
@@ -98,7 +98,7 @@ export function filesToRouteManifest(routesDirectory: string, files: string[]): 
   }
 
   const prefixLookup = new PrefixLookupTrie();
-  const sortedRouteIds = Array.from(routeIds).sort(([a], [b]) => b.length - a.length);
+  const sortedRouteIds = [...routeIds].sort(([a], [b]) => b.length - a.length);
 
   for (const [routeId, file] of sortedRouteIds) {
     const [segments, raw] = getRouteSegments(routeId.slice(routesDirectory.length + 1));
@@ -427,5 +427,5 @@ class PrefixLookupTrie {
 }
 
 function normalizeSlashes(file: string): string {
-  return file.split(win32.sep).join("/");
+  return file.split(nodePath.win32.sep).join("/");
 }

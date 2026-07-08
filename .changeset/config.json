@@ -13,5 +13,12 @@
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "onlyUpdatePeerDependentsWhenOutOfRange": true
   },
-  "ignore": ["@resolid/core", "@resolid/app-db", "@resolid/app-log", "@resolid/app-mail", "website"]
+  "ignore": [
+    "@resolid/core",
+    "@resolid/app-cache",
+    "@resolid/app-db",
+    "@resolid/app-log",
+    "@resolid/app-mail",
+    "website"
+  ]
 }

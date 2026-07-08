@@ -1,5 +1,5 @@
 import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import nodePath from "node:path";
 import { cwd } from "node:process";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { FileCache } from "./index";
@@ -9,7 +9,7 @@ describe("FileCache", () => {
   let cache: FileCache;
 
   beforeEach(async () => {
-    cacheDir = join(cwd(), "runtime", "file-cache-tests");
+    cacheDir = nodePath.join(cwd(), "runtime", "file-cache-tests");
     cache = new FileCache(cacheDir);
   });
 
@@ -57,7 +57,7 @@ describe("FileCache", () => {
 
     await Promise.all(writes);
 
-    const content = await readFile(join(cacheDir, "concurrent"), "utf-8");
+    const content = await readFile(nodePath.join(cacheDir, "concurrent"), "utf-8");
     const [finalValue] = JSON.parse(content);
     expect(finalValue).toMatch(/^v\d+$/);
   });
@@ -82,20 +82,20 @@ describe("FileCache", () => {
   });
 
   it("handles corrupted JSON gracefully", async () => {
-    const path = join(cacheDir, "corrupt");
-    await mkdir(join(path, ".."), { recursive: true });
-    await writeFile(path, "not-json");
+    const filePath = nodePath.join(cacheDir, "corrupt");
+    await mkdir(nodePath.join(filePath, ".."), { recursive: true });
+    await writeFile(filePath, "not-json");
     const value = await cache.get("corrupt");
     expect(value).toBeUndefined();
   });
 
   it("get triggers deletion on expired file", async () => {
     await cache.set("expire", "v", 1);
-    const path = join(cacheDir, "expire");
+    const filePath = nodePath.join(cacheDir, "expire");
     await new Promise((r) => setTimeout(r, 1200));
     const value = await cache.get("expire");
     expect(value).toBeUndefined();
-    const exists = await access(path)
+    const exists = await access(filePath)
       .then(() => true)
       .catch(() => false);
     expect(exists).toBe(false);

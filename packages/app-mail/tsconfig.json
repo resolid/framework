@@ -4,6 +4,7 @@
   "compilerOptions": {
     "paths": {
       "@resolid/core": ["../core/src"]
-    }
+    },
+    "types": ["nodemailer"]
   }
 }

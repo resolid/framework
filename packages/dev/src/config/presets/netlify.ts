@@ -1,6 +1,6 @@
 import type { Preset } from "@react-router/dev/config";
 import { writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import nodePath from "node:path";
 import { name, version } from "../../../package.json";
 import {
   buildPreset,
@@ -35,7 +35,7 @@ export function netlifyPreset({ nodeVersion, includeFiles }: NetlifyPresetOption
 
               await writeNetlifyConfigJson(
                 viteConfig.build.assetsDir,
-                join(netlifyRoot, "config.json"),
+                nodePath.join(netlifyRoot, "config.json"),
               );
 
               const netlifyFunctionDir = await createDir([netlifyRoot, "functions"]);
@@ -57,13 +57,13 @@ export function netlifyPreset({ nodeVersion, includeFiles }: NetlifyPresetOption
                 (r) => r.bundleId == bundleId,
               )?.path;
 
-              const pathPattern = !serverRoutePath
-                ? "/*"
-                : [serverRoutePath, `${serverRoutePath}/*`];
+              const pathPattern = serverRoutePath
+                ? [serverRoutePath, `${serverRoutePath}/*`]
+                : "/*";
 
               await writeFile(
-                join(context.netlifyFunctionDir, `${bundleId}.mjs`),
-                `export { default } from "./${join(bundleId, handleFile)}";
+                nodePath.join(context.netlifyFunctionDir, `${bundleId}.mjs`),
+                `export { default } from "./${nodePath.join(bundleId, handleFile)}";
 
 export const config = {
   path: ${Array.isArray(pathPattern) ? JSON.stringify(pathPattern) : `"${pathPattern}"`},
@@ -73,7 +73,7 @@ export const config = {
   nodeVersion: ${nodeVersion}
 };
 `,
-                "utf8",
+                "utf-8",
               );
             },
           });
@@ -95,5 +95,5 @@ async function writeNetlifyConfigJson(assetsDir: string, netlifyConfigFile: stri
     values: { "Cache-Control": "public, max-age=31536000, immutable" },
   });
 
-  await writeFile(netlifyConfigFile, JSON.stringify(configJson, null, 2), "utf8");
+  await writeFile(netlifyConfigFile, JSON.stringify(configJson, null, 2), "utf-8");
 }

@@ -20,8 +20,6 @@ pnpm add -D @resolid/dev @react-router/dev
   plugin.
 - Route helpers (`@resolid/dev/routes`):`flexRoutes`, `relativeFactory`.
 - Router helpers (`@resolid/dev/router`): `mergeMeta`.
-- HTTP server helpers (`@resolid/dev/http.server`):
-  `requestId`, `clientIp`, `requestOrigin`, `httpProblem`, `httpNotFound`, `httpRedirect`.
 - HTTP platform adapters (`@resolid/dev/http.server`): `createHonoNodeServer`,
   `createHonoNetlifyServer`, `createHonoVercelServer`.
 

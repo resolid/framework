@@ -1,4 +1,4 @@
-import { isbot } from "isbot";
+import { isBot } from "isbot";
 import { PassThrough, Readable } from "node:stream";
 import { type RenderToPipeableStreamOptions, renderToPipeableStream } from "react-dom/server";
 import { type EntryContext, type RouterContextProvider, ServerRouter } from "react-router";
@@ -25,7 +25,7 @@ export default function handleRequest(
     const userAgent = request.headers.get("User-Agent");
 
     const readyOption: keyof RenderToPipeableStreamOptions =
-      userAgent && isbot(userAgent) ? "onAllReady" : "onShellReady";
+      userAgent && isBot(userAgent) ? "onAllReady" : "onShellReady";
 
     let timeoutId: ReturnType<typeof setTimeout> | undefined = setTimeout(
       () => abort(),

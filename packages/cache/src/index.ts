@@ -98,7 +98,9 @@ export class Cacher {
 
   async getMultiple<T>(keys: string[], defaultValue?: T): Promise<(T | undefined)[]> {
     if (this._store.getMultiple) {
-      return (await this._store.getMultiple(keys.map(normalizeKey))).map((v) =>
+      const values = await this._store.getMultiple(keys.map(normalizeKey));
+
+      return values.map((v) =>
         v === undefined ? defaultValue : this._serializer.deserialize<T>(v),
       );
     }
@@ -108,21 +110,20 @@ export class Cacher {
 
   async setMultiple<T>(values: Record<string, T>, ttl?: number): Promise<boolean> {
     if (this._store.setMultiple) {
-      return this._store.setMultiple(
-        Object.entries(values).reduce(
-          (acc, [k, v]) => {
-            acc[normalizeKey(k)] = this._serializer.serialize(v);
-            return acc;
-          },
-          {} as Record<string, string>,
-        ),
-        ttl,
-      );
+      const serialized: Record<string, string> = {};
+
+      for (const [key, value] of Object.entries(values)) {
+        serialized[normalizeKey(key)] = this._serializer.serialize(value);
+      }
+
+      return this._store.setMultiple(serialized, ttl);
     }
 
-    return (await Promise.all(Object.entries(values).map(([k, v]) => this.set(k, v, ttl)))).every(
-      Boolean,
+    const results = await Promise.all(
+      Object.entries(values).map(([key, value]) => this.set(key, value, ttl)),
     );
+
+    return results.every(Boolean);
   }
 
   async delMultiple(keys: string[]): Promise<boolean> {
@@ -130,7 +131,9 @@ export class Cacher {
       return this._store.delMultiple(keys.map(normalizeKey));
     }
 
-    return (await Promise.all(keys.map((k) => this.del(k)))).every(Boolean);
+    const results = await Promise.all(keys.map((key) => this.del(key)));
+
+    return results.every(Boolean);
   }
 
   async has(key: string): Promise<boolean> {

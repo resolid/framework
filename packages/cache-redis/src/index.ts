@@ -211,7 +211,8 @@ export class RedisCache implements CacheStore {
 
         await Promise.all(
           Array.from(this._getSlotMap(namespaceKeys), async ([slot, slotKeys]) => {
-            const values = await (await this._getSlotMaster(slot)).mGet(slotKeys);
+            const master = await this._getSlotMaster(slot);
+            const values = await master.mGet(slotKeys);
 
             for (const [index, value] of values.entries()) {
               valueMap.set(slotKeys[index]!, value ?? undefined);
@@ -222,9 +223,12 @@ export class RedisCache implements CacheStore {
         return namespaceKeys.map((key) => valueMap.get(key));
       }
 
-      return (await (await this._getClient()).mGet(namespaceKeys)).map((v) => v ?? undefined);
+      const client = await this._getClient();
+      const values = await client.mGet(namespaceKeys);
+
+      return values.map((v) => v ?? undefined);
     } catch {
-      return Array(keys.length).fill(undefined);
+      return Array.from({ length: keys.length }).fill(undefined) as undefined[];
     }
   }
 
@@ -260,7 +264,8 @@ export class RedisCache implements CacheStore {
 
         await Promise.all(
           Array.from(slotMap.entries(), async ([slot, slotValues]) => {
-            const commands = (await this._getSlotMaster(slot)).multi();
+            const master = await this._getSlotMaster(slot);
+            const commands = master.multi();
 
             for (const [key, value] of Object.entries(slotValues)) {
               if (ttl) {
@@ -321,7 +326,8 @@ export class RedisCache implements CacheStore {
       if (this._isCluster) {
         await Promise.all(
           Array.from(this._getSlotMap(namespaceKeys), async ([slot, slotKeys]) => {
-            const commands = (await this._getSlotMaster(slot)).multi();
+            const master = await this._getSlotMaster(slot);
+            const commands = master.multi();
 
             for (const key of slotKeys) {
               commands.del(key);
@@ -331,7 +337,8 @@ export class RedisCache implements CacheStore {
           }),
         );
       } else {
-        await (await this._getClient()).del(namespaceKeys);
+        const client = await this._getClient();
+        await client.del(namespaceKeys);
       }
 
       return true;
@@ -364,7 +371,8 @@ export class RedisCache implements CacheStore {
               // oxlint-disable-next-line no-await-in-loop
               await Promise.all(
                 Array.from(this._getSlotMap(result.keys).entries(), async ([slot, slotKeys]) => {
-                  await (await this._getSlotMaster(slot)).del(slotKeys);
+                  const master = await this._getSlotMaster(slot);
+                  await master.del(slotKeys);
                 }),
               );
             }

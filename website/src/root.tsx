@@ -4,6 +4,7 @@ import zhCN from "@resolid/react-ui/locales/zh-CN";
 import { Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { ErrorComponent } from "~/components/error-component";
 import { RouteProcessBar } from "~/components/route-process-bar";
+import type { Route } from "../.react-router/types/src/+types/root";
 
 import style from "./root.css?url";
 
@@ -35,8 +36,10 @@ export function Layout({ children }: PropsWithChildren) {
   );
 }
 
-export const ErrorBoundary = ErrorComponent;
-
 export default function Root() {
   return <Outlet />;
+}
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  return <ErrorComponent error={error} />;
 }

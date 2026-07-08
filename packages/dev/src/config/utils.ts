@@ -12,7 +12,7 @@ import {
   symlink,
   writeFile,
 } from "node:fs/promises";
-import { basename, dirname, join, relative } from "node:path";
+import nodePath from "node:path";
 import { build } from "rolldown";
 import { esmExternalRequirePlugin } from "rolldown/plugins";
 import { type ResolvedConfig, searchForWorkspaceRoot } from "vite";
@@ -68,18 +68,21 @@ export async function buildPreset<BuildContext>({
   const rootPath = viteConfig.root;
   const { assetsDir } = viteConfig.build;
   const packageJson = JSON.parse(
-    await readFile(join(rootPath, "package.json"), "utf8"),
+    await readFile(nodePath.join(rootPath, "package.json"), "utf-8"),
   ) as PackageJson;
   const packageDeps = getPackageDependencies(
     packageJson.dependencies ?? {},
     viteConfig.ssr.external,
   );
-  const serverBuildPath = join(reactRouterConfig.buildDirectory, "server");
+  const serverBuildPath = nodePath.join(reactRouterConfig.buildDirectory, "server");
 
   const serverBundles = buildManifest?.serverBundles ?? {
     site: {
       id: "site",
-      file: relative(rootPath, join(serverBuildPath, reactRouterConfig.serverBuildFile)),
+      file: nodePath.relative(
+        rootPath,
+        nodePath.join(serverBuildPath, reactRouterConfig.serverBuildFile),
+      ),
     },
   };
 
@@ -90,11 +93,11 @@ export async function buildPreset<BuildContext>({
   await Promise.all(
     Object.entries(serverBundles).map(async ([, bundle]) => {
       const bundleId = bundle.id;
-      const buildFile = join(rootPath, bundle.file);
-      const buildPath = dirname(buildFile);
+      const buildFile = nodePath.join(rootPath, bundle.file);
+      const buildPath = nodePath.dirname(buildFile);
 
       await writePackageJson(
-        join(buildPath, "package.json"),
+        nodePath.join(buildPath, "package.json"),
         packageJson,
         packageDeps,
         nodeVersion,
@@ -102,7 +105,7 @@ export async function buildPreset<BuildContext>({
 
       console.log(`Bundle file for ${bundleId}...`);
 
-      const bundleFile = join(buildPath, "server.mjs");
+      const bundleFile = nodePath.join(buildPath, "server.mjs");
 
       await build({
         experimental: { lazyBarrel: false },
@@ -131,11 +134,13 @@ export async function buildPreset<BuildContext>({
         ],
       });
 
-      await rm(join(buildPath, assetsDir), { force: true, recursive: true });
+      await rm(nodePath.join(buildPath, assetsDir), { force: true, recursive: true });
       await rm(buildFile, { force: true });
 
       await Promise.all(
-        matchedFiles.map((file) => cp(file, join(serverBuildPath, file), { recursive: true })),
+        matchedFiles.map((file) =>
+          cp(file, nodePath.join(serverBuildPath, file), { recursive: true }),
+        ),
       );
 
       await buildBundleEnd?.(context, buildPath, bundleId, bundleFile, packageDeps);
@@ -162,23 +167,19 @@ function getPackageDependencies(
       )
     : ssrExternal;
 
-  return Object.keys(dependencies)
-    .filter((key) => {
-      if (ssrExternalFiltered === undefined) {
-        return false;
-      }
+  if (ssrExternalFiltered === undefined) {
+    return {};
+  }
 
-      if (ssrExternalFiltered === true) {
-        return true;
-      }
+  const result: Record<string, string> = {};
 
-      return ssrExternalFiltered.includes(key);
-    })
-    .reduce((obj: Record<string, string>, key) => {
-      obj[key] = dependencies[key] ?? "";
+  for (const key of Object.keys(dependencies)) {
+    if (ssrExternalFiltered === true || ssrExternalFiltered.includes(key)) {
+      result[key] = dependencies[key] ?? "";
+    }
+  }
 
-      return obj;
-    }, {});
+  return result;
 }
 
 async function writePackageJson(
@@ -200,11 +201,11 @@ async function writePackageJson(
     },
   };
 
-  await writeFile(outputFile, JSON.stringify(distPkg, null, 2), "utf8");
+  await writeFile(outputFile, JSON.stringify(distPkg, null, 2), "utf-8");
 }
 
 export async function createDir(paths: string[], rmBefore = false): Promise<string> {
-  const presetRoot = join(...paths);
+  const presetRoot = nodePath.join(...paths);
 
   if (rmBefore) {
     await rm(presetRoot, { recursive: true, force: true });
@@ -254,7 +255,7 @@ export function getServerRoutes(buildManifest: BuildManifest | undefined): {
       for (const path of paths) {
         if (
           !bundleRoutes[path] &&
-          !Object.keys(bundleRoutes).find(
+          !Object.keys(bundleRoutes).some(
             (key) =>
               bundleRoutes[key]!.bundleId == bundleId && path.startsWith(bundleRoutes[key]!.path),
           )
@@ -316,41 +317,52 @@ export async function copyFilesToFunction(
     cache: nftCache,
   });
 
-  const fileList = Array.from(traced.fileList).map((file) => join(base, file));
+  const fileList = [...traced.fileList].map((file) => nodePath.join(base, file));
 
-  let ancestorDir = dirname(fileList[0]!);
+  let ancestorDir = nodePath.dirname(fileList[0]!);
 
   for (const file of fileList.slice(1)) {
     while (!file.startsWith(ancestorDir)) {
-      ancestorDir = dirname(ancestorDir);
+      ancestorDir = nodePath.dirname(ancestorDir);
     }
   }
 
   await Promise.all(
     fileList.map(async (origin) => {
-      const dest = join(destPath, relative(ancestorDir, origin));
+      const dest = nodePath.join(destPath, nodePath.relative(ancestorDir, origin));
       const real = await realpath(origin);
 
       const isSymlink = real !== origin;
-      const isDirectory = (await stat(origin)).isDirectory();
+      const statResult = await stat(origin);
+      const isDirectory = statResult.isDirectory();
 
-      await mkdir(dirname(dest), { recursive: true });
+      await mkdir(nodePath.dirname(dest), { recursive: true });
 
       if (origin == bundleFile) {
-        const sourceDir = dirname(bundleFile);
-        const destDir = dirname(dest);
+        const bundleName = nodePath.basename(bundleFile);
+        const sourceDir = nodePath.dirname(bundleFile);
+        const destDir = nodePath.dirname(dest);
+        const files = await readdir(sourceDir);
+        const copies: Promise<void>[] = [];
 
-        await Promise.all(
-          (await readdir(sourceDir))
-            .filter((file) => file !== basename(bundleFile))
-            .map((file) => cp(join(sourceDir, file), join(destDir, file), { recursive: true })),
-        );
+        for (const file of files) {
+          if (file !== bundleName) {
+            copies.push(
+              cp(nodePath.join(sourceDir, file), nodePath.join(destDir, file), { recursive: true }),
+            );
+          }
+        }
+
+        await Promise.all(copies);
       }
 
       if (isSymlink) {
         if (!existsSync(dest)) {
           await symlink(
-            relative(dirname(dest), join(destPath, relative(ancestorDir, real))),
+            nodePath.relative(
+              nodePath.dirname(dest),
+              nodePath.join(destPath, nodePath.relative(ancestorDir, real)),
+            ),
             dest,
             isDirectory ? "dir" : "file",
           );
@@ -361,5 +373,5 @@ export async function copyFilesToFunction(
     }),
   );
 
-  return relative(ancestorDir, bundleFile);
+  return nodePath.relative(ancestorDir, bundleFile);
 }

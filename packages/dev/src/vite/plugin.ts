@@ -8,7 +8,7 @@ import type {
 } from "vite";
 import { getRequestListener } from "@hono/node-server";
 import { existsSync, statSync } from "node:fs";
-import { join } from "node:path";
+import nodePath from "node:path";
 import type { VitePluginOptions } from "../config";
 import {
   createExcludePatterns,
@@ -104,7 +104,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
           next: Connect.NextFunction,
         ): Promise<void> => {
           if (req.url) {
-            const filePath = join(publicDirPath, req.url);
+            const filePath = nodePath.join(publicDirPath, req.url);
 
             try {
               if (existsSync(filePath) && statSync(filePath).isFile()) {
@@ -121,9 +121,9 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
 
           const entry = reactRouterConfig!.entryFile;
 
-          const app = (
-            await (devServer.environments.ssr as RunnableDevEnvironment).runner.import(entry)
-          ).default;
+          const { default: app } = await (
+            devServer.environments.ssr as RunnableDevEnvironment
+          ).runner.import(entry);
 
           if (!app) {
             return next(new Error(`Failed to find default export from ${entry}`));

@@ -11,7 +11,7 @@ import { requestOrigin } from "../middlewares/request-origin";
 import { getRemoteAddr, getRequestOrigin } from "../utils/request";
 import { createHonoServer, type HonoServerOptions, type NodeEnv } from "../utils/server";
 
-export type { NodeEnv };
+export type { NodeEnv } from "../utils/server";
 
 export type HonoNodeServerOptions = HonoServerOptions<NodeEnv> & {
   port?: number;
@@ -124,7 +124,7 @@ export async function createHonoNodeServer(
 
 export function cacheControl(seconds: number, immutable = false): MiddlewareHandler {
   return async (c, next) => {
-    if (!c.req.path.match(/\.[a-zA-Z0-9]+$/) || c.req.path.endsWith(".data")) {
+    if (!/\.[a-zA-Z0-9]+$/.test(c.req.path) || c.req.path.endsWith(".data")) {
       return next();
     }
 

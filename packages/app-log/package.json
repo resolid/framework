@@ -48,14 +48,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@logtape/logtape": "^2.2.3",
+    "@logtape/logtape": "^2.2.4",
     "@resolid/core": "workspace:^"
   },
   "devDependencies": {
     "tsdown": "^0.22.3"
   },
   "peerDependencies": {
-    "@logtape/file": "^2.2.3"
+    "@logtape/file": "^2.2.4"
   },
   "peerDependenciesMeta": {
     "@logtape/file": {

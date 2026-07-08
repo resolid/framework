@@ -3,6 +3,7 @@ import type { Resolver } from "../shared";
 export class InjectionContextError extends Error {
   constructor() {
     super("inject() must be called within a injection context");
+    this.name = "InjectionContextError";
   }
 }
 
@@ -15,7 +16,7 @@ export class InjectionContext {
   }
 
   static current(): InjectionContext {
-    const ctx = this.contextStack[this.contextStack.length - 1];
+    const ctx = this.contextStack.at(-1);
 
     if (ctx === undefined) {
       throw new InjectionContextError();

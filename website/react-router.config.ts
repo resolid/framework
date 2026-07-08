@@ -1,3 +1,1 @@
-import { reactRouterConfig } from "./resolid.config";
-
-export default reactRouterConfig;
+export { reactRouterConfig as default } from "./resolid.config";

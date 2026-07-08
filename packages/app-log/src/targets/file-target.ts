@@ -10,15 +10,15 @@ import {
   type StreamFileSinkOptions,
   type TimeRotatingFileSinkOptions,
 } from "@logtape/file";
-import { mkdirSync } from "fs";
-import { join } from "path";
+import { mkdirSync } from "node:fs";
+import nodePath from "node:path";
 
 function getLogFilePath(file: string, runtimePath: AppContext["runtimePath"]) {
   const logPath = runtimePath("logs");
 
   mkdirSync(logPath, { recursive: true });
 
-  return join(logPath, `${file}.log`);
+  return nodePath.join(logPath, `${file}.log`);
 }
 
 export function fileTarget(

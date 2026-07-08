@@ -1,6 +1,8 @@
 import type { AppContext, ExtensionCreator } from "@resolid/core";
 import { Cacher, type CacheSerializer } from "@resolid/cache";
-import { NullCache, MemoryCache, type CacheStore } from "@resolid/cache/stores";
+import { NullCache, type CacheStore } from "@resolid/cache/stores";
+
+export { NullCache, MemoryCache, type CacheStore } from "@resolid/cache/stores";
 
 type CacheServiceConfig = {
   caches: Map<string, Cacher>;
@@ -111,5 +113,3 @@ export function createCacheExtension({
     };
   };
 }
-
-export { NullCache, MemoryCache, type CacheStore };

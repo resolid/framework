@@ -5,13 +5,12 @@ import {
   dispose,
   getConsoleSink,
   getLogger,
-  lazy,
   type Logger,
   type LoggerConfig,
   type Sink,
-  withContext,
-  withFilter,
 } from "@logtape/logtape";
+
+export { type Sink, withContext, withFilter, lazy } from "@logtape/logtape";
 
 export type LoggerEntity = { category: string } & Omit<LoggerConfig<string, string>, "category">;
 
@@ -21,8 +20,6 @@ export type LogConfig = { defaultTarget?: string; defaultCategory?: string } & O
 > & {
     loggers?: LoggerEntity[];
   };
-
-export { type Sink, withContext, withFilter, lazy };
 
 type LogCategory = Pick<Logger, "debug" | "info" | "warn" | "error" | "fatal">;
 

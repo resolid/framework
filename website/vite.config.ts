@@ -2,7 +2,7 @@ import { resolidVite } from "@resolid/dev/vite";
 import rolldownBabel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { reactCompilerPreset } from "@vitejs/plugin-react";
-import { join } from "node:path";
+import nodePath from "node:path";
 import { type AliasOptions, defineConfig, type UserConfig } from "vite";
 import { vitePluginOptions } from "./resolid.config";
 
@@ -37,14 +37,11 @@ export default defineConfig(({ command }) => {
         },
       },
     },
-    ssr: {
-      external: ["mysql2"],
-    },
     resolve: {
       tsconfigPaths: !isBuild,
-      alias: [isBuild && { find: "~", replacement: join(import.meta.dirname, "./src") }].filter(
-        Boolean,
-      ) as AliasOptions,
+      alias: [
+        isBuild && { find: "~", replacement: nodePath.join(import.meta.dirname, "./src") },
+      ].filter(Boolean) as AliasOptions,
     },
   } satisfies UserConfig;
 });

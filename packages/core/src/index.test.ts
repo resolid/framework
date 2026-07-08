@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import nodePath from "node:path";
 import { cwd } from "node:process";
 import { describe, expect, it, vi } from "vitest";
 import { createApp, type ExtensionCreator, type PathResolver, type Token } from "./index";
@@ -9,19 +9,21 @@ const testPathMethod = (methodFn: PathResolver, basePath: string) => {
   });
 
   it("should handle single segment", () => {
-    expect(methodFn("config")).toBe(join(basePath, "config"));
-    expect(methodFn("config\\log")).toBe(join(basePath, "config", "log"));
-    expect(methodFn("config/log")).toBe(join(basePath, "config", "log"));
+    expect(methodFn("config")).toBe(nodePath.join(basePath, "config"));
+    expect(methodFn("config\\log")).toBe(nodePath.join(basePath, "config", "log"));
+    expect(methodFn("config/log")).toBe(nodePath.join(basePath, "config", "log"));
   });
 
   it("should handle multiple segments", () => {
-    expect(methodFn("a", "b", "c")).toBe(join(basePath, "a", "b", "c"));
-    expect(methodFn("x\\y", "z")).toBe(join(basePath, "x", "y", "z"));
-    expect(methodFn("nested\\dir/file.txt")).toBe(join(basePath, "nested", "dir", "file.txt"));
+    expect(methodFn("a", "b", "c")).toBe(nodePath.join(basePath, "a", "b", "c"));
+    expect(methodFn("x\\y", "z")).toBe(nodePath.join(basePath, "x", "y", "z"));
+    expect(methodFn("nested\\dir/file.txt")).toBe(
+      nodePath.join(basePath, "nested", "dir", "file.txt"),
+    );
   });
 
   it("should handle empty string segments", () => {
-    expect(methodFn("")).toBe(join(basePath, ""));
+    expect(methodFn("")).toBe(nodePath.join(basePath, ""));
   });
 };
 
@@ -171,7 +173,7 @@ describe("createApp", () => {
     const app = await createApp({ name: "test-app" });
 
     const rootBase = cwd();
-    const runtimeBase = join(rootBase, "runtime");
+    const runtimeBase = nodePath.join(rootBase, "runtime");
 
     testPathMethod((...paths) => app.rootPath(...paths), rootBase);
     testPathMethod((...paths) => app.runtimePath(...paths), runtimeBase);

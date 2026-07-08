@@ -1,12 +1,7 @@
-import {
-  HistoryLink,
-  HistoryNavLink,
-  useHistoryBack,
-  type UseHistoryBackOptions,
-} from "@resolid/dev/router";
+import { useHistoryBack, type UseHistoryBackOptions } from "@resolid/dev/router";
 import { Button, type ButtonProps, type PrimitiveProps } from "@resolid/react-ui";
 
-export { HistoryLink, HistoryNavLink };
+export { HistoryLink, HistoryNavLink } from "@resolid/dev/router";
 
 type HistoryBackProps = ButtonProps & UseHistoryBackOptions;
 

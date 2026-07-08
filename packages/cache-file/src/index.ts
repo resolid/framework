@@ -1,6 +1,6 @@
 import type { CacheStore } from "@resolid/cache/stores";
 import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import nodePath from "node:path";
 
 // oxlint-disable-next-line prefer-named-capture-group
 const INVALID_KEY_RE = /(\.\/|\.\.\/)/;
@@ -18,7 +18,7 @@ export class FileCache implements CacheStore {
       throw new Error(`Invalid key: ${key}. Should not contain relative paths.`);
     }
 
-    return join(this._basePath, key.replaceAll(":", "/"));
+    return nodePath.join(this._basePath, key.replaceAll(":", "/"));
   }
 
   private async _exists(path: string) {
@@ -55,15 +55,15 @@ export class FileCache implements CacheStore {
   }
 
   async get(key: string): Promise<string | undefined> {
-    const path = this._resolve(key);
+    const resolve = this._resolve(key);
 
     try {
-      const content = await readFile(path, { encoding: "utf-8" });
+      const content = await readFile(resolve, { encoding: "utf-8" });
 
       const [value, expire] = JSON.parse(content);
 
       if (expire !== -1 && expire < Date.now()) {
-        await rm(path, { force: true });
+        await rm(resolve, { force: true });
 
         return undefined;
       }
@@ -75,28 +75,28 @@ export class FileCache implements CacheStore {
   }
 
   async set(key: string, value: string, ttl?: number): Promise<boolean> {
-    const path = this._resolve(key);
+    const resolve = this._resolve(key);
 
     return this._lockedRun(key, async () => {
-      await mkdir(dirname(path), { recursive: true });
+      await mkdir(nodePath.dirname(resolve), { recursive: true });
 
-      await writeFile(path, JSON.stringify([value, ttl ? Date.now() + ttl * 1000 : -1]));
+      await writeFile(resolve, JSON.stringify([value, ttl ? Date.now() + ttl * 1000 : -1]));
 
       return true;
     });
   }
 
   async del(key: string): Promise<boolean> {
-    const path = this._resolve(key);
+    const resolve = this._resolve(key);
 
-    const exists = await this._exists(path);
+    const exists = await this._exists(resolve);
 
     if (!exists) {
       return false;
     }
 
     return this._lockedRun(key, async () => {
-      await rm(path);
+      await rm(resolve);
 
       return true;
     });

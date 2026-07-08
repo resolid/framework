@@ -1,10 +1,10 @@
 import { createClient, createCluster } from "@redis/client";
 import { retry } from "@resolid/utils";
 import { execSync } from "node:child_process";
-import { resolve } from "node:path";
+import nodePath from "node:path";
 
 export default async function (): Promise<() => Promise<void>> {
-  const composeFile = resolve(import.meta.dirname, `./docker/redis-compose.yaml`);
+  const composeFile = nodePath.resolve(import.meta.dirname, `./docker/redis-compose.yaml`);
 
   execSync(`docker compose -f ${composeFile} --project-name resolid up -d`, {
     stdio: "inherit",
@@ -34,7 +34,8 @@ export default async function (): Promise<() => Promise<void>> {
       });
       await clusterClient.connect();
 
-      const ok = (await clusterClient.clusterInfo()).includes("cluster_state:ok");
+      const clusterInfo = await clusterClient.clusterInfo();
+      const ok = clusterInfo.includes("cluster_state:ok");
 
       await clusterClient.close();
 

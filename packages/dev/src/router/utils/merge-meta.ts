@@ -6,11 +6,13 @@ export function mergeMeta<A extends { matches: any[] }>(
   titleJoin = " - ",
 ): (args: A) => MetaDescriptor[] {
   return (args) => {
-    const leafMeta = metaFn(args);
+    const mergedMeta = [...metaFn(args)];
 
-    const mergedMeta = args.matches.reduceRight((acc, match) => {
+    for (let i = args.matches.length - 1; i >= 0; i--) {
+      const match = args.matches[i];
+
       for (const parentMeta of match.meta) {
-        const index = acc.findIndex((meta: MetaDescriptor) => {
+        const index = mergedMeta.findIndex((meta: MetaDescriptor) => {
           if ("name" in meta && "name" in parentMeta) {
             return meta.name === parentMeta.name;
           }
@@ -26,13 +28,11 @@ export function mergeMeta<A extends { matches: any[] }>(
           return false;
         });
 
-        if (index == -1) {
-          acc.push(parentMeta);
+        if (index === -1) {
+          mergedMeta.push(parentMeta);
         }
       }
-
-      return acc;
-    }, leafMeta);
+    }
 
     const titles: string[] = [];
     const result: MetaDescriptor[] = [];

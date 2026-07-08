@@ -53,9 +53,7 @@ export function ColorModeToggle() {
             key={key}
             label={key}
             className={colorMode == key ? "text-link" : ""}
-            onSelect={() => {
-              setColorMode(key as ColorMode);
-            }}
+            onSelect={() => setColorMode(key as ColorMode)}
           >
             <SpriteIcon name={mode.icon} className="me-1.5" />
             {mode.label}

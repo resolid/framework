@@ -1,6 +1,6 @@
 import type { BuildManifest, Preset } from "@react-router/dev/config";
 import { cp, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import nodePath from "node:path";
 import {
   buildPreset,
   copyFilesToFunction,
@@ -27,11 +27,14 @@ export function vercelPreset({ nodeVersion, includeFiles }: VercelPresetOptions)
             async buildStart() {
               const vercelOutput = await createDir([viteConfig.root, ".vercel", "output"], true);
 
-              await copyStaticFiles(join(reactRouterConfig.buildDirectory, "client"), vercelOutput);
+              await copyStaticFiles(
+                nodePath.join(reactRouterConfig.buildDirectory, "client"),
+                vercelOutput,
+              );
               await writeVercelConfigJson(
                 viteConfig.build.assetsDir,
                 buildManifest,
-                join(vercelOutput, "config.json"),
+                nodePath.join(vercelOutput, "config.json"),
               );
 
               return { vercelOutput, nftCache: {} };
@@ -51,7 +54,7 @@ export function vercelPreset({ nodeVersion, includeFiles }: VercelPresetOptions)
               );
 
               await writeFile(
-                join(vercelFunctionDir, ".vc-config.json"),
+                nodePath.join(vercelFunctionDir, ".vc-config.json"),
                 JSON.stringify(
                   {
                     handler: handleFile,
@@ -62,7 +65,7 @@ export function vercelPreset({ nodeVersion, includeFiles }: VercelPresetOptions)
                   null,
                   2,
                 ),
-                "utf8",
+                "utf-8",
               );
             },
           });
@@ -82,7 +85,7 @@ async function copyStaticFiles(outDir: string, vercelOutDir: string) {
     force: true,
   });
 
-  await rm(join(vercelStaticDir, ".vite"), { recursive: true, force: true });
+  await rm(nodePath.join(vercelStaticDir, ".vite"), { recursive: true, force: true });
 }
 
 async function writeVercelConfigJson(
@@ -100,15 +103,16 @@ async function writeVercelConfigJson(
     },
   };
 
-  configJson.routes.push({
-    src: `^/${assetsDir}/.*`,
-    headers: { "Cache-Control": "public, max-age=31536000, immutable" },
-    continue: true,
-  });
-
-  configJson.routes.push({
-    handle: "filesystem",
-  });
+  configJson.routes.push(
+    {
+      src: `^/${assetsDir}/.*`,
+      headers: { "Cache-Control": "public, max-age=31536000, immutable" },
+      continue: true,
+    },
+    {
+      handle: "filesystem",
+    },
+  );
 
   const serverRoutes = getServerRoutes(buildManifest);
 
@@ -126,5 +130,5 @@ async function writeVercelConfigJson(
     }
   }
 
-  await writeFile(vercelConfigFile, JSON.stringify(configJson, null, 2), "utf8");
+  await writeFile(vercelConfigFile, JSON.stringify(configJson, null, 2), "utf-8");
 }

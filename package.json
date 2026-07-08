@@ -26,18 +26,18 @@
     "@changesets/cli": "^2.31.0",
     "@commitlint/cli": "^21.2.0",
     "@commitlint/config-conventional": "^21.2.0",
-    "@resolid/config": "^5.3.27",
+    "@resolid/config": "^5.3.29",
     "@tailwindcss/language-server": "^0.14.29",
     "@types/node": "^24.13.2",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint-plugin-react-you-might-not-need-an-effect": "^1.0.1",
     "lefthook": "^2.1.9",
-    "oxfmt": "^0.57.0",
-    "oxlint": "^1.72.0",
+    "oxfmt": "^0.58.0",
+    "oxlint": "^1.73.0",
     "oxlint-tsgolint": "^0.24.0",
-    "turbo": "^2.10.3",
+    "turbo": "^2.10.4",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.10"
   },
   "engines": {
     "node": "^22.22.0 || >=24"

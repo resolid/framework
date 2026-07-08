@@ -1,9 +1,10 @@
-import { Container, inject, type Provider, type Token } from "@resolid/di";
+import { Container, type Provider, type Token } from "@resolid/di";
 import { Emitter } from "@resolid/event";
-import { join } from "node:path";
+import nodePath from "node:path";
 import { cwd, env } from "node:process";
 
-export { inject, type Emitter, type Provider, type Token };
+export type { Emitter } from "@resolid/event";
+export { inject, type Provider, type Token } from "@resolid/di";
 
 export interface AppConfig {
   readonly name: string;
@@ -122,7 +123,7 @@ class App<E extends Record<string, unknown>> {
   }
 
   rootPath(...paths: string[]): string {
-    return join(this._root, ...paths.map((p) => p.replace(/\\/g, "/")));
+    return nodePath.join(this._root, ...paths.map((p) => p.replaceAll("\\", "/")));
   }
 
   runtimePath(...paths: string[]): string {

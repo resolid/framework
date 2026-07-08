@@ -1,8 +1,8 @@
+// oxlint-disable-next-line no-unused-vars
 import { isRouteErrorResponse } from "react-router";
 import { HistoryBack } from "~/components/history-link";
-import type { Route } from "../../.react-router/types/src/+types/root";
 
-export function ErrorComponent({ error }: Route.ErrorBoundaryProps) {
+export function ErrorComponent({ error }: { error: unknown }) {
   if (isRouteErrorResponse(error) && error.status == 404) {
     return (
       <div className="relative mx-auto flex max-w-144 justify-center px-4 py-8">

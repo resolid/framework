@@ -1,18 +1,16 @@
 import type { Transport } from "nodemailer";
 import type MailMessage from "nodemailer/lib/mailer/mail-message";
-import { mkdirSync } from "fs";
-import { existsSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, writeFileSync, mkdirSync } from "node:fs";
+import nodePath from "node:path";
 import { version } from "../../package.json";
 
 export class FileTransport implements Transport {
-  public name: string;
+  public name: string = "FileTransport";
   public version: string;
 
   private readonly _path: string;
 
   constructor(path: string) {
-    this.name = "FileTransport";
     this.version = version;
     this._path = path;
   }
@@ -28,7 +26,7 @@ export class FileTransport implements Transport {
 
     const [filename] = messageId.replace("<", "").replace(">", "").split("@");
 
-    const file = join(this._path, `${filename}.txt`);
+    const file = nodePath.join(this._path, `${filename}.txt`);
 
     setImmediate(() => {
       mail.normalize((err, data) => {

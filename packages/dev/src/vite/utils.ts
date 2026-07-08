@@ -1,6 +1,6 @@
 import type { BuildManifest, Config as ReactRouterConfig } from "@react-router/dev/config";
 import { makeRe } from "minimatch";
-import { join, relative } from "node:path";
+import nodePath from "node:path";
 import { type UserConfig, normalizePath } from "vite";
 import type { VitePluginOptions } from "../config";
 
@@ -33,12 +33,12 @@ export function resolveReactRouterPluginConfig(
   const { reactRouterConfig, rootDirectory, buildManifest } =
     config.__reactRouterPluginContext as ReactRouterPluginContext;
 
-  const appDir = relative(rootDirectory, reactRouterConfig.appDirectory);
+  const appDir = nodePath.relative(rootDirectory, reactRouterConfig.appDirectory);
 
   return {
-    entryFile: join(appDir, options.entryFile),
+    entryFile: nodePath.join(appDir, options.entryFile),
     appDir,
-    buildDir: relative(rootDirectory, reactRouterConfig.buildDirectory),
+    buildDir: nodePath.relative(rootDirectory, reactRouterConfig.buildDirectory),
     assetsDir: config.build?.assetsDir ?? "assets",
     ssrBuild: reactRouterConfig.ssr,
     basename: reactRouterConfig.basename,
@@ -57,8 +57,10 @@ export function createExcludePatterns(appDir: string, userExclude?: (string | Re
   ];
 
   if (appPath != appRoot) {
-    patterns.push(new RegExp(`^(?=\\/${appRoot}\\/)((?!.*\\.data(\\?|$)).*\\..*(\\?.*)?$)`));
-    patterns.push(new RegExp(`^(?=\\/${appRoot}\\/.*\\/\\..*\\/.*)`));
+    patterns.push(
+      new RegExp(`^(?=\\/${appRoot}\\/)((?!.*\\.data(\\?|$)).*\\..*(\\?.*)?$)`),
+      new RegExp(`^(?=\\/${appRoot}\\/.*\\/\\..*\\/.*)`),
+    );
   }
 
   if (userExclude) {
