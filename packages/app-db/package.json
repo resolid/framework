@@ -52,7 +52,7 @@
     "drizzle-orm": "rc"
   },
   "devDependencies": {
-    "tsdown": "^0.22.3"
+    "tsdown": "^0.22.4"
   },
   "peerDependencies": {
     "mysql2": "^3.22.6"

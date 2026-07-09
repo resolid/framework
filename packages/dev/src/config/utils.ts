@@ -1,5 +1,4 @@
 import type { BuildManifest } from "@react-router/dev/config";
-import fg from "fast-glob";
 import { existsSync } from "node:fs";
 import {
   cp,
@@ -15,6 +14,7 @@ import {
 import nodePath from "node:path";
 import { build } from "rolldown";
 import { esmExternalRequirePlugin } from "rolldown/plugins";
+import { glob } from "tinyglobby";
 import { type ResolvedConfig, searchForWorkspaceRoot } from "vite";
 import type { NodeVersion, ServerPlatform } from "../types";
 
@@ -86,7 +86,7 @@ export async function buildPreset<BuildContext>({
     },
   };
 
-  const matchedFiles = includeFiles.length > 0 ? await fg(includeFiles, { cwd: rootPath }) : [];
+  const matchedFiles = includeFiles.length > 0 ? await glob(includeFiles, { cwd: rootPath }) : [];
 
   const context = await buildStart();
 
