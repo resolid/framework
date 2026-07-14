@@ -1,9 +1,9 @@
+import { getHonoContext } from "@resolid/dev/http.server";
 import { mergeMeta } from "@resolid/dev/router";
 import { Alert, AlertDescription, AlertTitle, ClientOnly } from "@resolid/react-ui";
 import { deviceTimezone } from "@resolid/utils";
 import { formatDate } from "@resolid/utils/date";
 import { Suspense, useMemo } from "react";
-import { appContext, honoContext } from "~/foundation/context.server";
 import { SystemRepository } from "~/modules/system/repository.server";
 import type { Route } from "./+types/status";
 
@@ -14,15 +14,17 @@ export const meta = mergeMeta(() => [
 ]);
 
 export async function loader({ context }: Route.LoaderArgs) {
+  const honoContext = getHonoContext(context);
+
   return {
     ssr: {
       message: "服务器渲染正常",
       datetime: new Date().toISOString(),
-      requestId: context.get(honoContext).get("requestId"),
-      remoteAddress: context.get(honoContext).get("clientIp"),
+      clientIp: honoContext.get("clientIp"),
+      requestId: honoContext.get("requestId"),
     },
-    db: context
-      .get(appContext)
+    db: honoContext
+      .get("app")
       .get(SystemRepository)
       .getFirst()
       .then(() => ({ success: true, message: "数据库访问正常" }))
@@ -73,7 +75,7 @@ export default function Status({ loaderData }: Route.ComponentProps) {
             <ClientOnly>{() => formatDatetime(ssr.datetime)}</ClientOnly>
           </dd>
           <dt>客户端地址：</dt>
-          <dd className="font-mono text-sm">{ssr.remoteAddress}</dd>
+          <dd className="font-mono text-sm">{ssr.clientIp}</dd>
           <dt>客户端时间：</dt>
           <dd className="font-mono text-sm">
             <ClientOnly>{() => formatDatetime(new Date())}</ClientOnly>

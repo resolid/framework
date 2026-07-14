@@ -1,4 +1,10 @@
-import type { Context } from "hono";
-import { createContext, type RouterContext } from "react-router";
+import type { Context, Env } from "hono";
+import type { BlankEnv } from "hono/types";
+import type { RouterContextProvider } from "react-router";
+import { honoContext } from "./server";
 
-export const honoContext: RouterContext<Context> = createContext<Context>();
+export function getHonoContext<E extends Env = BlankEnv>(
+  context: Readonly<RouterContextProvider>,
+): Context<E> {
+  return context.get(honoContext);
+}

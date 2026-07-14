@@ -1,31 +1,46 @@
 import {
-  type RouterContextProvider,
   createHonoNetlifyServer,
   createHonoNodeServer,
   createHonoVercelServer,
+  type MiddlewareHandler,
 } from "@resolid/dev/http.server";
 import { env } from "node:process";
-import { app } from "~/foundation/app.server";
-import { appContext } from "~/foundation/context.server";
+import { type App, app } from "~/foundation/app.server";
 
 await app.run();
 
-const configureLoadContext = (loadContext: RouterContextProvider) => {
-  loadContext.set(appContext, app);
-};
+declare module "@resolid/dev/env" {
+  interface AppVariableMap {
+    app: App;
+  }
+}
+
+function appMiddleware(): MiddlewareHandler {
+  return async (ctx, next) => {
+    ctx.set("app", app);
+
+    await next();
+  };
+}
 
 export default import.meta.env.RESOLID_PLATFORM == "netlify"
   ? await createHonoNetlifyServer({
-      configureLoadContext,
+      honoConfig(hono) {
+        hono.use(appMiddleware());
+      },
     })
   : import.meta.env.RESOLID_PLATFORM == "vercel"
     ? await createHonoVercelServer({
-        configureLoadContext,
+        honoConfig(hono) {
+          hono.use(appMiddleware());
+        },
       })
     : await createHonoNodeServer({
         port: env.SERVER_PORT,
-        configureLoadContext,
-        onShutdown: async () => {
+        honoConfig(hono) {
+          hono.use(appMiddleware());
+        },
+        async onShutdown() {
           await app.dispose();
         },
       });

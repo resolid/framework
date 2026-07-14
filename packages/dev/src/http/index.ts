@@ -1,5 +1,4 @@
-export type { Hono, Context, Env } from "hono";
-export type { RouterContextProvider } from "react-router";
+export type { Hono, Context, Env, MiddlewareHandler } from "hono";
 
 export * from "./utils/context";
 export * from "./utils/response";

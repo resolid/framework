@@ -1,64 +1,57 @@
 import type { Http2Bindings, HttpBindings } from "@hono/node-server";
 import type { MaybePromise } from "@resolid/utils";
 import type { HonoOptions } from "hono/hono-base";
-import type { BlankEnv } from "hono/types";
 import { type Context, type Env, Hono } from "hono";
-import { createRequestHandler, RouterContextProvider } from "react-router";
-import { honoContext } from "./context";
+import {
+  createContext,
+  createRequestHandler,
+  type RouterContext,
+  RouterContextProvider,
+} from "react-router";
+
+export const honoContext: RouterContext<Context> = createContext<Context>();
 
 export type NodeEnv = {
-  // oxlint-disable-next-line typescript/no-redundant-type-constituents
   Bindings: HttpBindings | Http2Bindings;
 };
 
-export type ConfigureLoadContext<E extends Env = BlankEnv> = (
-  loadContext: RouterContextProvider,
-  context: Context<E>,
-  mode?: string,
-) => MaybePromise<void>;
-
-export interface HonoServerOptions<E extends Env = BlankEnv> {
-  configure?: <E extends Env = BlankEnv>(app: Hono<E>) => Promise<void> | void;
+export interface HonoServerOptions<E extends Env> {
+  honoConfig?: (hono: Hono<E>) => MaybePromise<void>;
   honoOptions?: HonoOptions<E>;
-  configureLoadContext?: ConfigureLoadContext<E>;
 }
 
-export async function createHonoServer<E extends Env = BlankEnv>(
+export async function createHonoServer<E extends Env>(
   mode: string | undefined,
   options: HonoServerOptions<E>,
 ): Promise<Hono<E>> {
-  const basename = import.meta.env.RESOLID_BASENAME;
+  const hono: Hono<E> = new Hono(options.honoOptions);
 
-  const app: Hono<E> = new Hono(options.honoOptions);
-
-  if (options.configure) {
-    await options.configure(app);
+  if (options.honoConfig) {
+    await options.honoConfig(hono);
   }
 
-  const routeApp: Hono<E> = new Hono({
+  const app: Hono<E> = new Hono({
     strict: false,
   });
 
-  routeApp.use(async (c) => {
-    return (async (ctx) => {
-      const requestHandler = createRequestHandler(
-        // @ts-expect-error - Virtual module provided by React Router at build time
-        await import("virtual:react-router/server-build"),
-        mode,
-      );
-      const loadContext = new RouterContextProvider();
-      loadContext.set(honoContext, ctx);
-      await options.configureLoadContext?.(loadContext, ctx, mode);
+  // @ts-expect-error - Virtual module provided by React Router at build time
+  const build = import("virtual:react-router/server-build");
 
-      return requestHandler(ctx.req.raw, loadContext);
-    })(c);
+  app.use(async (ctx) => {
+    const requestHandler = createRequestHandler(await build, mode);
+    const loadContext = new RouterContextProvider();
+    loadContext.set(honoContext, ctx);
+
+    return requestHandler(ctx.req.raw, loadContext);
   });
 
-  app.route(basename, routeApp);
+  const basename = import.meta.env.RESOLID_BASENAME;
+
+  hono.route(basename, app);
 
   if (basename) {
-    app.route(`${basename}.data`, routeApp);
+    hono.route(`${basename}.data`, app);
   }
 
-  return app;
+  return hono;
 }

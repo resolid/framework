@@ -1,3 +1,4 @@
+import { getHonoContext } from "@resolid/dev/http.server";
 import {
   Badge,
   Button,
@@ -17,7 +18,6 @@ import { ResolidUiLogo } from "~/components/resolid-ui-logo";
 import { SpriteIcon } from "~/components/sprite-icon";
 import { VercelAnalytics } from "~/extensions/vercel/vercel-analytics";
 import { VercelSpeedInsights } from "~/extensions/vercel/vercel-speed-insights";
-import { honoContext } from "~/foundation/context.server";
 import type { Route } from "./+types/layout";
 
 const NavMenu = ({ onClick }: { onClick?: MouseEventHandler<HTMLAnchorElement> }) => (
@@ -141,7 +141,7 @@ const NavBar = () => {
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   return {
-    requestOrigin: context.get(honoContext).get("requestOrigin") ?? request.url,
+    requestOrigin: getHonoContext(context).get("requestOrigin") ?? request.url,
   };
 }
 

@@ -15,27 +15,22 @@ export type NetlifyEnv = {
 
 export type HonoNetlifyServerOptions = HonoServerOptions<NetlifyEnv>;
 
-export type HonoNetlifyServer = (
-  req: Request,
-  context: NetlifyContext,
-) => Response | Promise<Response>;
-
 export async function createHonoNetlifyServer(
   options: HonoNetlifyServerOptions = {},
-): Promise<HonoNetlifyServer> {
+): Promise<(req: Request, context: NetlifyContext) => Response | Promise<Response>> {
   const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
 
-  const { configure, ...rest } = options;
+  const { honoConfig, ...rest } = options;
 
   const app = await createHonoServer<NetlifyEnv>(mode, {
-    configure: async (hono) => {
+    honoConfig: async (hono) => {
       hono.use(
         clientIp((ctx: Context<NetlifyEnv>) => ctx.env.context.ip),
         requestId((ctx: Context<NetlifyEnv>) => ctx.env.context.requestId),
         requestOrigin((ctx: Context<NetlifyEnv>) => ctx.env.context.site.url),
       );
 
-      await configure?.(hono);
+      await honoConfig?.(hono);
     },
     ...rest,
   });

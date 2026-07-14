@@ -8,6 +8,9 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
+// oxlint-disable-next-line typescript/no-empty-object-type
+export interface AppVariableMap {}
+
 type ClientVariables = {
   clientIp: string;
   requestOrigin: string | undefined;
@@ -15,5 +18,5 @@ type ClientVariables = {
 
 declare module "hono" {
   // oxlint-disable-next-line typescript/no-empty-object-type
-  interface ContextVariableMap extends ClientVariables {}
+  interface ContextVariableMap extends ClientVariables, AppVariableMap {}
 }

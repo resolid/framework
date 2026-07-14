@@ -7,24 +7,22 @@ import { createHonoServer, type HonoServerOptions, type NodeEnv } from "../utils
 
 export type HonoVercelServerOptions = HonoServerOptions<NodeEnv>;
 
-export type HonoVercelServer = Hono<NodeEnv>;
-
 export async function createHonoVercelServer(
   options: HonoVercelServerOptions = {},
-): Promise<HonoVercelServer> {
+): Promise<Hono<NodeEnv>> {
   const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
 
-  const { configure, ...rest } = options;
+  const { honoConfig, ...rest } = options;
 
   return await createHonoServer<NodeEnv>(mode, {
-    configure: async (hono) => {
+    honoConfig: async (hono) => {
       hono.use(
         clientIp((ctx) => ctx.req.raw.headers.get("x-real-ip") ?? ""),
         requestId((ctx) => ctx.req.raw.headers.get("x-vercel-id") ?? ""),
         requestOrigin(() => `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`),
       );
 
-      await configure?.(hono);
+      await honoConfig?.(hono);
     },
     ...rest,
   });

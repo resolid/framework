@@ -48,8 +48,8 @@
     "cluster-key-slot": "^1.1.2"
   },
   "devDependencies": {
-    "@resolid/utils": "^1.6.3",
-    "tsdown": "^0.22.4"
+    "@resolid/utils": "^1.7.0",
+    "tsdown": "^0.22.7"
   },
   "peerDependencies": {
     "@resolid/cache": "workspace:^"

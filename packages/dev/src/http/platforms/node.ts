@@ -1,4 +1,4 @@
-import type { Context, Hono, MiddlewareHandler } from "hono";
+import type { Hono, MiddlewareHandler } from "hono";
 import type { AddressInfo } from "node:net";
 import { serve, type ServerType } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
@@ -23,11 +23,9 @@ export type HonoNodeServerOptions = HonoServerOptions<NodeEnv> & {
   ipHeaders?: string;
 };
 
-export type HonoNodeServer = Hono<NodeEnv>;
-
 export async function createHonoNodeServer(
   options: HonoNodeServerOptions = {},
-): Promise<HonoNodeServer> {
+): Promise<Hono<NodeEnv>> {
   const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
   const isProduction = mode == "production";
   const basename = import.meta.env.RESOLID_BASENAME;
@@ -54,7 +52,7 @@ export async function createHonoNodeServer(
   let server: ServerType | null = null;
 
   const app = await createHonoServer(mode, {
-    configure: async (hono) => {
+    honoConfig: async (hono) => {
       if (isProduction) {
         const clientBuildPath = `${import.meta.env.RESOLID_BUILD_DIR}/client`;
 
@@ -73,19 +71,16 @@ export async function createHonoNodeServer(
       }
 
       hono.use(
-        clientIp((ctx: Context<NodeEnv>) =>
+        clientIp((ctx) =>
           getRemoteAddr(ctx.req.raw, ctx.env.incoming.socket, { proxy, proxyCount, ipHeaders }),
         ),
         requestId(),
-        requestOrigin((ctx: Context<NodeEnv>) =>
-          getRequestOrigin(ctx.req.raw, ctx.env.incoming.socket, proxy),
-        ),
+        requestOrigin((ctx) => getRequestOrigin(ctx.req.raw, ctx.env.incoming.socket, proxy)),
       );
 
-      await mergedOptions.configure?.(hono);
+      await mergedOptions.honoConfig?.(hono);
     },
     honoOptions: mergedOptions.honoOptions,
-    configureLoadContext: mergedOptions.configureLoadContext,
   });
 
   if (isProduction) {
