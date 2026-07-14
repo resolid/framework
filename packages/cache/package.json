@@ -1,6 +1,6 @@
 {
   "name": "@resolid/cache",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "private": false,
   "description": "Type-safe Async Cache for TypeScript",
   "keywords": [

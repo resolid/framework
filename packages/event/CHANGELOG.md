@@ -1,5 +1,11 @@
 # @resolid/event
 
+## 0.3.1
+
+### Patch Changes
+
+- [`c1d974b`](https://github.com/resolid/framework/commit/c1d974bd43746ccbbf6885cf28368bb4cdd9e03b) - chore: update dependencies
+
 ## 0.3.0
 
 ### Minor Changes

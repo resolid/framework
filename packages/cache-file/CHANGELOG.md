@@ -1,5 +1,11 @@
 # @resolid/cache-file
 
+## 1.1.2
+
+### Patch Changes
+
+- [`c1d974b`](https://github.com/resolid/framework/commit/c1d974bd43746ccbbf6885cf28368bb4cdd9e03b) - chore: update dependencies
+
 ## 1.1.1
 
 ### Patch Changes

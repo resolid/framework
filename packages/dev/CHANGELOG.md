@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.8.0
+
+### Minor Changes
+
+- [`c1d974b`](https://github.com/resolid/framework/commit/c1d974bd43746ccbbf6885cf28368bb4cdd9e03b) - refactor(dev): remove react-router loadContext in favor of hono context
+
 ## 0.7.2
 
 ### Patch Changes
