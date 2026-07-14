@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.7.5
+
+### Patch Changes
+
+- [`c1d974b`](https://github.com/resolid/framework/commit/c1d974bd43746ccbbf6885cf28368bb4cdd9e03b) - chore: update dependencies
+
 ## 0.7.4
 
 ### Patch Changes
