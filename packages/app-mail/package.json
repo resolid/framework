@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@types/nodemailer": "^8.0.1",
-    "tsdown": "^0.22.7"
+    "tsdown": "^0.22.8"
   },
   "engines": {
     "node": "^22.22.0 || >=24"
