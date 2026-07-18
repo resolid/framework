@@ -5,7 +5,7 @@
     "rootDirs": [".", "./.react-router/types"],
     "paths": {
       "~/*": ["./src/*"],
-      "@resolid/core": ["../packages/core/src"],
+      "@resolid/app": ["../packages/app/src"],
       "@resolid/app-cache": ["../packages/app-cache/src"],
       "@resolid/app-db": ["../packages/app-db/src"],
       "@resolid/app-db/adapters/*": ["../packages/app-db/src/adapters/*"],

@@ -1,5 +1,5 @@
 import type { Sink } from "@logtape/logtape";
-import type { AppContext } from "@resolid/core";
+import type { AppContext } from "@resolid/app";
 import {
   type FileSinkOptions,
   getFileSink,

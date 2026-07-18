@@ -1,4 +1,4 @@
-import type { AppContext, ExtensionCreator } from "@resolid/core";
+import type { AppContext, ExtensionCreator } from "@resolid/app";
 import { Cacher, type CacheSerializer } from "@resolid/cache";
 import { NullCache, type CacheStore } from "@resolid/cache/stores";
 

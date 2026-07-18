@@ -48,7 +48,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@resolid/core": "workspace:^",
+    "@resolid/app": "workspace:^",
     "drizzle-orm": "rc"
   },
   "devDependencies": {

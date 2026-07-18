@@ -1,4 +1,4 @@
-import type { AppContext, Emitter, ExtensionCreator } from "@resolid/core";
+import type { AppContext, Emitter, ExtensionCreator } from "@resolid/app";
 import type { AnyRelations, EmptyRelations } from "drizzle-orm/relations";
 import { DefaultLogger, type DrizzleConfig, type Logger } from "drizzle-orm";
 import type { DatabaseConnection } from "./connection";
@@ -20,7 +20,7 @@ interface AppDbEvents {
   "db:query": [connection: string, query: string, params: unknown[]];
 }
 
-declare module "@resolid/core" {
+declare module "@resolid/app" {
   // oxlint-disable-next-line typescript/no-empty-object-type
   export interface AppEvents extends AppDbEvents {}
 }

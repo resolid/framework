@@ -1,4 +1,4 @@
-import { createApp } from "@resolid/core";
+import { createApp } from "@resolid/app";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createLogExtension, LogService } from "./index";
 import {

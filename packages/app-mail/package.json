@@ -42,7 +42,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@resolid/core": "workspace:^",
+    "@resolid/app": "workspace:^",
     "nodemailer": "^9.0.3"
   },
   "devDependencies": {

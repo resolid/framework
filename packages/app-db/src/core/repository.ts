@@ -1,4 +1,4 @@
-import { inject } from "@resolid/core";
+import { inject } from "@resolid/app";
 import { DatabaseService } from "./service";
 
 export abstract class Repository<T> {

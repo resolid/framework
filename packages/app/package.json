@@ -1,8 +1,8 @@
 {
-  "name": "@resolid/core",
+  "name": "@resolid/app",
   "version": "0.0.0",
   "private": true,
-  "description": "Core runtime for Resolid applications",
+  "description": "Application runtime for Resolid applications",
   "keywords": [
     "framework",
     "resolid"
@@ -16,7 +16,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/resolid/framework.git",
-    "directory": "packages/core"
+    "directory": "packages/app"
   },
   "files": [
     "dist"

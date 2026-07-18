@@ -14,7 +14,7 @@
     "onlyUpdatePeerDependentsWhenOutOfRange": true
   },
   "ignore": [
-    "@resolid/core",
+    "@resolid/app",
     "@resolid/app-cache",
     "@resolid/app-db",
     "@resolid/app-log",

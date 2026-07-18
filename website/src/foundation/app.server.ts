@@ -1,3 +1,4 @@
+import { createApp, loadProviders } from "@resolid/app";
 import { createCacheExtension, MemoryCache } from "@resolid/app-cache";
 import { createDatabaseExtension } from "@resolid/app-db";
 import { MySqlConnection, type MySqlDatabase } from "@resolid/app-db/adapters/mysql";
@@ -6,7 +7,6 @@ import { rotatingFileTarget } from "@resolid/app-log/targets";
 import { createMailExtension, createMailTransport } from "@resolid/app-mail";
 import { FileCache } from "@resolid/cache-file";
 import { RedisCache } from "@resolid/cache-redis";
-import { createApp, loadProviders } from "@resolid/core";
 import { __DEV__ } from "@resolid/utils";
 import { env } from "node:process";
 

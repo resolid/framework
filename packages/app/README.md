@@ -1,7 +1,7 @@
-# Core runtime for Resolid applications
+# Application runtime for Resolid applications
 
 ![GitHub License](https://img.shields.io/github/license/resolid/framework)
-![NPM Version](https://img.shields.io/npm/v/%40resolid/core)
+![NPM Version](https://img.shields.io/npm/v/%40resolid/app)
 
 <b>[Documentation](https://www.resolid.tech/docs)</b> | [Framework Bundle](https://github.com/resolid/framework)
 

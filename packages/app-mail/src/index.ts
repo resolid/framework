@@ -1,4 +1,4 @@
-import type { Emitter, ExtensionCreator, PathResolver } from "@resolid/core";
+import type { Emitter, ExtensionCreator, PathResolver } from "@resolid/app";
 import type { Address, Attachment, Options } from "nodemailer/lib/mailer";
 import nodemailer, { createTransport, type Transport, type Transporter } from "nodemailer";
 import { FileTransport } from "./transports/file";
@@ -30,7 +30,7 @@ interface AppMailEvents {
   "mail:sent": [string, MailMessage, string];
 }
 
-declare module "@resolid/core" {
+declare module "@resolid/app" {
   // oxlint-disable-next-line typescript/no-empty-object-type
   export interface AppEvents extends AppMailEvents {}
 }

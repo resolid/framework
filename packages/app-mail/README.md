@@ -20,7 +20,7 @@ bun add @resolid/app-mail
 ## Usage
 
 ```ts
-import { createApp } from "@resolid/core";
+import { createApp } from "@resolid/app";
 import { createMailExtension, type MailConfig, MailService } from "@resolid/app-mail";
 
 const mailConfig: MailConfig = { from: "info@resolid.tech" };

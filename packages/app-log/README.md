@@ -20,7 +20,7 @@ bun add @resolid/app-log
 ## Usage
 
 ```ts
-import { createApp } from "@resolid/core";
+import { createApp } from "@resolid/app";
 import { createLogExtension, type LogConfig, LogService } from "@resolid/app-log";
 
 const logConfig: LogConfig = {};

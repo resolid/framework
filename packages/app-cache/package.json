@@ -41,8 +41,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@resolid/cache": "^1.3.0",
-    "@resolid/core": "workspace:^"
+    "@resolid/app": "workspace:^",
+    "@resolid/cache": "^1.3.0"
   },
   "devDependencies": {
     "tsdown": "^0.22.9"

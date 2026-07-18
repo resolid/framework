@@ -1,4 +1,4 @@
-import type { AppContext, ExtensionCreator } from "@resolid/core";
+import type { AppContext, ExtensionCreator } from "@resolid/app";
 import {
   type Config,
   configure,

@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "@logtape/logtape": "^2.2.4",
-    "@resolid/core": "workspace:^"
+    "@resolid/app": "workspace:^"
   },
   "devDependencies": {
     "tsdown": "^0.22.9"
