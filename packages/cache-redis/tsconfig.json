@@ -1,9 +1,0 @@
-{
-  "extends": "@resolid/config/tsconfig/lib.json",
-  "include": ["src/**/*", "*.config.ts", "vitest.global-setup.ts"],
-  "compilerOptions": {
-    "paths": {
-      "@resolid/cache": ["../cache/src"]
-    }
-  }
-}

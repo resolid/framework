@@ -41,15 +41,15 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@resolid/cache": "workspace:^",
+    "@resolid/cache": "^1.3.0",
     "@resolid/core": "workspace:^"
   },
   "devDependencies": {
     "tsdown": "^0.22.9"
   },
   "peerDependencies": {
-    "@resolid/cache-file": "workspace:^",
-    "@resolid/cache-redis": "workspace:^"
+    "@resolid/cache-file": "^1.2.0",
+    "@resolid/cache-redis": "^1.2.0"
   },
   "peerDependenciesMeta": {
     "@resolid/cache-file": {

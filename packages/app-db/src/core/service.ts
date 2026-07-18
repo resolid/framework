@@ -17,7 +17,7 @@ export type DatabaseConfig<
 };
 
 interface AppDbEvents {
-  "db:query": [string, unknown[]];
+  "db:query": [connection: string, query: string, params: unknown[]];
 }
 
 declare module "@resolid/core" {
@@ -58,13 +58,9 @@ export class DatabaseService<
 
     const { logger, jit = true, ...rest } = this._config.drizzleConfig ?? {};
 
-    const queryEmit = (query: string, params: unknown[]) => {
-      this._emitter.emit("db:query", query, params);
-    };
-
-    const drizzleLogger: Logger = {
-      logQuery(query, params) {
-        queryEmit(query, params);
+    const createLogger = (connection: string): Logger => ({
+      logQuery: (query, params) => {
+        this._emitter.emit("db:query", connection, query, params);
 
         if (logger === true) {
           new DefaultLogger().logQuery(query, params);
@@ -72,11 +68,11 @@ export class DatabaseService<
           logger?.logQuery(query, params);
         }
       },
-    };
+    });
 
     for (const [key, conn] of Object.entries(connections)) {
       // oxlint-disable-next-line no-await-in-loop
-      await conn.connect({ logger: drizzleLogger, jit, ...rest });
+      await conn.connect({ logger: createLogger(key), jit, ...rest });
 
       this._connections.set(key, conn);
     }
