@@ -70,7 +70,7 @@
     "@netlify/types": "^2.8.0",
     "@resolid/utils": "^1.7.1",
     "@vercel/nft": "^1.10.2",
-    "hono": "^4.12.30",
+    "hono": "^4.12.31",
     "minimatch": "^10.2.5",
     "rolldown": "^1.2.0",
     "tinyglobby": "^0.2.17"
@@ -78,7 +78,7 @@
   "devDependencies": {
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "tsdown": "^0.22.9"
+    "tsdown": "^0.22.12"
   },
   "peerDependencies": {
     "@react-router/dev": "^8.2.0",
