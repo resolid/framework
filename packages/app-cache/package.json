@@ -45,7 +45,7 @@
     "@resolid/cache": "^1.3.0"
   },
   "devDependencies": {
-    "tsdown": "^0.22.12"
+    "tsdown": "^0.22.13"
   },
   "peerDependencies": {
     "@resolid/cache-file": "^1.2.0",

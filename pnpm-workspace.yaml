@@ -2,9 +2,9 @@ packages:
   - packages/*
   - website
 overrides:
-  react: ^19.2.7
-  react-dom: ^19.2.7
-  react-is: ^19.2.7
+  react: ^19.2.8
+  react-dom: ^19.2.8
+  react-is: ^19.2.8
   typescript: ^7.0.2
   safer-buffer: npm:@nolyfill/safer-buffer@^1
 engineStrict: true

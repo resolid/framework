@@ -58,12 +58,6 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
             output: {
               codeSplitting: false,
             },
-            onwarn(warning, warn) {
-              if (warning.code === "UNUSED_EXTERNAL_IMPORT" && warning.message.includes("react")) {
-                return;
-              }
-              warn(warning);
-            },
           },
         },
       };
