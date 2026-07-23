@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.8.2
+
+### Patch Changes
+
+- [`b6b1a6b`](https://github.com/resolid/framework/commit/b6b1a6b8ef8cac68df977712fa0b8820b832bd6f) - refactor: remove custom warning filter
+
 ## 0.8.1
 
 ### Patch Changes
