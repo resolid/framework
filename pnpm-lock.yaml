@@ -8,7 +8,6 @@ overrides:
   react: ^19.2.8
   react-dom: ^19.2.8
   react-is: ^19.2.8
-  typescript: ^7.0.2
   safer-buffer: npm:@nolyfill/safer-buffer@^1
 
 importers:
@@ -31,8 +30,8 @@ importers:
         specifier: ^6.1.0
         version: 6.1.0(eslint-plugin-react-you-might-not-need-an-effect@1.0.1(eslint@10.5.0(jiti@2.7.0)(supports-color@7.2.0)))(oxfmt@0.60.0)(oxlint-tsgolint@7.0.2001)(oxlint@1.75.0(oxlint-tsgolint@7.0.2001))(typescript@7.0.2)
       '@tailwindcss/language-server':
-        specifier: ^0.14.29
-        version: 0.14.29
+        specifier: ^0.16.0
+        version: 0.16.0
       '@types/node':
         specifier: ^24.13.3
         version: 24.13.3
@@ -1105,7 +1104,7 @@ packages:
       '@vitejs/plugin-rsc': ~0.5.26
       react-router: ^8.3.0
       react-server-dom-webpack: ^19.2.7
-      typescript: ^7.0.2
+      typescript: ^5.1.0 || ^6.0.0 || ^7.0.0
       vite: ^7.0.0 || ^8.0.0
       wrangler: ^4.0.0
     peerDependenciesMeta:
@@ -1125,7 +1124,7 @@ packages:
     engines: {node: '>=22.22.0'}
     peerDependencies:
       react-router: 8.3.0
-      typescript: ^7.0.2
+      typescript: ^5.1.0 || ^6.0.0 || ^7.0.0
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -1424,8 +1423,8 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
-  '@tailwindcss/language-server@0.14.29':
-    resolution: {integrity: sha512-aZ3/XyTNmsoIyhs09Fghlw6D6y7o70aIxHmQEYPFiJPe/1k3HqtxXqhn7g7a5UpA1yeGOyKK9HRNJ8ghZqIclg==}
+  '@tailwindcss/language-server@0.16.0':
+    resolution: {integrity: sha512-ko2xr4nlFIkqwJFnnw7hfdpjbsnK0DOk+QEEI51tvKOCF97OG0RU59iGfadoaOoY6I9xkSMbTW+AAwgnGnLH3w==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -2168,13 +2167,13 @@ packages:
     peerDependencies:
       '@types/node': '*'
       cosmiconfig: '>=9'
-      typescript: ^7.0.2
+      typescript: '>=5'
 
   cosmiconfig@9.0.2:
     resolution: {integrity: sha512-gtTZxTDau1wL7Y7zifc2dd8jHSK/k6BTx/2Xp/BpdlAdnlYWFVt7qhJqgwi7637yRwRQ3qL4ZidbB4I8tA5VOg==}
     engines: {node: '>=14'}
     peerDependencies:
-      typescript: ^7.0.2
+      typescript: '>=4.9.5'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -3272,7 +3271,7 @@ packages:
       '@typescript/native-preview': '*'
       '@volar/typescript': ~2.4.0
       rolldown: ^1.0.0
-      typescript: ^7.0.2
+      typescript: ^5.0.0 || ^6.0.0 || ~7.0.0
       vue-tsc: ~3.2.0 || ~3.3.0
     peerDependenciesMeta:
       '@typescript/native-preview':
@@ -3444,7 +3443,7 @@ packages:
       '@vitejs/devtools': '*'
       publint: ^0.3.8
       tsx: '*'
-      typescript: ^7.0.2
+      typescript: ^5.0.0 || ^6.0.0 || ^7.0.0
       unplugin-unused: ^0.5.0
       unrun: '*'
     peerDependenciesMeta:
@@ -3511,7 +3510,7 @@ packages:
   valibot@1.4.2:
     resolution: {integrity: sha512-gjdCvJ6d3RyHAneqxMYMW9QMCwYMb3jpOO0IyHZV1bnRHFBHrX3VkIILt5XYR0WhwHiH7Mty8ovuPZ/O3gamrg==}
     peerDependencies:
-      typescript: ^7.0.2
+      typescript: '>=5'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -4809,7 +4808,7 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@tailwindcss/language-server@0.14.29': {}
+  '@tailwindcss/language-server@0.16.0': {}
 
   '@tailwindcss/node@4.3.3':
     dependencies:
