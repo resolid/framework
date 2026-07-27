@@ -31,7 +31,7 @@
     "@resolid/utils": "^1.7.1",
     "@tailwindcss/typography": "^0.5.20",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/functions": "^3.7.5",
+    "@vercel/functions": "^3.7.6",
     "@vercel/speed-insights": "^2.0.0",
     "isbot": "^5.2.1",
     "mysql2": "^3.23.1",
