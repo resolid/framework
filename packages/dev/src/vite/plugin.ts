@@ -101,6 +101,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
             const filePath = nodePath.join(publicDirPath, req.url);
 
             try {
+              // oxlint-disable-next-line node/no-sync
               if (existsSync(filePath) && statSync(filePath).isFile()) {
                 return next();
               }
@@ -156,7 +157,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
     },
 
     handleHotUpdate({ server, modules }) {
-      const isSSR = modules.some((mod) => mod._ssrModule);
+      const isSSR = modules.some((mod) => mod.ssrModule);
 
       if (isSSR) {
         server.hot.send({ type: "full-reload" });

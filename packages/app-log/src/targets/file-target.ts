@@ -16,6 +16,7 @@ import nodePath from "node:path";
 function getLogFilePath(file: string, runtimePath: AppContext["runtimePath"]) {
   const logPath = runtimePath("logs");
 
+  // oxlint-disable-next-line node/no-sync
   mkdirSync(logPath, { recursive: true });
 
   return nodePath.join(logPath, `${file}.log`);

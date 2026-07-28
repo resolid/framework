@@ -71,7 +71,7 @@
     "@resolid/utils": "^1.7.1",
     "@vercel/nft": "^1.10.2",
     "hono": "^4.12.32",
-    "minimatch": "^10.2.5",
+    "minimatch": "^10.2.6",
     "rolldown": "^1.2.0",
     "tinyglobby": "^0.2.17"
   },

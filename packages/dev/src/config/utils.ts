@@ -357,6 +357,7 @@ export async function copyFilesToFunction(
       }
 
       if (isSymlink) {
+        // oxlint-disable-next-line node/no-sync
         if (!existsSync(dest)) {
           await symlink(
             nodePath.relative(

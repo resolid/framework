@@ -20,7 +20,9 @@ export class FileTransport implements Transport {
 
     const messageId = mail.message.messageId();
 
+    // oxlint-disable-next-line node/no-sync
     if (!existsSync(this._path)) {
+      // oxlint-disable-next-line node/no-sync
       mkdirSync(this._path, { recursive: true });
     }
 
@@ -39,7 +41,8 @@ export class FileTransport implements Transport {
           // @ts-expect-error normalizedHeaders
           delete data.normalizedHeaders;
 
-          writeFileSync(file, JSON.stringify(data));
+          // oxlint-disable-next-line node/no-sync
+          writeFileSync(file, JSON.stringify(data), "utf-8");
 
           return done(null, {
             messageId,
