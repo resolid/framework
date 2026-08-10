@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { reactCompilerPreset } from "@vitejs/plugin-react";
 import nodePath from "node:path";
 import { type AliasOptions, defineConfig, type UserConfig } from "vite";
-import { vitePluginOptions } from "./resolid.config";
+import { vitePluginOptions } from "./resolid.config.ts";
 
 export default defineConfig(({ command }) => {
   const isBuild = command == "build";

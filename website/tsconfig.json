@@ -2,6 +2,7 @@
   "extends": "@resolid/config/tsconfig/react.json",
   "include": [".react-router/types/**/*", "src/**/*", "env.d.ts", "*.config.ts"],
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "rootDirs": [".", "./.react-router/types"],
     "paths": {
       "~/*": ["./src/*"],
