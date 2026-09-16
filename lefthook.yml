@@ -1,3 +1,4 @@
+colors: false
 extends:
   - "packages/*/lefthook.yml"
 

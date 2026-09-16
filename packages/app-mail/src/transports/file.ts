@@ -1,8 +1,11 @@
-import type { Transport } from "nodemailer";
-import type MailMessage from "nodemailer/lib/mailer/mail-message";
+import type { Transport, MailMessage, SentMessageInfo } from "nodemailer";
 import { existsSync, writeFileSync, mkdirSync } from "node:fs";
 import nodePath from "node:path";
 import { version } from "../../package.json";
+
+export interface FileSentMessageInfo extends SentMessageInfo {
+  messageId: string;
+}
 
 export class FileTransport implements Transport {
   public name: string = "FileTransport";
@@ -15,10 +18,14 @@ export class FileTransport implements Transport {
     this._path = path;
   }
 
-  send(mail: MailMessage, done: (err: Error | null, info?: { messageId: string }) => void): void {
-    mail.message.keepBcc = true;
+  send(
+    mail: MailMessage<FileSentMessageInfo>,
+    done: (err: Error | null, info?: FileSentMessageInfo) => void,
+  ): void {
+    mail.message!.keepBcc = true;
 
-    const messageId = mail.message.messageId();
+    const envelope = mail.message!.getEnvelope();
+    const messageId = mail.message!.messageId();
 
     // oxlint-disable-next-line node/no-sync
     if (!existsSync(this._path)) {
@@ -36,18 +43,16 @@ export class FileTransport implements Transport {
           return done(err);
         }
 
-        if (data) {
-          delete data.envelope;
-          // @ts-expect-error normalizedHeaders
-          delete data.normalizedHeaders;
+        delete data.envelope;
+        delete data.normalizedHeaders;
 
-          // oxlint-disable-next-line node/no-sync
-          writeFileSync(file, JSON.stringify(data), "utf-8");
+        // oxlint-disable-next-line node/no-sync
+        writeFileSync(file, JSON.stringify(data), "utf-8");
 
-          return done(null, {
-            messageId,
-          });
-        }
+        return done(null, {
+          envelope,
+          messageId,
+        });
       });
     });
   }

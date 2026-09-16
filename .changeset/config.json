@@ -1,5 +1,5 @@
 {
-  "$schema": "https://unpkg.com/@changesets/config@3.1.2/schema.json",
+  "$schema": "https://unpkg.com/@changesets/config@4.0.1/schema.json",
   "changelog": [
     "@changesets/changelog-github",
     { "repo": "resolid/framework", "disableThanks": true }
@@ -8,17 +8,8 @@
   "fixed": [],
   "linked": [],
   "access": "public",
-  "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "onlyUpdatePeerDependentsWhenOutOfRange": true
-  },
-  "ignore": [
-    "@resolid/app",
-    "@resolid/app-cache",
-    "@resolid/app-db",
-    "@resolid/app-log",
-    "@resolid/app-mail",
-    "website"
-  ]
+  }
 }

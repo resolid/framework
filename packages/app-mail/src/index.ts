@@ -1,6 +1,12 @@
 import type { Emitter, ExtensionCreator, PathResolver } from "@resolid/app";
-import type { Address, Attachment, Options } from "nodemailer/lib/mailer";
-import nodemailer, { createTransport, type Transport, type Transporter } from "nodemailer";
+import {
+  createTransport,
+  type Attachment,
+  type Address,
+  type Transport,
+  type Transporter,
+  type SendMailOptions,
+} from "nodemailer";
 import { FileTransport } from "./transports/file";
 
 export type MailConfig = {
@@ -20,7 +26,7 @@ export type MailSendResult =
       message: string;
     };
 
-export type MailMessage = Options & {
+export type MailMessage = SendMailOptions & {
   attachments?: (Attachment & { href?: string })[];
 };
 
@@ -52,7 +58,7 @@ export class MailService {
     this._defaultTransport = defaultTransport;
 
     this._transporters = {
-      file: nodemailer.createTransport(new FileTransport(runtimePath("mail"))),
+      file: createTransport(new FileTransport(runtimePath("mail"))),
       ...transporters,
     };
   }
