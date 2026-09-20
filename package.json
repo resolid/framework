@@ -25,23 +25,23 @@
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
-    "@commitlint/cli": "^21.2.2",
-    "@commitlint/config-conventional": "^21.2.2",
-    "@resolid/config": "^6.3.2",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@resolid/config": "^6.3.3",
     "@tailwindcss/language-server": "^0.16.0",
-    "@types/node": "^24.13.4",
+    "@types/node": "^24.13.6",
     "@vitest/coverage-v8": "^5.0.1",
     "eslint-plugin-react-you-might-not-need-an-effect": "^1.0.2",
     "lefthook": "^2.1.14",
     "oxfmt": "^0.68.0",
     "oxlint": "^1.83.0",
-    "oxlint-tsgolint": "^7.0.2001",
-    "turbo": "^2.10.13",
+    "oxlint-tsgolint": "^7.0.2002",
+    "turbo": "^2.11.2",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1"
   },
   "engines": {
     "node": "^22.22.0 || >=24"
   },
-  "packageManager": "pnpm@12.4.2"
+  "packageManager": "pnpm@12.5.1"
 }
