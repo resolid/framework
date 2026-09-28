@@ -20,39 +20,41 @@ import { VercelAnalytics } from "~/extensions/vercel/vercel-analytics";
 import { VercelSpeedInsights } from "~/extensions/vercel/vercel-speed-insights";
 import type { Route } from "./+types/layout";
 
-const NavMenu = ({ onClick }: { onClick?: MouseEventHandler<HTMLAnchorElement> }) => (
-  <ul
-    className={tx(
-      "mx-auto flex max-w-80 list-none flex-col justify-end p-4 text-center font-medium tracking-widest",
-      "md:max-w-none md:flex-row md:p-0 md:tracking-normal",
-    )}
-  >
-    {[
-      { name: "主页", href: "", end: true },
-      { name: "关于", href: "about" },
-    ].map((menu) => (
-      <li className="p-2.5 md:px-4" key={menu.name}>
-        <HistoryNavLink
-          className={({ isActive }) =>
-            tx("block hover:text-link-hovered", isActive && "text-link-pressed")
-          }
-          onClick={onClick}
-          to={menu.href}
-          end={menu.end}
-        >
-          {menu.name}
-        </HistoryNavLink>
+function NavMenu({ onClick }: { onClick?: MouseEventHandler<HTMLAnchorElement> }) {
+  return (
+    <ul
+      className={tx(
+        "mx-auto flex max-w-80 list-none flex-col justify-end p-4 text-center font-medium tracking-widest",
+        "md:max-w-none md:flex-row md:p-0 md:tracking-normal",
+      )}
+    >
+      {[
+        { name: "主页", href: "", end: true },
+        { name: "关于", href: "about" },
+      ].map((menu) => (
+        <li className="p-2.5 md:px-4" key={menu.name}>
+          <HistoryNavLink
+            className={({ isActive }) =>
+              tx("block hover:text-link-hovered", isActive && "text-link-pressed")
+            }
+            onClick={onClick}
+            to={menu.href}
+            end={menu.end}
+          >
+            {menu.name}
+          </HistoryNavLink>
+        </li>
+      ))}
+      <li className="inline-flex justify-center p-5 md:hidden">
+        <a href="https://ui.resolid.tech" target="_blank" rel="noreferrer">
+          <ResolidUiLogo height={16} />
+        </a>
       </li>
-    ))}
-    <li className="inline-flex justify-center p-5 md:hidden">
-      <a href="https://ui.resolid.tech" target="_blank" rel="noreferrer">
-        <ResolidUiLogo height={16} />
-      </a>
-    </li>
-  </ul>
-);
+    </ul>
+  );
+}
 
-const NavBar = () => {
+function NavBar() {
   const [opened, setOpened] = useState(false);
 
   return (
@@ -137,7 +139,7 @@ const NavBar = () => {
       </div>
     </nav>
   );
-};
+}
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   return {

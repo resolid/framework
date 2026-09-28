@@ -132,6 +132,24 @@ export async function buildPreset<BuildContext>({
             skipDuplicateCheck: true,
           }),
         ],
+        onLog(level, log, defaultHandler) {
+          if (
+            log.code === "MODULE_LEVEL_DIRECTIVE" &&
+            (log.message.includes("use client") || log.message.includes("use server"))
+          ) {
+            return;
+          }
+
+          if (
+            log.code === "SOURCEMAP_ERROR" &&
+            log.message.includes("resolve original location") &&
+            log.pos === 0
+          ) {
+            return;
+          }
+
+          defaultHandler(level, log);
+        },
       });
 
       await rm(nodePath.join(buildPath, assetsDir), { force: true, recursive: true });

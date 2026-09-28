@@ -22,10 +22,10 @@ export class FileTransport implements Transport {
     mail: MailMessage<FileSentMessageInfo>,
     done: (err: Error | null, info?: FileSentMessageInfo) => void,
   ): void {
-    mail.message!.keepBcc = true;
+    mail.message.keepBcc = true;
 
-    const envelope = mail.message!.getEnvelope();
-    const messageId = mail.message!.messageId();
+    const envelope = mail.message.getEnvelope();
+    const messageId = mail.message.messageId();
 
     // oxlint-disable-next-line node/no-sync
     if (!existsSync(this._path)) {

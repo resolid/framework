@@ -19,7 +19,7 @@
     "typegen": "react-router typegen"
   },
   "dependencies": {
-    "@logtape/file": "^2.3.6",
+    "@logtape/file": "^2.3.8",
     "@resolid/app": "workspace:^",
     "@resolid/app-cache": "workspace:^",
     "@resolid/app-db": "workspace:^",
@@ -31,7 +31,7 @@
     "@resolid/utils": "^1.7.1",
     "@tailwindcss/typography": "^0.5.20",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/functions": "^3.9.8",
+    "@vercel/functions": "^3.9.9",
     "@vercel/speed-insights": "^2.0.0",
     "isbot": "^5.2.2",
     "mysql2": "^3.24.4",
@@ -50,7 +50,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
     "babel-plugin-react-compiler": "^1.0.0",
-    "vite": "^8.3.0"
+    "vite": "^8.3.1"
   },
   "engines": {
     "node": "^22.22.0 || >=24"

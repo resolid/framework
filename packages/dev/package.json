@@ -70,9 +70,9 @@
     "@netlify/types": "^3.0.0",
     "@resolid/utils": "^1.7.1",
     "@vercel/nft": "^1.11.0",
-    "hono": "^4.13.8",
+    "hono": "^4.13.9",
     "minimatch": "^10.2.6",
-    "rolldown": "^1.2.9",
+    "rolldown": "^1.2.11",
     "tinyglobby": "^0.2.17"
   },
   "devDependencies": {
