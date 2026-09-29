@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.8.5
+
+### Patch Changes
+
+- [`d52b017`](https://github.com/resolid/framework/commit/d52b0175784815fdcf5a0b8a5d9b67c4d6199691) - chore: update dependencies
+
 ## 0.8.4
 
 ### Patch Changes
