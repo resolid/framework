@@ -19,7 +19,8 @@
     "typegen": "react-router typegen"
   },
   "dependencies": {
-    "@logtape/file": "^2.3.8",
+    "@hono/netlify": "^1.0.1",
+    "@logtape/file": "^2.3.9",
     "@resolid/app": "workspace:^",
     "@resolid/app-cache": "workspace:^",
     "@resolid/app-db": "workspace:^",
@@ -42,6 +43,7 @@
   },
   "devDependencies": {
     "@babel/core": "^8.0.6",
+    "@netlify/types": "^3.0.0",
     "@react-router/dev": "^8.4.0",
     "@resolid/dev": "workspace:^",
     "@rolldown/plugin-babel": "^0.2.4",

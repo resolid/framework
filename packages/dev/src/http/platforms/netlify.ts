@@ -1,6 +1,6 @@
 import type { Context as NetlifyContext } from "@netlify/types";
 import type { Context } from "hono";
-import { handle } from "hono/netlify";
+import { handle } from "@hono/netlify";
 import { env } from "node:process";
 import { clientIp } from "../middlewares/client-ip";
 import { requestId } from "../middlewares/request-id";

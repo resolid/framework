@@ -43,8 +43,9 @@ export default function Status({ loaderData }: Route.ComponentProps) {
     return "";
   }, []);
 
-  const formatDatetime = (datetime: Date | string) =>
-    formatDate(datetime, "YYYY-MM-DD HH:mm", { timezone: clientTimeZone });
+  const formatDatetime = (datetime: Date | string | null) =>
+    // oxlint-disable-next-line react/purity
+    formatDate(datetime ?? new Date(), "YYYY-MM-DD HH:mm", { timezone: clientTimeZone });
 
   return (
     <div className="mx-auto prose px-4 py-8 dark:prose-invert">
@@ -78,7 +79,7 @@ export default function Status({ loaderData }: Route.ComponentProps) {
           <dd className="font-mono text-sm">{ssr.clientIp}</dd>
           <dt>客户端时间：</dt>
           <dd className="font-mono text-sm">
-            <ClientOnly>{() => formatDatetime(new Date())}</ClientOnly>
+            <ClientOnly>{() => formatDatetime(null)}</ClientOnly>
           </dd>
           <dt>客户端时区：</dt>
           <dd className="font-mono text-sm">
