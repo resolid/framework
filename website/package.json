@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@hono/netlify": "^1.0.1",
-    "@logtape/file": "^2.3.9",
+    "@logtape/file": "^2.3.10",
     "@resolid/app": "workspace:^",
     "@resolid/app-cache": "workspace:^",
     "@resolid/app-db": "workspace:^",
