@@ -55,7 +55,7 @@
     "tsdown": "^0.23.1"
   },
   "peerDependencies": {
-    "mysql2": "^3.24.5"
+    "mysql2": "^3.24.6"
   },
   "peerDependenciesMeta": {
     "mysql2": {
