@@ -3,6 +3,7 @@
     "editorconfig.editorconfig",
     "vitest.explorer",
     "bradlc.vscode-tailwindcss",
-    "oxc.oxc-vscode"
+    "oxc.oxc-vscode",
+    "typescriptteam.native-preview"
   ]
 }

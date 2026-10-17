@@ -52,13 +52,18 @@
     "drizzle-orm": "rc"
   },
   "devDependencies": {
+    "@types/pg": "^8.23.1",
     "tsdown": "^0.23.1"
   },
   "peerDependencies": {
-    "mysql2": "^3.24.6"
+    "mysql2": "^3.24.6",
+    "pg": "^8.23.1"
   },
   "peerDependenciesMeta": {
     "mysql2": {
+      "optional": true
+    },
+    "pg": {
       "optional": true
     }
   },

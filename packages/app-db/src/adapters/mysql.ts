@@ -6,41 +6,27 @@ import {
 } from "drizzle-orm/mysql-core";
 import { drizzle, type MySql2Database } from "drizzle-orm/mysql2";
 import mysql, { type ConnectionOptions, type Pool } from "mysql2";
-import { DatabaseConnection } from "../core/connection";
+import { DatabaseConnection, type Enhancer } from "../core/connection";
 import { Repository } from "../core/repository";
-
-type Enhancer = (pool: Pool) => Pool | void;
 
 export type MySqlConfig = ConnectionOptions;
 
-export class MySqlConnection extends DatabaseConnection<
-  MySql2Database & {
-    $client: Pool;
-  }
-> {
+export class MySqlConnection extends DatabaseConnection<MySql2Database, Pool> {
   private readonly _config: MySqlConfig;
-  private readonly _enhancer: Enhancer | false | undefined;
 
-  constructor(config: MySqlConfig, enhancer?: Enhancer | false) {
-    super();
+  constructor(config: MySqlConfig, enhancer?: Enhancer<Pool> | false) {
+    super(enhancer);
 
     this._config = config;
-    this._enhancer = enhancer;
   }
 
   override connect(drizzleConfig: DrizzleMySqlConfig<EmptyRelations>): void {
-    let pool = mysql.createPool({
-      charsetNumber: mysql.Charsets.UTF8MB4_0900_AI_CI,
-      ...this._config,
-    });
-
-    if (this._enhancer) {
-      const maybe = this._enhancer(pool);
-
-      if (maybe) {
-        pool = maybe;
-      }
-    }
+    const pool = this.enhance(
+      mysql.createPool({
+        charsetNumber: mysql.Charsets.UTF8MB4_0900_AI_CI,
+        ...this._config,
+      }),
+    );
 
     this.setDb(drizzle({ client: pool, ...drizzleConfig }));
   }
@@ -54,10 +40,12 @@ export function createMySqlDefineTable(prefix = ""): MySqlTableFn {
   return mysqlTableCreator((name) => prefix + name);
 }
 
-export abstract class MySqlRepository extends Repository<MySql2Database> {}
+export abstract class MySqlRepository extends Repository<MySql2Database, Pool> {}
 
 export type MySqlDatabase<TRelations extends AnyRelations = EmptyRelations> =
   MySql2Database<TRelations>;
+
+export type MySqlClient = Pool;
 
 // oxlint-disable-next-line import/export
 export * from "drizzle-orm/mysql-core";

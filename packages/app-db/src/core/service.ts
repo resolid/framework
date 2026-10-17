@@ -5,14 +5,15 @@ import type { DatabaseConnection } from "./connection";
 
 export type DatabaseConfig<
   C,
+  P,
   TSchema extends Record<string, unknown> = Record<string, never>,
   TRelationConfigs extends AnyRelations = EmptyRelations,
 > = (C extends Record<string, infer T>
   ? {
-      connections: { [K in keyof C]: DatabaseConnection<T, TSchema, TRelationConfigs> };
+      connections: { [K in keyof C]: DatabaseConnection<T, P, TSchema, TRelationConfigs> };
       connection?: never;
     }
-  : { connection: DatabaseConnection<C, TSchema, TRelationConfigs>; connections?: never }) & {
+  : { connection: DatabaseConnection<C, P, TSchema, TRelationConfigs>; connections?: never }) & {
   drizzleConfig?: DrizzleConfig<TSchema, TRelationConfigs>;
 };
 
@@ -27,21 +28,22 @@ declare module "@resolid/app" {
 
 export class DatabaseService<
   C,
+  P,
   TSchema extends Record<string, unknown> = Record<string, never>,
   TRelationConfigs extends AnyRelations = EmptyRelations,
 > {
   private readonly _emitter: Emitter<AppDbEvents>;
-  private readonly _config: DatabaseConfig<C, TSchema, TRelationConfigs>;
+  private readonly _config: DatabaseConfig<C, P, TSchema, TRelationConfigs>;
   private readonly _connections: Map<
     string,
     C extends Record<string, infer T>
-      ? DatabaseConnection<T, TSchema, TRelationConfigs>
-      : DatabaseConnection<C, TSchema, TRelationConfigs>
+      ? DatabaseConnection<T, P, TSchema, TRelationConfigs>
+      : DatabaseConnection<C, P, TSchema, TRelationConfigs>
   > = new Map();
 
   private readonly _defaultSource = "main";
 
-  constructor(config: DatabaseConfig<C, TSchema, TRelationConfigs>, context: AppContext) {
+  constructor(config: DatabaseConfig<C, P, TSchema, TRelationConfigs>, context: AppContext) {
     this._config = config;
     this._emitter = context.emitter;
   }
@@ -52,8 +54,8 @@ export class DatabaseService<
     }) as Record<
       string,
       C extends Record<string, infer T>
-        ? DatabaseConnection<T, TSchema, TRelationConfigs>
-        : DatabaseConnection<C, TSchema, TRelationConfigs>
+        ? DatabaseConnection<T, P, TSchema, TRelationConfigs>
+        : DatabaseConnection<C, P, TSchema, TRelationConfigs>
     >;
 
     const { logger, jit = true, ...rest } = this._config.drizzleConfig ?? {};
@@ -100,9 +102,10 @@ export class DatabaseService<
 
 export function createDatabaseExtension<
   C,
+  P,
   TSchema extends Record<string, unknown> = Record<string, never>,
   TRelationConfigs extends AnyRelations = EmptyRelations,
->(config: DatabaseConfig<C, TSchema, TRelationConfigs>): ExtensionCreator {
+>(config: DatabaseConfig<C, P, TSchema, TRelationConfigs>): ExtensionCreator {
   return (context) => ({
     name: "resolid-db-module",
     providers: [

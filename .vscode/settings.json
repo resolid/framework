@@ -21,12 +21,9 @@
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "oxc.typeAware": true,
-  "[json]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
-  "[jsonc]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
   "debug.javascript.codelens.npmScripts": "never",
   "tailwindCSS.classFunctions": ["tx", "tv"],
   "tailwindCSS.experimental.configFile": "website/src/root.css",
-  "prettier.enable": false,
-  "eslint.enable": false,
-  "js/ts.tsdk.path": "node_modules/typescript/lib"
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.experimental.useTsgo": true
 }
