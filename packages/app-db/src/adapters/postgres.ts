@@ -27,7 +27,9 @@ export class PostgresConnection extends DatabaseConnection<NodePgDatabase, Pool>
   }
 
   override async close(): Promise<void> {
-    await this.getDb().$client.end();
+    if (this.connected) {
+      await this.getDb().$client.end();
+    }
   }
 }
 
@@ -35,7 +37,7 @@ export function createPostgresDefineTable(prefix = ""): PgTableFn {
   return pgTableCreator((name) => prefix + name);
 }
 
-export abstract class PostgresRepository extends Repository<NodePgDatabase, Pool> {}
+export abstract class PostgresRepository extends Repository<NodePgDatabase> {}
 
 export type PostgresDatabase<TRelations extends AnyRelations = EmptyRelations> =
   NodePgDatabase<TRelations>;

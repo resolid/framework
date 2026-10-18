@@ -17,6 +17,10 @@ export abstract class DatabaseConnection<
     this._enhancer = enhancer;
   }
 
+  get connected(): boolean {
+    return this._db !== undefined;
+  }
+
   protected enhance(pool: P): P {
     if (this._enhancer) {
       const maybe = this._enhancer(pool);
@@ -33,8 +37,12 @@ export abstract class DatabaseConnection<
     this._db = db;
   }
 
-  getDb() {
-    return this._db as DbConn<D, P>;
+  getDb(): DbConn<D, P> {
+    if (!this._db) {
+      throw new Error("Database connection has not been initialized, call connect() first.");
+    }
+
+    return this._db;
   }
 
   abstract connect(drizzleConfig: DrizzleConfig<TSchema, TRelationConfigs>): Promise<void> | void;

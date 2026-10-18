@@ -17,6 +17,16 @@ export type DatabaseConfig<
   drizzleConfig?: DrizzleConfig<TSchema, TRelationConfigs>;
 };
 
+type DatabaseConnectionOf<
+  C,
+  P,
+  TSchema extends Record<string, unknown>,
+  TRelationConfigs extends AnyRelations,
+> =
+  C extends Record<string, infer T>
+    ? DatabaseConnection<T, P, TSchema, TRelationConfigs>
+    : DatabaseConnection<C, P, TSchema, TRelationConfigs>;
+
 interface AppDbEvents {
   "db:query": [connection: string, query: string, params: unknown[]];
 }
@@ -27,8 +37,8 @@ declare module "@resolid/app" {
 }
 
 export class DatabaseService<
-  C,
-  P,
+  C = unknown,
+  P = unknown,
   TSchema extends Record<string, unknown> = Record<string, never>,
   TRelationConfigs extends AnyRelations = EmptyRelations,
 > {
@@ -36,12 +46,12 @@ export class DatabaseService<
   private readonly _config: DatabaseConfig<C, P, TSchema, TRelationConfigs>;
   private readonly _connections: Map<
     string,
-    C extends Record<string, infer T>
-      ? DatabaseConnection<T, P, TSchema, TRelationConfigs>
-      : DatabaseConnection<C, P, TSchema, TRelationConfigs>
+    DatabaseConnectionOf<C, P, TSchema, TRelationConfigs>
   > = new Map();
 
   private readonly _defaultSource = "main";
+
+  private _connected = false;
 
   constructor(config: DatabaseConfig<C, P, TSchema, TRelationConfigs>, context: AppContext) {
     this._config = config;
@@ -49,51 +59,62 @@ export class DatabaseService<
   }
 
   async connect(): Promise<void> {
+    if (this._connected) {
+      return;
+    }
+
     const connections = (this._config.connections ?? {
       [this._defaultSource]: this._config.connection,
-    }) as Record<
-      string,
-      C extends Record<string, infer T>
-        ? DatabaseConnection<T, P, TSchema, TRelationConfigs>
-        : DatabaseConnection<C, P, TSchema, TRelationConfigs>
-    >;
+    }) as Record<string, DatabaseConnectionOf<C, P, TSchema, TRelationConfigs>>;
 
     const { logger, jit = true, ...rest } = this._config.drizzleConfig ?? {};
+
+    const loggerImpl: Logger | undefined =
+      logger === true ? new DefaultLogger() : typeof logger === "object" ? logger : undefined;
 
     const createLogger = (connection: string): Logger => ({
       logQuery: (query, params) => {
         this._emitter.emit("db:query", connection, query, params);
-
-        if (logger === true) {
-          new DefaultLogger().logQuery(query, params);
-        } else if (logger !== false) {
-          logger?.logQuery(query, params);
-        }
+        loggerImpl?.logQuery(query, params);
       },
     });
 
-    for (const [key, conn] of Object.entries(connections)) {
-      // oxlint-disable-next-line no-await-in-loop
-      await conn.connect({ logger: createLogger(key), jit, ...rest });
+    await Promise.all(
+      Object.entries(connections).map(async ([key, conn]) => {
+        await conn.connect({ logger: createLogger(key), jit, ...rest });
 
-      this._connections.set(key, conn);
-    }
+        this._connections.set(key, conn);
+      }),
+    );
+
+    this._connected = true;
   }
 
   async dispose(): Promise<void> {
-    for (const conn of this._connections.values()) {
-      // oxlint-disable-next-line no-await-in-loop
-      await conn.close();
-    }
+    const connections = [...this._connections.values()];
 
     this._connections.clear();
+    this._connected = false;
+
+    const results = await Promise.allSettled(connections.map(async (conn) => conn.close()));
+    const errors = results.filter((result) => result.status === "rejected");
+
+    if (errors.length > 0) {
+      const message = errors
+        .map((error) =>
+          error.reason instanceof Error ? error.reason.message : String(error.reason),
+        )
+        .join("; ");
+
+      throw new Error(`Failed to close ${errors.length} database connection(s): ${message}`);
+    }
   }
 
-  get<T>(name: string = this._defaultSource) {
+  get<T>(name: string = this._defaultSource): T {
     const conn = this._connections.get(name);
 
     if (!conn) {
-      throw new Error(`Connection with name ${String(name)} does not exist.`);
+      throw new Error(`Connection with name ${name} does not exist.`);
     }
 
     return conn.getDb() as T;

@@ -32,7 +32,9 @@ export class MySqlConnection extends DatabaseConnection<MySql2Database, Pool> {
   }
 
   override close(): void {
-    this.getDb().$client.end();
+    if (this.connected) {
+      this.getDb().$client.end();
+    }
   }
 }
 
@@ -40,7 +42,7 @@ export function createMySqlDefineTable(prefix = ""): MySqlTableFn {
   return mysqlTableCreator((name) => prefix + name);
 }
 
-export abstract class MySqlRepository extends Repository<MySql2Database, Pool> {}
+export abstract class MySqlRepository extends Repository<MySql2Database> {}
 
 export type MySqlDatabase<TRelations extends AnyRelations = EmptyRelations> =
   MySql2Database<TRelations>;
