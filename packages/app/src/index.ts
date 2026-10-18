@@ -148,8 +148,11 @@ class App<E extends Record<string, unknown>> {
   }
 
   async dispose(): Promise<void> {
-    await this._container.dispose();
-    this.emitter.offAll();
+    try {
+      await this._container.dispose();
+    } finally {
+      this.emitter.offAll();
+    }
   }
 }
 

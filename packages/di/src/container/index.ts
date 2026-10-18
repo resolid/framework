@@ -79,10 +79,14 @@ export class Container implements Resolver, Disposable {
   }
 
   async dispose(): Promise<void> {
+    const disposables = [...this._singletons].reverse();
+
+    this._singletons.clear();
+
     let errorCount = 0;
     let errorMsg = "";
 
-    for (const [token, instance] of this._singletons) {
+    for (const [token, instance] of disposables) {
       /* istanbul ignore else -- @preserve */
       if (typeof (instance as Disposable).dispose === "function") {
         try {
@@ -95,8 +99,6 @@ export class Container implements Resolver, Disposable {
         }
       }
     }
-
-    this._singletons.clear();
 
     if (errorCount > 0) {
       throw new Error(`Failed to dispose ${errorCount} provider(s):\n${errorMsg.slice(0, -2)}`);

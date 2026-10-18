@@ -49,10 +49,7 @@ export class CacheService {
   }
 
   async dispose(): Promise<void> {
-    for (const cache of this._caches.values()) {
-      // oxlint-disable-next-line no-await-in-loop
-      await cache.dispose();
-    }
+    await Promise.all([...this._caches.values()].map((cache) => cache.dispose()));
 
     this._caches.clear();
   }

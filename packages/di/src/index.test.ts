@@ -62,15 +62,11 @@ describe("DI Container", () => {
   }
 
   class DatabaseService {
-    private connected = false;
+    public connected = false;
 
     async connect(): Promise<void> {
       await new Promise((resolve) => setTimeout(resolve, 100));
       this.connected = true;
-    }
-
-    isConnected(): boolean {
-      return this.connected;
     }
 
     async dispose(): Promise<void> {
@@ -352,11 +348,11 @@ describe("DI Container", () => {
 
       await db.connect();
 
-      expect(db.isConnected()).toBe(true);
+      expect(db.connected).toBe(true);
 
       await container.dispose();
 
-      expect(db.isConnected()).toBe(false);
+      expect(db.connected).toBe(false);
     });
 
     it("dispose errors should be collected and thrown together", async () => {
@@ -408,7 +404,74 @@ describe("DI Container", () => {
         // nothing
       }
 
-      expect(db.isConnected()).toBe(false);
+      expect(db.connected).toBe(false);
+    });
+
+    it("should dispose singletons in reverse creation order", async () => {
+      const FIRST = Symbol("First");
+      const SECOND = Symbol("Second");
+      const order: string[] = [];
+
+      container.add({
+        token: FIRST,
+        factory: () => ({
+          dispose: () => {
+            order.push("first");
+          },
+        }),
+      });
+
+      container.add({
+        token: SECOND,
+        factory: () => ({
+          dispose: () => {
+            order.push("second");
+          },
+        }),
+      });
+
+      container.get(FIRST);
+      container.get(SECOND);
+
+      await container.dispose();
+
+      expect(order).toEqual(["second", "first"]);
+    });
+
+    it("should dispose a dependent before its dependency", async () => {
+      const order: string[] = [];
+
+      const dependency = Symbol("Dependency");
+      const dependent = Symbol("Dependent");
+
+      container.add({
+        token: dependency,
+        factory: () => ({
+          dispose: () => {
+            order.push("dependency");
+          },
+        }),
+      });
+
+      container.add({
+        token: dependent,
+        factory: () => {
+          // Built while the dependent is being constructed, so created first.
+          inject(dependency);
+
+          return {
+            dispose: () => {
+              order.push("dependent");
+            },
+          };
+        },
+      });
+
+      container.get(dependent);
+
+      await container.dispose();
+
+      expect(order).toEqual(["dependent", "dependency"]);
     });
   });
 
