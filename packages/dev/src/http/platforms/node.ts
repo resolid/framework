@@ -95,7 +95,12 @@ export async function createHonoNodeServer(
 
   async function shutdown() {
     server?.close();
-    await mergedOptions.onShutdown?.();
+
+    try {
+      await mergedOptions.onShutdown?.();
+    } catch (error) {
+      console.error("[resolid] Error during shutdown:", error);
+    }
 
     process.removeListener("SIGINT", shutdown);
     process.removeListener("SIGTERM", shutdown);
