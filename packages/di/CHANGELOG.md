@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.7.6
+
+### Patch Changes
+
+- [`c632d80`](https://github.com/resolid/framework/commit/c632d80ca4a6eabf2781fe5ea2df8632be3fffbd) - fix(di): dispose singletons in reverse creation order
+
 ## 0.7.5
 
 ### Patch Changes

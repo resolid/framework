@@ -1,5 +1,11 @@
 # @resolid/event
 
+## 0.3.2
+
+### Patch Changes
+
+- [`ec560de`](https://github.com/resolid/framework/commit/ec560de9453723139118655889be6696717cfeee) - fix(event): make emission mutation-safe and handle falsy event keys
+
 ## 0.3.1
 
 ### Patch Changes

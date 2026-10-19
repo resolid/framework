@@ -1,5 +1,13 @@
 # @resolid/dev
 
+## 0.8.7
+
+### Patch Changes
+
+- [`d1fa3dc`](https://github.com/resolid/framework/commit/d1fa3dc3c118bd94aa147cddda5d9a110c392b83) - fix(dev): only register signal handlers in production
+
+- [`fddb0f7`](https://github.com/resolid/framework/commit/fddb0f78cb1fd5531697a0e3dd850bca943aea35) - perf(dev): reuse request handler across requests
+
 ## 0.8.6
 
 ### Patch Changes
