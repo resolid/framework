@@ -4,7 +4,7 @@ import { NullCache, type CacheStore } from "@resolid/cache/stores";
 
 export { NullCache, MemoryCache, type CacheStore } from "@resolid/cache/stores";
 
-type CacheServiceConfig = {
+export type CacheServiceConfig = {
   caches: Map<string, Cacher>;
   defaultCache: string;
 };
@@ -42,18 +42,22 @@ export class CacheService {
     const cache = this._caches.get(name);
 
     if (!cache) {
-      throw new Error(`Cache with name ${String(name)} does not exist.`);
+      throw new Error(`Cache with name "${name}" does not exist.`);
     }
 
     return cache;
   }
 
   async dispose(): Promise<void> {
-    await Promise.all([...this._caches.values()].map((cache) => cache.dispose()));
+    const caches = [...this._caches.values()];
 
     this._caches.clear();
+
+    await Promise.all(caches.map((cache) => cache.dispose()));
   }
 }
+
+type StoreFactory = (ctx: AppContext) => CacheStore;
 
 type CacheExtensionBaseConfig = {
   defaultTtl?: number;
@@ -61,52 +65,64 @@ type CacheExtensionBaseConfig = {
 };
 
 type CacheExtensionConfigWithStore = {
-  store?: ((ctx: AppContext) => CacheStore) | CacheStore;
+  store?: StoreFactory | CacheStore;
   stores?: never;
   defaultStore?: never;
 } & CacheExtensionBaseConfig;
 
 type CacheExtensionConfigWithStores = {
   store?: never;
-  stores: Record<string, ((ctx: AppContext) => CacheStore) | CacheStore>;
+  stores: Record<string, StoreFactory | CacheStore>;
   defaultStore?: string;
 } & CacheExtensionBaseConfig;
 
 export type CacheExtensionConfig = CacheExtensionConfigWithStore | CacheExtensionConfigWithStores;
 
-export function createCacheExtension({
-  store = new NullCache(),
-  stores,
-  defaultStore = "main",
-  defaultTtl,
-  serializer,
-}: CacheExtensionConfig = {}): ExtensionCreator {
-  return (ctx) => {
-    return {
-      name: "resolid-cache-module",
-      providers: [
-        {
-          token: CacheService,
-          factory() {
-            const caches: Map<string, Cacher> = new Map();
+const SINGLE_STORE_NAME = "main";
 
-            for (const [name, s] of stores
-              ? Object.entries(stores)
-              : [[defaultStore, store] as const]) {
-              caches.set(
-                name,
-                new Cacher({
-                  store: typeof s === "function" ? s(ctx) : s,
-                  defaultTtl,
-                  serializer,
-                }),
-              );
-            }
+export function createCacheExtension(config: CacheExtensionConfig = {}): ExtensionCreator {
+  const { store, stores, defaultStore, defaultTtl, serializer } = config;
 
-            return new CacheService({ caches, defaultCache: defaultStore });
-          },
+  const storeNames = stores ? Object.keys(stores) : [SINGLE_STORE_NAME];
+
+  if (storeNames.length === 0) {
+    throw new Error("createCacheExtension requires at least one store.");
+  }
+
+  const resolvedDefaultStore = defaultStore ?? storeNames[0]!;
+
+  if (!storeNames.includes(resolvedDefaultStore)) {
+    throw new Error(
+      `Default cache "${resolvedDefaultStore}" does not exist. Available caches: ${storeNames.join(", ")}.`,
+    );
+  }
+
+  return (ctx) => ({
+    name: "resolid-cache-module",
+    providers: [
+      {
+        token: CacheService,
+        factory() {
+          const caches: Map<string, Cacher> = new Map();
+
+          const entries: [string, StoreFactory | CacheStore][] = stores
+            ? Object.entries(stores)
+            : [[SINGLE_STORE_NAME, store ?? new NullCache()]];
+
+          for (const [name, store] of entries) {
+            caches.set(
+              name,
+              new Cacher({
+                store: typeof store === "function" ? store(ctx) : store,
+                defaultTtl,
+                serializer,
+              }),
+            );
+          }
+
+          return new CacheService({ caches, defaultCache: resolvedDefaultStore });
         },
-      ],
-    };
-  };
+      },
+    ],
+  });
 }
