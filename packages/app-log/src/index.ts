@@ -21,31 +21,55 @@ export type LogConfig = { defaultTarget?: string; defaultCategory?: string } & O
     loggers?: LoggerEntity[];
   };
 
-type LogCategory = Pick<Logger, "debug" | "info" | "warn" | "error" | "fatal">;
+export type LogCategory = Pick<Logger, "debug" | "info" | "warn" | "error" | "fatal">;
+
+const CONSOLE_TARGET = "console";
+const DEFAULT_TARGET = "default";
+const DEFAULT_CATEGORY = "app";
+
+function assertTargetExists(target: string, targets: Iterable<string>): void {
+  const availableTargets = new Set([CONSOLE_TARGET, DEFAULT_TARGET, ...targets]);
+
+  if (!availableTargets.has(target)) {
+    throw new Error(
+      `Default target "${target}" does not exist. Available targets: ${[...availableTargets].join(", ")}.`,
+    );
+  }
+}
 
 export class LogService {
   private readonly _config: LogConfig;
-  private readonly _defaultSink?: Sink;
+  private readonly _defaultTarget: string;
   private readonly _defaultCategory: string;
 
   constructor(config: LogConfig = {}) {
     this._config = config;
-    this._defaultCategory = config.defaultCategory ?? "app";
+    this._defaultCategory = config.defaultCategory ?? DEFAULT_CATEGORY;
+    this._defaultTarget = config.defaultTarget ?? DEFAULT_TARGET;
+
+    assertTargetExists(this._defaultTarget, Object.keys(config.sinks ?? {}));
   }
 
   async configure(): Promise<void> {
+    const consoleSink = getConsoleSink();
+
     await configure({
       reset: true,
       sinks: {
-        console: getConsoleSink(),
-        default: this._defaultSink ?? getConsoleSink(),
+        [CONSOLE_TARGET]: consoleSink,
+        [DEFAULT_TARGET]: consoleSink,
         ...this._config.sinks,
       },
       filters: this._config.filters,
+      contextLocalStorage: this._config.contextLocalStorage,
       loggers: [
-        { category: [], sinks: ["console"], lowestLevel: "info" },
+        { category: [], sinks: [CONSOLE_TARGET], lowestLevel: "info" },
         { category: ["logtape", "meta"], sinks: [], parentSinks: "override" },
-        { category: this._defaultCategory, sinks: ["default"] },
+        {
+          category: this._defaultCategory,
+          sinks: [this._defaultTarget],
+          parentSinks: "override",
+        },
         ...(this._config.loggers ?? []),
       ],
     });
@@ -67,7 +91,7 @@ export class LogService {
     this.getLogger().fatal(...args)) as Logger["fatal"];
 
   category(name: string): LogCategory {
-    return getLogger(name);
+    return this.getLogger(name);
   }
 
   getLogger(category: string = this._defaultCategory): Logger {
@@ -84,24 +108,28 @@ export type LogExtensionConfig = Omit<LogConfig, "sinks"> & {
 };
 
 export function createLogExtension(config: LogExtensionConfig = {}): ExtensionCreator {
+  const { targets = {}, ...logConfig } = config;
+
+  if (logConfig.defaultTarget !== undefined) {
+    assertTargetExists(logConfig.defaultTarget, Object.keys(targets));
+  }
+
   return (ctx) => ({
     name: "resolid-log-module",
     providers: [
       {
         token: LogService,
         factory() {
-          const { targets = {}, defaultCategory = ctx.name, ...rest } = config;
-
           const sinks: Record<string, Sink> = {};
 
-          for (const [key, v] of Object.entries(targets)) {
-            sinks[key] = v(ctx);
+          for (const [key, createTarget] of Object.entries(targets)) {
+            sinks[key] = createTarget(ctx);
           }
 
           return new LogService({
+            ...logConfig,
             sinks,
-            ...rest,
-            defaultCategory,
+            defaultCategory: logConfig.defaultCategory ?? ctx.name,
           });
         },
       },

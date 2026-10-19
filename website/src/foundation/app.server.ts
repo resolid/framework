@@ -47,6 +47,7 @@ export const app = await createApp({
         {
           uri: env.RX_DB_URI,
           ssl: {
+            ca: env.RX_DB_SSL_CA.replaceAll(/\\n/gm, "\n"),
             rejectUnauthorized: false,
           },
         },
