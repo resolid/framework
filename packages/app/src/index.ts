@@ -2,6 +2,7 @@ import { Container, type Provider, type Token } from "@resolid/di";
 import { Emitter } from "@resolid/event";
 import nodePath from "node:path";
 import { cwd, env } from "node:process";
+import { disposeApp, hotContext, rememberApp } from "./hmr";
 
 export type { Emitter } from "@resolid/event";
 export { inject, type Provider, type Token } from "@resolid/di";
@@ -159,7 +160,15 @@ class App<E extends Record<string, unknown>> {
 export async function createApp<E extends ExposeSchema = Record<string, never>>(
   options: AppOptions<E>,
 ): Promise<App<InferExpose<E>>> {
+  if (hotContext) {
+    await disposeApp(hotContext);
+  }
+
   const app: App<InferExpose<E>> = new App(options as unknown as AppOptions);
+
+  if (hotContext) {
+    rememberApp(hotContext, app);
+  }
 
   await app.init();
 
