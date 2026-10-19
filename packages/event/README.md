@@ -49,7 +49,7 @@ emitter.emit("hello", "World"); // -> "Hello, World!"
 ```js
 import { Emitter } from "@resolid/event";
 
-const emitter = Emitter();
+const emitter = new Emitter();
 
 emitter.once("ready", (msg: string) => {
   console.log(msg);
@@ -62,9 +62,9 @@ emitter.emit("ready", "Second call"); // won't trigger again
 ### Async Emission
 
 ```js
-import { Emitter } from "your-package-name";
+import { Emitter } from "@resolid/event";
 
-const emitter = Emitter();
+const emitter = new Emitter();
 
 emitter.on("done", () => {
   console.log("Event handled (after all sync code)");

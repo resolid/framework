@@ -125,4 +125,67 @@ describe("createEmitter", () => {
     const cb = vi.fn();
     expect(() => emitter.off("nonexistent", cb)).not.toThrow();
   });
+
+  it("offAll should only remove the given event even for a falsy key", () => {
+    const empty = vi.fn();
+    const other = vi.fn();
+    emitter.on("", empty);
+    emitter.on("other", other);
+
+    emitter.offAll("");
+    emitter.emit("");
+    emitter.emit("other");
+
+    expect(empty).not.toHaveBeenCalled();
+    expect(other).toHaveBeenCalledTimes(1);
+  });
+
+  it("emit should not skip listeners when a once listener removes itself", () => {
+    const order: string[] = [];
+    emitter.on("event", () => order.push("a"));
+    emitter.once("event", () => order.push("once"));
+    emitter.on("event", () => order.push("c"));
+
+    emitter.emit("event");
+
+    expect(order).toEqual(["a", "once", "c"]);
+  });
+
+  it("emit should not call listeners added during emission", () => {
+    const late = vi.fn();
+    emitter.on("event", () => emitter.on("event", late));
+
+    emitter.emit("event");
+    expect(late).not.toHaveBeenCalled();
+
+    emitter.emit("event");
+    expect(late).toHaveBeenCalledTimes(1);
+  });
+
+  it("emit should still call listeners removed during emission", () => {
+    const second = vi.fn();
+    emitter.on("event", () => emitter.off("event", second));
+    emitter.on("event", second);
+
+    emitter.emit("event");
+
+    expect(second).toHaveBeenCalledTimes(1);
+  });
+
+  it("emitAsync should do nothing if event has no listeners", async () => {
+    expect(() => emitter.emitAsync("nonexistent")).not.toThrow();
+    await Promise.resolve();
+  });
+
+  it("emitAsync should capture listeners at call time", async () => {
+    const cb = vi.fn();
+    emitter.on("event", cb);
+
+    emitter.emitAsync("event");
+    emitter.offAll("event");
+
+    await Promise.resolve();
+
+    expect(cb).toHaveBeenCalledTimes(1);
+  });
 });

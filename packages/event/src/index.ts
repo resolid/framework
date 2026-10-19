@@ -1,6 +1,6 @@
 export type EventType = string | symbol;
 
-type Callback<Args extends unknown[] = unknown[]> = (...args: Args) => void;
+export type Callback<Args extends unknown[] = unknown[]> = (...args: Args) => void;
 
 // oxlint-disable-next-line typescript/no-explicit-any
 export class Emitter<Events extends Record<EventType, any> = Record<EventType, any>> {
@@ -18,6 +18,15 @@ export class Emitter<Events extends Record<EventType, any> = Record<EventType, a
     callbacks.push(callback);
 
     return () => this.off(event, callback);
+  }
+
+  once<K extends keyof Events>(event: K, callback: Callback<Events[K]>): void {
+    const wrapper: Callback<Events[K]> = (...args) => {
+      this.off(event, wrapper);
+      callback(...args);
+    };
+
+    this.on(event, wrapper);
   }
 
   off<K extends keyof Events>(event: K, callback: Callback<Events[K]>): void {
@@ -40,20 +49,11 @@ export class Emitter<Events extends Record<EventType, any> = Record<EventType, a
   }
 
   offAll<K extends keyof Events>(event?: K): void {
-    if (event) {
-      this._events.delete(event);
-    } else {
+    if (event === undefined) {
       this._events.clear();
+    } else {
+      this._events.delete(event);
     }
-  }
-
-  once<K extends keyof Events>(event: K, callback: Callback<Events[K]>): void {
-    const wrapper: Callback<Events[K]> = (...args) => {
-      callback(...args);
-      this.off(event, wrapper);
-    };
-
-    this.on(event, wrapper);
   }
 
   emit<K extends keyof Events>(event: K, ...args: Events[K]): void {
@@ -63,7 +63,13 @@ export class Emitter<Events extends Record<EventType, any> = Record<EventType, a
       return;
     }
 
-    for (const callback of callbacks) {
+    if (callbacks.length === 1) {
+      callbacks[0]!(...(args as unknown[]));
+      return;
+    }
+
+    // oxlint-disable-next-line unicorn/no-useless-spread, unicorn/prefer-spread
+    for (const callback of [...callbacks]) {
       callback(...(args as unknown[]));
     }
   }
@@ -76,8 +82,11 @@ export class Emitter<Events extends Record<EventType, any> = Record<EventType, a
       return;
     }
 
+    // oxlint-disable-next-line unicorn/prefer-spread
+    const snapshot = [...callbacks];
+
     queueMicrotask(() => {
-      for (const callback of callbacks) {
+      for (const callback of snapshot) {
         callback(...(args as unknown[]));
       }
     });
