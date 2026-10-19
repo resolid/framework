@@ -1,18 +1,17 @@
-import type { Emitter, ExtensionCreator, PathResolver } from "@resolid/app";
+import type { AppEvents, Emitter, ExtensionCreator, PathResolver } from "@resolid/app";
 import {
   createTransport,
-  type Attachment,
   type Address,
+  type SendMailOptions,
   type Transport,
   type Transporter,
-  type SendMailOptions,
 } from "nodemailer";
 import { FileTransport } from "./transports/file";
 
 export type MailConfig = {
   from: string | Address | (string | Address)[];
   replyTo?: string | Address | (string | Address)[];
-  transporters: Record<string, Transporter>;
+  transporters?: Record<string, Transporter>;
   defaultTransport?: string;
 };
 
@@ -26,9 +25,7 @@ export type MailSendResult =
       message: string;
     };
 
-export type MailMessage = SendMailOptions & {
-  attachments?: (Attachment & { href?: string })[];
-};
+export type MailMessage = SendMailOptions;
 
 interface AppMailEvents {
   "mail:sending": [string, MailMessage];
@@ -41,30 +38,41 @@ declare module "@resolid/app" {
   export interface AppEvents extends AppMailEvents {}
 }
 
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 export class MailService {
-  private readonly _emitter: Emitter<AppMailEvents>;
-  private readonly _from: string | Address | (string | Address)[];
-  private readonly _replyTo: string | Address | (string | Address)[] | undefined;
+  private readonly _emitter: Emitter<AppEvents>;
+  private readonly _from: MailConfig["from"];
+  private readonly _replyTo: MailConfig["replyTo"];
   private readonly _transporters: Record<string, Transporter>;
   private readonly _defaultTransport: string;
 
-  constructor(config: MailConfig, runtimePath: PathResolver, emitter: Emitter) {
+  private _disposed = false;
+
+  constructor(config: MailConfig, runtimePath: PathResolver, emitter: Emitter<AppEvents>) {
+    const { defaultTransport = "file", transporters = {}, from, replyTo } = config;
+
+    const transportNames = ["file", ...Object.keys(transporters).filter((name) => name !== "file")];
+
+    if (!transportNames.includes(defaultTransport)) {
+      throw new Error(
+        `Default transporter "${defaultTransport}" does not exist. Available transporters: ${transportNames.join(", ")}.`,
+      );
+    }
+
     this._emitter = emitter;
-
-    const { defaultTransport = "file", transporters, from, replyTo } = config;
-
     this._from = from;
     this._replyTo = replyTo;
     this._defaultTransport = defaultTransport;
+    this._transporters = { ...transporters };
 
-    this._transporters = {
-      file: createTransport(new FileTransport(runtimePath("mail"))),
-      ...transporters,
-    };
+    this._transporters.file ??= createTransport(new FileTransport(runtimePath("mail")));
   }
 
   async send(mail: MailMessage, transport?: string): Promise<MailSendResult> {
-    const message = { from: this._from, replyTo: this._replyTo, ...mail };
+    const message: MailMessage = { from: this._from, replyTo: this._replyTo, ...mail };
 
     const current = transport ?? this._defaultTransport;
     const transporter = this._transporters[current];
@@ -72,7 +80,8 @@ export class MailService {
     this._emitter.emit("mail:sending", current, message);
 
     if (!transporter) {
-      const errorMessage = `Transporter "${current}" is not exists`;
+      const errorMessage = `Transporter "${current}" does not exist. Available transporters: ${Object.keys(this._transporters).join(", ")}.`;
+
       this._emitter.emit("mail:error", errorMessage);
 
       return { success: false, message: errorMessage };
@@ -80,19 +89,38 @@ export class MailService {
 
     try {
       const result = await transporter.sendMail(message);
+
       this._emitter.emit("mail:sent", current, message, result.messageId);
 
       return { success: true, messageId: result.messageId };
-    } catch (e) {
-      this._emitter.emit("mail:error", (e as Error).message);
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
 
-      return { success: false, message: (e as Error).message };
+      this._emitter.emit("mail:error", errorMessage);
+
+      return { success: false, message: errorMessage };
     }
   }
 
   dispose(): void {
-    for (const key of Object.keys(this._transporters)) {
-      this._transporters[key]?.close();
+    if (this._disposed) {
+      return;
+    }
+
+    this._disposed = true;
+
+    const errors: unknown[] = [];
+
+    for (const transporter of Object.values(this._transporters)) {
+      try {
+        transporter.close();
+      } catch (error) {
+        errors.push(error);
+      }
+    }
+
+    if (errors.length > 0) {
+      throw new AggregateError(errors, `Failed to close ${errors.length} mail transporter(s).`);
     }
   }
 }

@@ -1,10 +1,12 @@
-import type { Transport, MailMessage, SentMessageInfo } from "nodemailer";
-import { existsSync, writeFileSync, mkdirSync } from "node:fs";
+import type { MailMessage, SentMessageInfo, Transport } from "nodemailer";
+import { mkdir, writeFile } from "node:fs/promises";
 import nodePath from "node:path";
 import { version } from "../../package.json";
 
-export interface FileSentMessageInfo extends SentMessageInfo {
-  messageId: string;
+function getMessageFileName(messageId: string): string {
+  const [filename = "message"] = messageId.replaceAll(/^<|>$/g, "").split("@");
+
+  return filename.replaceAll(/[^\w.-]/g, "_") || "message";
 }
 
 export class FileTransport implements Transport {
@@ -18,43 +20,40 @@ export class FileTransport implements Transport {
     this._path = path;
   }
 
-  send(
-    mail: MailMessage<FileSentMessageInfo>,
-    done: (err: Error | null, info?: FileSentMessageInfo) => void,
-  ): void {
-    mail.message.keepBcc = true;
+  send(mail: MailMessage, done: (err: Error | null, info?: SentMessageInfo) => void): void {
+    try {
+      mail.message.keepBcc = true;
 
-    const envelope = mail.message.getEnvelope();
-    const messageId = mail.message.messageId();
+      const envelope = mail.message.getEnvelope();
+      const messageId = mail.message.messageId();
+      const file = nodePath.join(this._path, `${getMessageFileName(messageId)}.txt`);
 
-    // oxlint-disable-next-line node/no-sync
-    if (!existsSync(this._path)) {
-      // oxlint-disable-next-line node/no-sync
-      mkdirSync(this._path, { recursive: true });
-    }
+      setImmediate(() => {
+        mail.normalize((error, data) => {
+          if (error) {
+            done(error);
+            return;
+          }
 
-    const [filename] = messageId.replace("<", "").replace(">", "").split("@");
+          delete data.envelope;
+          delete data.normalizedHeaders;
 
-    const file = nodePath.join(this._path, `${filename}.txt`);
+          void (async () => {
+            try {
+              await mkdir(this._path, { recursive: true });
+              await writeFile(file, JSON.stringify(data), "utf-8");
+            } catch (writeError) {
+              done(writeError as Error);
+              return;
+            }
 
-    setImmediate(() => {
-      mail.normalize((err, data) => {
-        if (err) {
-          return done(err);
-        }
-
-        delete data.envelope;
-        delete data.normalizedHeaders;
-
-        // oxlint-disable-next-line node/no-sync
-        writeFileSync(file, JSON.stringify(data), "utf-8");
-
-        return done(null, {
-          envelope,
-          messageId,
+            done(null, { envelope, messageId });
+          })();
         });
       });
-    });
+    } catch (error) {
+      done(error as Error);
+    }
   }
 
   close(): void {}

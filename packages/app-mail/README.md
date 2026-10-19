@@ -21,24 +21,35 @@ bun add @resolid/app-mail
 
 ```ts
 import { createApp } from "@resolid/app";
-import { createMailExtension, type MailConfig, MailService } from "@resolid/app-mail";
+import { createMailExtension, createMailTransport, MailService } from "@resolid/app-mail";
 
-const mailConfig: MailConfig = { from: "info@resolid.tech" };
-
-const app = createApp<{
-  mailer: MailService;
-}>({
+const app = await createApp({
   name: "App",
-  extensions: [createMailExtension(mailConfig)],
+  extensions: [
+    createMailExtension({
+      from: "info@resolid.tech",
+      transporters: {
+        smtp: createMailTransport({
+          host: "smtp.example.com",
+          port: 587,
+          auth: {
+            user: "user",
+            pass: "password",
+          },
+        }),
+      },
+      defaultTransport: "smtp",
+    }),
+  ],
   expose: {
-    mailer: {
-      token: MailService,
-    },
+    mailer: MailService,
   },
 });
 
-app.$.mailer.send({ to: "user@resolid.tech", subject: "Email" });
+await app.$.mailer.send({ to: "user@resolid.tech", subject: "Email" });
 ```
+
+Without `transporters`, the default file transporter writes messages to `runtime/mail` for local development.
 
 > For more information, see the official Nodemailer website: [https://nodemailer.com/](https://nodemailer.com/)
 
