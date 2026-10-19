@@ -93,30 +93,51 @@ export async function createHonoNodeServer(
     );
   }
 
-  async function shutdown() {
-    server?.close();
+  function closeServer(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!server) {
+        resolve();
+        return;
+      }
+
+      if ("closeIdleConnections" in server) {
+        server.closeIdleConnections();
+      }
+
+      server.close(() => resolve());
+    });
+  }
+
+  let shutdownPromise: Promise<void> | null = null;
+
+  function shutdown(): Promise<void> {
+    shutdownPromise ??= performShutdown();
+
+    return shutdownPromise;
+  }
+
+  async function performShutdown(): Promise<void> {
+    process.removeListener("SIGINT", shutdown);
+    process.removeListener("SIGTERM", shutdown);
+
+    let exitCode = 0;
 
     try {
+      await closeServer();
       await mergedOptions.onShutdown?.();
     } catch (error) {
+      exitCode = 1;
       console.error("[resolid] Error during shutdown:", error);
     }
 
-    process.removeListener("SIGINT", shutdown);
-    process.removeListener("SIGTERM", shutdown);
-
     console.log("[resolid] Node server shutdown.");
 
-    process.exit(0);
+    process.exit(exitCode);
   }
 
-  process.on("SIGTERM", shutdown);
-  process.on("SIGINT", shutdown);
-
-  // @ts-expect-error hot
-  if (import.meta.hot) {
-    process.removeListener("SIGINT", shutdown);
-    process.removeListener("SIGTERM", shutdown);
+  if (isProduction) {
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
   }
 
   return app;
