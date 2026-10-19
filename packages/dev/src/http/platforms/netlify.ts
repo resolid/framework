@@ -1,10 +1,9 @@
 import type { Context as NetlifyContext } from "@netlify/types";
 import type { Context, Hono } from "hono";
-import { env } from "node:process";
 import { clientIp } from "../middlewares/client-ip";
 import { requestId } from "../middlewares/request-id";
 import { requestOrigin } from "../middlewares/request-origin";
-import { createHonoServer, type HonoServerOptions } from "../utils/server";
+import { createHonoServer, type HonoServerOptions, resolveServerMode } from "../utils/server";
 
 export type NetlifyEnv = {
   Bindings: {
@@ -21,7 +20,7 @@ export type HonoNetlifyServerOptions = HonoServerOptions<NetlifyEnv> & {
 export async function createHonoNetlifyServer(
   options: HonoNetlifyServerOptions,
 ): Promise<NetlifyHandle> {
-  const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
+  const mode = resolveServerMode();
 
   const { handle, honoConfig, ...rest } = options;
 

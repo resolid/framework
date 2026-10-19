@@ -9,7 +9,12 @@ import { clientIp } from "../middlewares/client-ip";
 import { requestId } from "../middlewares/request-id";
 import { requestOrigin } from "../middlewares/request-origin";
 import { getRemoteAddr, getRequestOrigin } from "../utils/request";
-import { createHonoServer, type HonoServerOptions, type NodeEnv } from "../utils/server";
+import {
+  createHonoServer,
+  type HonoServerOptions,
+  type NodeEnv,
+  resolveServerMode,
+} from "../utils/server";
 
 export type { NodeEnv } from "../utils/server";
 
@@ -26,7 +31,7 @@ export type HonoNodeServerOptions = HonoServerOptions<NodeEnv> & {
 export async function createHonoNodeServer(
   options: HonoNodeServerOptions = {},
 ): Promise<Hono<NodeEnv>> {
-  const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
+  const mode = resolveServerMode();
   const isProduction = mode == "production";
   const basename = import.meta.env.RESOLID_BASENAME;
 

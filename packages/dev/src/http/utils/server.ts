@@ -2,9 +2,11 @@ import type { Http2Bindings, HttpBindings } from "@hono/node-server";
 import type { MaybePromise } from "@resolid/utils";
 import type { HonoOptions } from "hono/hono-base";
 import { type Context, type Env, Hono } from "hono";
+import { env } from "node:process";
 import {
   createContext,
   createRequestHandler,
+  type RequestHandler,
   type RouterContext,
   RouterContextProvider,
 } from "react-router";
@@ -18,6 +20,10 @@ export type NodeEnv = {
 export interface HonoServerOptions<E extends Env> {
   honoConfig?: (hono: Hono<E>) => MaybePromise<void>;
   honoOptions?: HonoOptions<E>;
+}
+
+export function resolveServerMode(): string | undefined {
+  return env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
 }
 
 export async function createHonoServer<E extends Env>(
@@ -37,12 +43,17 @@ export async function createHonoServer<E extends Env>(
   // @ts-expect-error - Virtual module provided by React Router at build time
   const build = import("virtual:react-router/server-build");
 
+  // Build the request handler once, lazily, instead of on every request.
+  let requestHandler: Promise<RequestHandler> | undefined;
+
   app.use(async (ctx) => {
-    const requestHandler = createRequestHandler(await build, mode);
+    requestHandler ??= build.then((serverBuild) => createRequestHandler(serverBuild, mode));
+
+    const handleRequest = await requestHandler;
     const loadContext = new RouterContextProvider();
     loadContext.set(honoContext, ctx);
 
-    return requestHandler(ctx.req.raw, loadContext);
+    return handleRequest(ctx.req.raw, loadContext);
   });
 
   const basename = import.meta.env.RESOLID_BASENAME;

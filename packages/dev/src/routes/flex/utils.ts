@@ -116,7 +116,9 @@ export function filesToRouteManifest(routesDirectory: string, files: string[]): 
     }
 
     const childRouteIds = prefixLookup.findAndRemove(routeId, (value) => {
-      return [".", "/"].includes(value.slice(routeId.length).charAt(0));
+      const nextChar = value.charAt(routeId.length);
+
+      return nextChar === "." || nextChar === "/";
     });
     prefixLookup.add(routeId);
 
@@ -125,20 +127,6 @@ export function filesToRouteManifest(routesDirectory: string, files: string[]): 
         routeManifest[childRouteId]!.parentId = routeId;
       }
     }
-  }
-
-  const parentChildrenMap: Map<string, RouteManifestEntry[]> = new Map();
-
-  for (const [routeId] of sortedRouteIds) {
-    const config = routeManifest[routeId]!;
-
-    if (!config.parentId) {
-      continue;
-    }
-
-    const existingChildren = parentChildrenMap.get(config.parentId) ?? [];
-    existingChildren.push(config);
-    parentChildrenMap.set(config.parentId, existingChildren);
   }
 
   const uniqueRoutes: Map<string, RouteManifestEntry> = new Map();
@@ -248,11 +236,10 @@ function getRouteSegments(routeId: string): [string[], string[]] {
 
     switch (state) {
       case "NORMAL": {
-        if (char && [".", "/"].includes(char)) {
+        if (char === "." || char === "/") {
           pushRouteSegment(routeSegment, rawRouteSegment);
           routeSegment = "";
           rawRouteSegment = "";
-          state = "NORMAL";
           break;
         }
         if (char === escapeStart) {

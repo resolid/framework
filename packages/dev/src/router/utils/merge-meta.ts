@@ -1,7 +1,6 @@
 import type { MetaDescriptor } from "react-router";
 
-// oxlint-disable-next-line typescript/no-explicit-any
-export function mergeMeta<A extends { matches: any[] }>(
+export function mergeMeta<A extends { matches: { meta?: MetaDescriptor[] }[] }>(
   metaFn: (args: A) => MetaDescriptor[],
   titleJoin = " - ",
 ): (args: A) => MetaDescriptor[] {
@@ -9,9 +8,7 @@ export function mergeMeta<A extends { matches: any[] }>(
     const mergedMeta = [...metaFn(args)];
 
     for (let i = args.matches.length - 1; i >= 0; i--) {
-      const match = args.matches[i];
-
-      for (const parentMeta of match.meta) {
+      for (const parentMeta of args.matches[i]!.meta ?? []) {
         const index = mergedMeta.findIndex((meta: MetaDescriptor) => {
           if ("name" in meta && "name" in parentMeta) {
             return meta.name === parentMeta.name;

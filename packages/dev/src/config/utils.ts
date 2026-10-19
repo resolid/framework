@@ -166,33 +166,34 @@ export async function buildPreset<BuildContext>({
   );
 }
 
+const reactRouterServerPackages = new Set([
+  "react-router",
+  "@react-router/architect",
+  "@react-router/cloudflare",
+  "@react-router/dev",
+  "@react-router/express",
+  "@react-router/node",
+  "@react-router/serve",
+]);
+
 function getPackageDependencies(
   dependencies: Record<string, string | undefined>,
   ssrExternal: ResolvedConfig["ssr"]["external"],
 ): Record<string, string> {
   const ssrExternalFiltered = Array.isArray(ssrExternal)
-    ? ssrExternal.filter(
-        (id) =>
-          ![
-            "react-router",
-            "@react-router/architect",
-            "@react-router/cloudflare",
-            "@react-router/dev",
-            "@react-router/express",
-            "@react-router/node",
-            "@react-router/serve",
-          ].includes(id),
-      )
+    ? ssrExternal.filter((id) => !reactRouterServerPackages.has(id))
     : ssrExternal;
 
   if (ssrExternalFiltered === undefined) {
     return {};
   }
 
+  const externalSet = ssrExternalFiltered === true ? true : new Set(ssrExternalFiltered);
+
   const result: Record<string, string> = {};
 
   for (const key of Object.keys(dependencies)) {
-    if (ssrExternalFiltered === true || ssrExternalFiltered.includes(key)) {
+    if (externalSet === true || externalSet.has(key)) {
       result[key] = dependencies[key] ?? "";
     }
   }
@@ -203,7 +204,7 @@ function getPackageDependencies(
 async function writePackageJson(
   outputFile: string,
   packageJson: PackageJson,
-  packageDeps: unknown,
+  packageDeps: Record<string, string>,
   nodeVersion: NodeVersion,
 ): Promise<void> {
   const distPkg = {
@@ -238,62 +239,58 @@ export function getServerRoutes(buildManifest: BuildManifest | undefined): {
   path: string;
   bundleId: string;
 }[] {
-  if (buildManifest?.routeIdToServerBundleId) {
-    const routes: { id: string; path: string }[] = Object.values(buildManifest.routes)
-      .filter((route) => route.id != "root")
-      .map((route) => {
-        const path = [
-          ...getRoutePathsFromParentId(buildManifest.routes, route.parentId),
-          route.path,
-        ].join("/");
-
-        return {
-          id: route.id,
-          path: `/${path}`,
-        };
-      });
-
-    const routePathBundles: Record<string, string[]> = {};
-
-    for (const [routeId, serverBoundId] of Object.entries(buildManifest.routeIdToServerBundleId)) {
-      routePathBundles[serverBoundId] ??= [];
-
-      for (const routePath of routes) {
-        if (routePath.id == routeId) {
-          routePathBundles[serverBoundId].push(routePath.path);
-        }
-      }
-    }
-
-    const bundleRoutes: Record<string, { path: string; bundleId: string }> = {};
-
-    for (const [bundleId, paths] of Object.entries(routePathBundles)) {
-      paths.sort((a, b) => (a.length < b.length ? -1 : 1));
-
-      for (const path of paths) {
-        if (
-          !bundleRoutes[path] &&
-          !Object.keys(bundleRoutes).some(
-            (key) =>
-              bundleRoutes[key]!.bundleId == bundleId && path.startsWith(bundleRoutes[key]!.path),
-          )
-        ) {
-          bundleRoutes[path] = { path, bundleId };
-        }
-      }
-    }
-
-    const result = Object.values(bundleRoutes).map((route) => ({
-      path: route.path.endsWith("/") ? route.path.slice(0, -1) : route.path,
-      bundleId: route.bundleId,
-    }));
-
-    result.sort((a, b) => (a.path.length > b.path.length ? -1 : 1));
-
-    return result;
+  if (!buildManifest?.routeIdToServerBundleId) {
+    return [{ path: "", bundleId: "site" }];
   }
 
-  return [{ path: "", bundleId: "site" }];
+  const { routes, routeIdToServerBundleId } = buildManifest;
+
+  const routePaths: Map<string, string> = new Map();
+
+  for (const route of Object.values(routes)) {
+    if (route.id == "root") {
+      continue;
+    }
+
+    const path = [...getRoutePathsFromParentId(routes, route.parentId), route.path].join("/");
+
+    routePaths.set(route.id, `/${path}`);
+  }
+
+  const bundlePaths: Record<string, string[]> = {};
+
+  for (const [routeId, bundleId] of Object.entries(routeIdToServerBundleId)) {
+    const path = routePaths.get(routeId);
+
+    if (path !== undefined) {
+      (bundlePaths[bundleId] ??= []).push(path);
+    }
+  }
+
+  const bundleRoutes: Record<string, { path: string; bundleId: string }> = {};
+
+  for (const [bundleId, paths] of Object.entries(bundlePaths)) {
+    // Shortest first, so a parent path always precedes its children.
+    paths.sort((a, b) => a.length - b.length);
+
+    const addedPaths: string[] = [];
+
+    for (const path of paths) {
+      if (bundleRoutes[path] || addedPaths.some((addedPath) => path.startsWith(addedPath))) {
+        continue;
+      }
+
+      bundleRoutes[path] = { path, bundleId };
+      addedPaths.push(path);
+    }
+  }
+
+  return Object.values(bundleRoutes)
+    .map((route) => ({
+      path: route.path.endsWith("/") ? route.path.slice(0, -1) : route.path,
+      bundleId: route.bundleId,
+    }))
+    .sort((a, b) => b.path.length - a.path.length);
 }
 
 function getRoutePathsFromParentId(routes: BuildManifest["routes"], parentId: string | undefined) {

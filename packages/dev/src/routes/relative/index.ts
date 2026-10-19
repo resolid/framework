@@ -8,27 +8,17 @@ export function relativeFactory(directory: string): {
 } {
   const appDirectory = getAppDirectory();
 
+  const resolve = (file: string) =>
+    nodePath.relative(appDirectory, nodePath.resolve(directory, file));
+
   return {
+    // The `rest` spread is cast because TypeScript cannot resolve the overloaded helper signatures here.
     route: (path, file, ...rest) =>
-      route(
-        path,
-        nodePath.relative(appDirectory, nodePath.resolve(directory, file)),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ...(rest as any),
-      ),
-
-    index: (file, ...rest) =>
-      index(
-        nodePath.relative(appDirectory, nodePath.resolve(directory, file)),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ...(rest as any),
-      ),
-
-    layout: (file, ...rest) =>
-      layout(
-        nodePath.relative(appDirectory, nodePath.resolve(directory, file)),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ...(rest as any),
-      ),
+      // oxlint-disable-next-line typescript/no-explicit-any
+      route(path, resolve(file), ...(rest as any)),
+    // oxlint-disable-next-line typescript/no-explicit-any
+    index: (file, ...rest) => index(resolve(file), ...(rest as any)),
+    // oxlint-disable-next-line typescript/no-explicit-any
+    layout: (file, ...rest) => layout(resolve(file), ...(rest as any)),
   };
 }

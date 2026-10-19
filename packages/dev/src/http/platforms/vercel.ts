@@ -3,14 +3,19 @@ import { env } from "node:process";
 import { clientIp } from "../middlewares/client-ip";
 import { requestId } from "../middlewares/request-id";
 import { requestOrigin } from "../middlewares/request-origin";
-import { createHonoServer, type HonoServerOptions, type NodeEnv } from "../utils/server";
+import {
+  createHonoServer,
+  type HonoServerOptions,
+  type NodeEnv,
+  resolveServerMode,
+} from "../utils/server";
 
 export type HonoVercelServerOptions = HonoServerOptions<NodeEnv>;
 
 export async function createHonoVercelServer(
   options: HonoVercelServerOptions = {},
 ): Promise<Hono<NodeEnv>> {
-  const mode = env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
+  const mode = resolveServerMode();
 
   const { honoConfig, ...rest } = options;
 
