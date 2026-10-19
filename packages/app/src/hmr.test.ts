@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { disposeApp, type HotContext, rememberApp } from "./hmr";
+import { disposeApp, forgetApp, type HotContext, rememberApp } from "./hmr";
 
 const createHot = (): HotContext => ({ data: {} });
 
@@ -53,5 +53,29 @@ describe("disposeResolidApp", () => {
     expect(hot.data.resolidApp).toBeUndefined();
 
     consoleError.mockRestore();
+  });
+});
+
+describe("forgetApp", () => {
+  it("should clear the slot when it still holds the given app", () => {
+    const hot = createHot();
+    const app = { dispose: vi.fn() };
+
+    rememberApp(hot, app);
+    forgetApp(hot, app);
+
+    expect(hot.data.resolidApp).toBeUndefined();
+  });
+
+  it("should keep a newer app when the slot was replaced", () => {
+    const hot = createHot();
+    const stale = { dispose: vi.fn() };
+    const current = { dispose: vi.fn() };
+
+    rememberApp(hot, stale);
+    rememberApp(hot, current);
+    forgetApp(hot, stale);
+
+    expect(hot.data.resolidApp).toBe(current);
   });
 });

@@ -1,7 +1,39 @@
 import nodePath from "node:path";
-import { cwd } from "node:process";
+import { cwd, env } from "node:process";
 import { describe, expect, it, vi } from "vitest";
-import { createApp, type ExtensionCreator, type PathResolver, type Token } from "./index";
+import {
+  createApp,
+  type ExtensionCreator,
+  loadProviders,
+  type PathResolver,
+  type Token,
+} from "./index";
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const withTimezone = async (timezone: string | undefined, run: () => Promise<void>) => {
+  const previous = env.TZ;
+
+  if (timezone === undefined) {
+    delete env.TZ;
+  } else {
+    env.TZ = timezone;
+  }
+
+  try {
+    await run();
+  } finally {
+    if (previous === undefined) {
+      delete env.TZ;
+    } else {
+      env.TZ = previous;
+    }
+  }
+};
+
+// Capitalized but not constructible, so it must not be registered as a provider.
+const Handler = () => "not a class";
+const lowerCaseHandler = () => "not a class";
 
 const testPathMethod = (methodFn: PathResolver, basePath: string) => {
   it("should return base path when called with no arguments", () => {
@@ -82,6 +114,183 @@ describe("createApp", () => {
     await app.run();
 
     expect(order).toEqual(["A", "B"]);
+  });
+
+  it("should run boot functions in extension order, even when an earlier one is slow", async () => {
+    const order: string[] = [];
+
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [
+        {
+          name: "a",
+          bootstrap: async () => {
+            await delay(20);
+            order.push("A");
+          },
+        },
+        {
+          name: "b",
+          bootstrap: async () => {
+            order.push("B");
+          },
+        },
+        {
+          name: "c",
+          bootstrap: () => {
+            order.push("C");
+          },
+        },
+      ],
+    });
+
+    await app.run();
+
+    expect(order).toEqual(["A", "B", "C"]);
+  });
+
+  it("should share a single start between concurrent run() calls", async () => {
+    const boot = vi.fn(async () => {
+      await delay(10);
+    });
+
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [{ name: "a", bootstrap: boot }],
+    });
+
+    await Promise.all([app.run(), app.run(), app.run()]);
+
+    expect(boot).toHaveBeenCalledTimes(1);
+  });
+
+  it("should not re-run boot functions after a failed start", async () => {
+    const boot = vi.fn(() => {
+      throw new Error("boot failed");
+    });
+
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [{ name: "a", bootstrap: boot }],
+    });
+
+    await expect(app.run()).rejects.toThrow("boot failed");
+    await expect(app.run()).rejects.toThrow("boot failed");
+
+    expect(boot).toHaveBeenCalledTimes(1);
+  });
+
+  it("should wait for an in-flight start before disposing", async () => {
+    const order: string[] = [];
+    const RESOURCE = Symbol("RESOURCE");
+
+    const app = await createApp({
+      name: "TestApp",
+      providers: [
+        {
+          token: RESOURCE,
+          factory: () => ({
+            dispose: () => {
+              order.push("dispose");
+            },
+          }),
+        },
+      ],
+      extensions: [
+        {
+          name: "a",
+          bootstrap: async () => {
+            await delay(10);
+            order.push("bootstrap");
+          },
+        },
+      ],
+      expose: { resource: RESOURCE },
+    });
+
+    await Promise.all([app.run(), app.dispose()]);
+
+    expect(order).toEqual(["bootstrap", "dispose"]);
+  });
+
+  it("should keep disposing when the start failed", async () => {
+    const RESOURCE = Symbol("RESOURCE");
+    const dispose = vi.fn();
+
+    const app = await createApp({
+      name: "TestApp",
+      providers: [{ token: RESOURCE, factory: () => ({ dispose }) }],
+      extensions: [
+        {
+          name: "a",
+          bootstrap: () => {
+            throw new Error("boot failed");
+          },
+        },
+      ],
+      expose: { resource: RESOURCE },
+    });
+
+    await expect(app.run()).rejects.toThrow("boot failed");
+    await expect(app.dispose()).resolves.toBeUndefined();
+
+    expect(dispose).toHaveBeenCalledTimes(1);
+  });
+
+  it("should dispose providers once when dispose is called concurrently", async () => {
+    const RESOURCE = Symbol("RESOURCE");
+    const dispose = vi.fn();
+
+    const app = await createApp({
+      name: "TestApp",
+      providers: [{ token: RESOURCE, factory: () => ({ dispose }) }],
+      expose: { resource: RESOURCE },
+    });
+
+    await Promise.all([app.dispose(), app.dispose(), app.dispose()]);
+
+    expect(dispose).toHaveBeenCalledTimes(1);
+  });
+
+  it("should refuse to run after being disposed", async () => {
+    const boot = vi.fn();
+
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [{ name: "a", bootstrap: boot }],
+    });
+
+    await app.dispose();
+
+    await expect(app.run()).rejects.toThrow("Cannot run a disposed application.");
+    expect(boot).not.toHaveBeenCalled();
+  });
+
+  it("should prefer the configured timezone", async () => {
+    await withTimezone("Europe/Paris", async () => {
+      const app = await createApp({ name: "TestApp", timezone: "Asia/Tokyo" });
+
+      expect(app.timezone).toBe("Asia/Tokyo");
+      expect(env.TZ).toBe("Asia/Tokyo");
+    });
+  });
+
+  it("should honor an existing TZ environment variable", async () => {
+    await withTimezone("Europe/Paris", async () => {
+      const app = await createApp({ name: "TestApp" });
+
+      expect(app.timezone).toBe("Europe/Paris");
+      expect(env.TZ).toBe("Europe/Paris");
+    });
+  });
+
+  it("should default to UTC when no timezone is configured", async () => {
+    await withTimezone(undefined, async () => {
+      const app = await createApp({ name: "TestApp" });
+
+      expect(app.timezone).toBe("UTC");
+      expect(env.TZ).toBe("UTC");
+    });
   });
 
   it("should only execute boots once even if run() is called multiple times", async () => {
@@ -169,6 +378,35 @@ describe("createApp", () => {
     await expect(app.run()).rejects.toThrow("Boot failed");
   });
 
+  it("should dispose the app and resolve nothing when initialization fails", async () => {
+    const RESOURCE = Symbol("RESOURCE");
+    const MISSING = Symbol("MISSING");
+    const dispose = vi.fn();
+
+    await expect(
+      createApp({
+        name: "TestApp",
+        providers: [{ token: RESOURCE, factory: () => ({ dispose }) }],
+        expose: { resource: RESOURCE, missing: MISSING },
+      }),
+    ).rejects.toThrow("No provider found for MISSING");
+
+    expect(dispose).toHaveBeenCalledTimes(1);
+  });
+
+  it("should not resolve values when there is nothing to expose", async () => {
+    const TOKEN = Symbol("TOKEN");
+    const factory = vi.fn(() => ({ name: "service" }));
+
+    const app = await createApp({
+      name: "TestApp",
+      providers: [{ token: TOKEN, factory }],
+    });
+
+    expect(factory).not.toHaveBeenCalled();
+    expect(Object.keys(app.$)).toEqual([]);
+  });
+
   describe("rootPath and runtimePath should handle simple paths", async () => {
     const app = await createApp({ name: "test-app" });
 
@@ -177,5 +415,73 @@ describe("createApp", () => {
 
     testPathMethod((...paths) => app.rootPath(...paths), rootBase);
     testPathMethod((...paths) => app.runtimePath(...paths), runtimeBase);
+  });
+});
+
+describe("loadProviders", () => {
+  it("should register class exports and resolve them through the container", async () => {
+    class MyService {
+      public readonly value = "resolved";
+    }
+
+    const app = await createApp({
+      name: "TestApp",
+      providers: loadProviders([{ MyService }]),
+      expose: { myService: MyService },
+    });
+
+    expect(app.$.myService).toBeInstanceOf(MyService);
+    expect(app.$.myService.value).toBe("resolved");
+  });
+
+  it("should keep explicit provider objects", async () => {
+    const TOKEN = Symbol("TOKEN");
+    const provider = { token: TOKEN, factory: () => ({ name: "explicit" }) };
+
+    const providers = loadProviders([{ provider }]);
+
+    expect(providers).toEqual([provider]);
+  });
+
+  it("should skip values that are neither providers nor constructible classes", async () => {
+    const providers = loadProviders([
+      {
+        value: 42,
+        text: "hello",
+        nothing: null,
+        Handler,
+        lowerCaseHandler,
+        async task() {
+          return undefined;
+        },
+      },
+    ]);
+
+    expect(providers).toEqual([]);
+  });
+
+  it("should ignore objects that only look like providers", () => {
+    const providers = loadProviders([
+      { partial: { token: Symbol("TOKEN") } },
+      { wrongFactory: { token: Symbol("TOKEN"), factory: "not a function" } },
+      { noToken: { factory: () => undefined } },
+    ]);
+
+    expect(providers).toEqual([]);
+  });
+
+  it("should keep the last provider when a token is registered more than once", async () => {
+    const TOKEN = Symbol("TOKEN");
+
+    const providers = loadProviders([
+      { first: { token: TOKEN, factory: () => "first" } },
+      { second: { token: TOKEN, factory: () => "second" } },
+    ]);
+
+    expect(providers).toHaveLength(1);
+
+    const app = await createApp({ name: "TestApp", providers });
+
+    expect(app.get<string>(TOKEN)).toBe("second");
   });
 });

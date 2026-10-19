@@ -27,3 +27,9 @@ export async function disposeApp(hot: HotContext): Promise<void> {
 export function rememberApp(hot: HotContext, app: DisposableApp): void {
   hot.data[RESOLID_APP] = app;
 }
+
+export function forgetApp(hot: HotContext, app: DisposableApp): void {
+  if (hot.data[RESOLID_APP] === app) {
+    hot.data[RESOLID_APP] = undefined;
+  }
+}

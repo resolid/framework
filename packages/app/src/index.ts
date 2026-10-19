@@ -2,7 +2,7 @@ import { Container, type Provider, type Token } from "@resolid/di";
 import { Emitter } from "@resolid/event";
 import nodePath from "node:path";
 import { cwd, env } from "node:process";
-import { disposeApp, hotContext, rememberApp } from "./hmr";
+import { disposeApp, forgetApp, hotContext, rememberApp } from "./hmr";
 
 export type { Emitter } from "@resolid/event";
 export { inject, type Provider, type Token } from "@resolid/di";
@@ -48,44 +48,47 @@ export type AppOptions<E extends ExposeSchema = Record<string, never>> = AppConf
   readonly expose?: E;
 };
 
-class App<E extends Record<string, unknown>> {
+export class App<E extends ExposeSchema = Record<string, never>> {
   private readonly _root: string;
   private readonly _container: Container;
   private readonly _context: AppContext;
   private readonly _bootstraps: BootstrapFunction[] = [];
-  private readonly _expose?: ExposeSchema;
+  private readonly _expose?: E;
 
-  private _started = false;
+  private _startPromise?: Promise<void>;
+  private _disposePromise?: Promise<void>;
 
   public readonly name: string;
   public readonly debug: boolean;
   public readonly timezone: string;
   public readonly emitter: Emitter<AppEvents>;
 
-  public readonly $: E = Object.create(null);
+  public readonly $: InferExpose<E> = Object.create(null) as InferExpose<E>;
 
   constructor({
     name,
     debug = false,
-    timezone = "UTC",
+    timezone,
     extensions = [],
     providers = [],
     expose,
-  }: AppOptions) {
-    env.timezone = timezone;
+  }: AppOptions<E>) {
+    const resolvedTimezone = timezone ?? env.TZ ?? "UTC";
+
+    env.TZ = resolvedTimezone;
 
     this._root = cwd();
     this._container = new Container();
 
     this.name = name;
     this.debug = debug;
-    this.timezone = timezone;
+    this.timezone = resolvedTimezone;
     this.emitter = new Emitter<AppEvents>();
 
     this._context = {
       name,
       debug,
-      timezone,
+      timezone: resolvedTimezone,
       emitter: this.emitter,
       container: this._container,
       /* istanbul ignore next -- @preserve */
@@ -116,10 +119,14 @@ class App<E extends Record<string, unknown>> {
   }
 
   async init(): Promise<void> {
-    if (this._expose) {
-      for (const [key, value] of Object.entries(this._expose)) {
-        this.$[key as keyof E] = this._container.get(value) as E[typeof key];
-      }
+    if (!this._expose) {
+      return;
+    }
+
+    const exposed = this.$ as Record<string, unknown>;
+
+    for (const [key, token] of Object.entries(this._expose)) {
+      exposed[key] = this._container.get(token);
     }
   }
 
@@ -136,20 +143,33 @@ class App<E extends Record<string, unknown>> {
   }
 
   async run(): Promise<void> {
-    if (this._started) {
-      return;
+    if (this._disposePromise) {
+      throw new Error("Cannot run a disposed application.");
     }
 
-    await Promise.all(
-      this._bootstraps.map((bootstrap) => Promise.resolve(bootstrap(this._context))),
-    );
+    this._startPromise ??= this._start();
 
-    this.emitter.emit("app:ready", { name: this.name, debug: this.debug, timezone: this.timezone });
-    this._started = true;
+    return this._startPromise;
   }
 
-  async dispose(): Promise<void> {
+  private async _start(): Promise<void> {
+    for (const bootstrap of this._bootstraps) {
+      // oxlint-disable-next-line no-await-in-loop
+      await bootstrap(this._context);
+    }
+
+    this.emitter.emit("app:ready", { name: this.name, debug: this.debug, timezone: this.timezone });
+  }
+
+  dispose(): Promise<void> {
+    this._disposePromise ??= this._dispose();
+
+    return this._disposePromise;
+  }
+
+  private async _dispose(): Promise<void> {
     try {
+      await this._startPromise?.catch(() => undefined);
       await this._container.dispose();
     } finally {
       this.emitter.offAll();
@@ -159,46 +179,58 @@ class App<E extends Record<string, unknown>> {
 
 export async function createApp<E extends ExposeSchema = Record<string, never>>(
   options: AppOptions<E>,
-): Promise<App<InferExpose<E>>> {
+): Promise<App<E>> {
   if (hotContext) {
     await disposeApp(hotContext);
   }
 
-  const app: App<InferExpose<E>> = new App(options as unknown as AppOptions);
+  const app: App<E> = new App(options);
 
   if (hotContext) {
     rememberApp(hotContext, app);
   }
 
-  await app.init();
+  try {
+    await app.init();
+  } catch (error) {
+    if (hotContext) {
+      forgetApp(hotContext, app);
+    }
+
+    await app.dispose();
+
+    throw error;
+  }
 
   return app;
 }
 
+function isProvider(value: unknown): value is Provider {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const candidate = value as Partial<Provider>;
+
+  return candidate.token !== undefined && typeof candidate.factory === "function";
+}
+
+function isProviderClass(value: unknown): value is new () => unknown {
+  return typeof value === "function" && value.prototype !== undefined && /^[A-Z]/.test(value.name);
+}
+
 export function loadProviders(modules: Record<string, unknown>[]): Provider[] {
-  const providers: Provider[] = [];
+  const providers: Map<Token, Provider> = new Map();
 
   for (const mod of modules) {
     for (const value of Object.values(mod)) {
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        "token" in value &&
-        "factory" in value &&
-        typeof (value as Provider).factory === "function"
-      ) {
-        providers.push(value as Provider);
-        continue;
-      }
-
-      if (typeof value === "function" && /^[A-Z]/.test(value.name)) {
-        providers.push({
-          token: value,
-          factory: () => new (value as new () => unknown)(),
-        });
+      if (isProvider(value)) {
+        providers.set(value.token, value);
+      } else if (isProviderClass(value)) {
+        providers.set(value, { token: value, factory: () => new value() });
       }
     }
   }
 
-  return providers;
+  return [...providers.values()];
 }
