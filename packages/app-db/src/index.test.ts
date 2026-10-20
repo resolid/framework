@@ -1,66 +1,77 @@
 import { createApp } from "@resolid/app";
-import { type DrizzleConfig, getTableName, type Logger } from "drizzle-orm";
+import {
+  CompiledQuery,
+  DummyDriver,
+  type Generated,
+  SqliteAdapter,
+  SqliteIntrospector,
+  SqliteQueryCompiler,
+  type Dialect,
+  type KyselyPlugin,
+  type Logger,
+} from "kysely";
 import { describe, expect, it } from "vitest";
-import { createMySqlDefineTable, int as mysqlInt } from "./adapters/mysql";
-import { createPostgresDefineTable, integer as postgresInt } from "./adapters/postgres";
+import { SqliteConnection } from "./adapters/sqlite";
 import { DatabaseConnection } from "./core/connection";
 import { Repository } from "./core/repository";
 import { createDatabaseExtension, DatabaseService } from "./core/service";
 
-interface FakeDb {
-  readonly tag: string;
+const fakeDialect: Dialect = {
+  createAdapter: () => new SqliteAdapter(),
+  createDriver: () => new DummyDriver(),
+  createIntrospector: (db) => new SqliteIntrospector(db),
+  createQueryCompiler: () => new SqliteQueryCompiler(),
+};
+
+interface ConnectOptions {
+  logger?: Logger;
+  plugins?: KyselyPlugin[];
 }
 
-interface FakePool {
-  closed: boolean;
-}
-
-class FakeConnection extends DatabaseConnection<FakeDb, FakePool> {
+class FakeConnection extends DatabaseConnection<Record<string, never>> {
   readonly tag: string;
   readonly failClose: boolean;
 
   connectCount = 0;
   closeCount = 0;
-  lastLogger: DrizzleConfig["logger"] = undefined;
+  connectOptions?: ConnectOptions;
 
   constructor(tag: string, options: { failClose?: boolean } = {}) {
-    super();
+    super({});
 
     this.tag = tag;
     this.failClose = options.failClose ?? false;
   }
 
-  override connect(config: DrizzleConfig): void {
-    this.connectCount += 1;
-    this.lastLogger = config.logger;
-
-    this.setDb({ tag: this.tag, $client: { closed: false } });
+  protected override createDialect(): Dialect {
+    return fakeDialect;
   }
 
-  override close(): void {
+  override connect(options: ConnectOptions): void {
+    this.connectCount += 1;
+    this.connectOptions = options;
+
+    super.connect(options);
+  }
+
+  override async close(): Promise<void> {
     this.closeCount += 1;
 
     if (this.failClose) {
       throw new Error(`Failed to close ${this.tag}`);
     }
-
-    if (this.connected) {
-      this.getDb().$client.closed = true;
-    }
   }
 }
 
-class FakeRepository extends Repository<FakeDb> {
-  getTag(): string {
-    return this.db.tag;
-  }
+interface FakeDatabase {
+  user: {
+    name: string;
+  };
 }
 
-class ReplicaRepository extends Repository<FakeDb> {
-  protected override source = "replica";
-
-  getTag(): string {
-    return this.db.tag;
+class FakeRepository extends Repository<FakeDatabase> {
+  async findFirstUser(): Promise<FakeDatabase["user"] | undefined> {
+    return this.db.selectFrom("user").selectAll().limit(1).executeTakeFirst();
   }
 }
 
@@ -68,9 +79,10 @@ async function createTestApp(connection = new FakeConnection("main")) {
   const app = await createApp({
     name: "TestApp",
     extensions: [
-      createDatabaseExtension<FakeDb, FakePool>({
+      createDatabaseExtension({
         connection,
-        drizzleConfig: { logger: false },
+        logger: false,
+        plugins: [{} as KyselyPlugin],
       }),
     ],
     expose: { database: DatabaseService },
@@ -80,20 +92,17 @@ async function createTestApp(connection = new FakeConnection("main")) {
 }
 
 describe("DatabaseConnection", () => {
-  it("should throw when used before connect", () => {
+  it("should throw when database is used before connect", () => {
     const connection = new FakeConnection("main");
 
-    expect(connection.connected).toBe(false);
-    expect(() => connection.getDb()).toThrow("not been initialized");
+    expect(() => connection.database).toThrow("not been initialized");
   });
 
-  it("should expose the client once connected", () => {
+  it("should not destroy an unconnected database twice", async () => {
     const connection = new FakeConnection("main");
 
-    connection.connect({});
-
-    expect(connection.connected).toBe(true);
-    expect(connection.getDb().$client.closed).toBe(false);
+    await connection.close();
+    await expect(connection.close()).resolves.toBeUndefined();
   });
 });
 
@@ -104,52 +113,81 @@ describe("DatabaseService", () => {
     await app.run();
 
     expect(connection.connectCount).toBe(1);
-    expect(app.$.database.get<FakeDb>().tag).toBe("main");
+    expect(connection.connectOptions?.logger).toBeDefined();
 
     await app.dispose();
 
     expect(connection.closeCount).toBe(1);
   });
 
-  it("should not reconnect on subsequent connect calls", async () => {
+  it("should not start twice", async () => {
     const { app, connection } = await createTestApp();
 
     await app.run();
-    await app.$.database.connect();
+    await app.get(DatabaseService).start();
 
     expect(connection.connectCount).toBe(1);
   });
 
-  it("should emit db:query with the connection name", async () => {
+  it("should pass plugins through to kysely", async () => {
+    const pluginStub = {} as KyselyPlugin;
+    const connection = new FakeConnection("main");
+
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [
+        createDatabaseExtension({
+          connection,
+          plugins: [pluginStub],
+          logger: false,
+        }),
+      ],
+      expose: { database: DatabaseService },
+    });
+
+    await app.run();
+
+    expect(connection.connectOptions?.plugins ?? []).toContain(pluginStub);
+  });
+
+  it("should emit db:query with the source name", async () => {
     const { app, connection } = await createTestApp();
 
     await app.run();
 
     const events: unknown[] = [];
 
-    app.emitter.on("db:query", (name, query, params) => {
-      events.push([name, query, params]);
+    app.emitter.on("db:query", (name, query, duration) => {
+      events.push([name, query, duration]);
     });
 
-    (connection.lastLogger as Logger).logQuery("select 1", [1]);
+    if (!connection.connectOptions?.logger) {
+      throw new Error("Logger is missing on the connect options.");
+    }
 
-    expect(events).toEqual([["main", "select 1", [1]]]);
+    void connection.connectOptions.logger({
+      level: "query",
+      query: CompiledQuery.raw("select 1", [1]),
+      queryDurationMillis: 12,
+    });
+
+    expect(events).toEqual([["main", "select 1", 12]]);
   });
 
-  it("should throw for an unknown connection", async () => {
+  it("should throw for an unknown source", async () => {
     const { app } = await createTestApp();
 
     await app.run();
 
-    expect(() => app.$.database.get("missing")).toThrow(
+    expect(() => app.get(DatabaseService).get("missing")).toThrow(
       "Connection with name missing does not exist.",
     );
   });
 
-  it("should throw when the connection is not established yet", async () => {
+  it("should throw when not started yet", async () => {
     const { app } = await createTestApp();
 
-    expect(() => app.$.database.get<FakeDb>()).toThrow("does not exist");
+    expect(() => app.get(DatabaseService).get()).toThrow("does not exist");
   });
 });
 
@@ -161,9 +199,9 @@ describe("DatabaseService with multiple connections", () => {
     const app = await createApp({
       name: "TestApp",
       extensions: [
-        createDatabaseExtension<Record<string, FakeDb>, FakePool>({
+        createDatabaseExtension({
           connections: { main, replica },
-          drizzleConfig: { logger: false },
+          plugins: [],
         }),
       ],
       expose: { database: DatabaseService },
@@ -171,8 +209,11 @@ describe("DatabaseService with multiple connections", () => {
 
     await app.run();
 
-    expect(app.$.database.get<FakeDb>().tag).toBe("main");
-    expect(app.$.database.get<FakeDb>("replica").tag).toBe("replica");
+    const mainDb = app.get(DatabaseService).get<FakeDatabase>();
+    const replicaDb = app.get(DatabaseService).get<FakeDatabase>("replica");
+
+    expect(mainDb).not.toBe(replicaDb);
+    expect(await replicaDb.selectFrom("user").selectAll().execute()).toEqual([]);
 
     await app.dispose();
 
@@ -187,7 +228,7 @@ describe("DatabaseService with multiple connections", () => {
     const app = await createApp({
       name: "TestApp",
       extensions: [
-        createDatabaseExtension<Record<string, FakeDb>, FakePool>({
+        createDatabaseExtension({
           connections: { main, replica },
         }),
       ],
@@ -207,39 +248,177 @@ describe("DatabaseService with multiple connections", () => {
 
 describe("Repository", () => {
   it("should resolve the service through dependency injection", async () => {
-    const main = new FakeConnection("main");
-    const replica = new FakeConnection("replica");
-
     const app = await createApp({
       name: "TestApp",
       extensions: [
-        createDatabaseExtension<Record<string, FakeDb>, FakePool>({
-          connections: { main, replica },
+        createDatabaseExtension({
+          connection: new FakeConnection("main"),
         }),
       ],
-      providers: [
-        { token: FakeRepository, factory: () => new FakeRepository() },
-        { token: ReplicaRepository, factory: () => new ReplicaRepository() },
-      ],
+      providers: [{ token: FakeRepository, factory: () => new FakeRepository() }],
     });
 
     await app.run();
 
-    expect(app.get(FakeRepository).getTag()).toBe("main");
-    expect(app.get(ReplicaRepository).getTag()).toBe("replica");
+    const user = await app.get(FakeRepository).findFirstUser();
+
+    expect(user).toBeUndefined();
   });
 });
 
-describe("define table helpers", () => {
-  it("should prefix mysql table names", () => {
-    const defineTable = createMySqlDefineTable("rx_");
+interface TestDatabase {
+  user: {
+    id: Generated<number>;
+    name: string;
+  };
+  userOrders: {
+    id: Generated<number>;
+  };
+}
 
-    expect(getTableName(defineTable("user", { id: mysqlInt() }))).toBe("rx_user");
+describe("SqliteConnection", () => {
+  it("should run kysely queries through the sqlite dialect", async () => {
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [
+        createDatabaseExtension({
+          connection: new SqliteConnection({ databaseFile: ":memory:" }),
+        }),
+      ],
+      expose: { database: DatabaseService },
+    });
+
+    await app.run();
+
+    const events: [string, string][] = [];
+
+    app.emitter.on("db:query", (source, query) => {
+      events.push([source, query]);
+    });
+
+    const db = app.get(DatabaseService).get<TestDatabase>();
+
+    await db.schema
+      .createTable("user")
+      .addColumn("id", "integer", (col) => col.primaryKey().autoIncrement())
+      .addColumn("name", "text", (col) => col.notNull())
+      .execute();
+
+    await db.insertInto("user").values({ name: "resolid" }).execute();
+
+    const users = await db.selectFrom("user").selectAll().execute();
+
+    expect(users).toEqual([{ id: 1, name: "resolid" }]);
+    expect(events.some(([, query]) => query.includes("create table"))).toBe(true);
+    expect(events.filter(([source]) => source === "main").length).toBeGreaterThan(0);
+
+    await app.dispose();
   });
 
-  it("should prefix postgres table names", () => {
-    const defineTable = createPostgresDefineTable("rx_");
+  it("should prefix table names through the tablePrefix config", async () => {
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [
+        createDatabaseExtension({
+          connection: new SqliteConnection({
+            databaseFile: ":memory:",
+            tablePrefix: "rx_",
+          }),
+        }),
+      ],
+      expose: { database: DatabaseService },
+    });
 
-    expect(getTableName(defineTable("user", { id: postgresInt() }))).toBe("rx_user");
+    await app.run();
+
+    const events: [string, string][] = [];
+
+    app.emitter.on("db:query", (source, query) => {
+      events.push([source, query]);
+    });
+
+    const db = app.get(DatabaseService).get<TestDatabase>();
+
+    await db.schema
+      .createTable("user")
+      .addColumn("id", "integer", (col) => col.primaryKey().autoIncrement())
+      .addColumn("name", "text", (col) => col.notNull())
+      .execute();
+
+    await db.insertInto("user").values({ name: "resolid" }).execute();
+
+    const users = await db.selectFrom("user").selectAll().execute();
+
+    expect(users).toEqual([{ id: 1, name: "resolid" }]);
+    expect(events.some(([, query]) => query.includes('"rx_user"'))).toBe(true);
+
+    await app.dispose();
+  });
+
+  it("should snake case table names by default", async () => {
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [
+        createDatabaseExtension({
+          connection: new SqliteConnection({
+            databaseFile: ":memory:",
+          }),
+        }),
+      ],
+      expose: { database: DatabaseService },
+    });
+
+    await app.run();
+
+    const events: [string, string][] = [];
+
+    app.emitter.on("db:query", (source, query) => {
+      events.push([source, query]);
+    });
+
+    const db = app.get(DatabaseService).get<TestDatabase>();
+
+    await db.schema
+      .createTable("userOrders")
+      .addColumn("id", "integer", (col) => col.primaryKey().autoIncrement())
+      .execute();
+
+    expect(events.some(([, query]) => query.includes('create table "user_orders"'))).toBe(true);
+
+    await app.dispose();
+  });
+
+  it("should keep table names verbatim when snakeCaseTables is disabled", async () => {
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [
+        createDatabaseExtension({
+          connection: new SqliteConnection({
+            databaseFile: ":memory:",
+            snakeCaseTables: false,
+          }),
+        }),
+      ],
+      expose: { database: DatabaseService },
+    });
+
+    await app.run();
+
+    const events: [string, string][] = [];
+
+    app.emitter.on("db:query", (source, query) => {
+      events.push([source, query]);
+    });
+
+    const db = app.get(DatabaseService).get<TestDatabase>();
+
+    await db.schema
+      .createTable("userOrders")
+      .addColumn("id", "integer", (col) => col.primaryKey().autoIncrement())
+      .execute();
+
+    expect(events.some(([, query]) => query.includes('"userOrders"'))).toBe(true);
+
+    await app.dispose();
   });
 });

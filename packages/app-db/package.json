@@ -6,7 +6,7 @@
   "keywords": [
     "database",
     "db",
-    "drizzle-orm",
+    "kysely",
     "orm",
     "resolid"
   ],
@@ -33,7 +33,7 @@
       "import": "./dist/index.mjs"
     },
     "./adapters/*": {
-      "types": "./dist/adapters/*.d.ts",
+      "types": "./dist/adapters/*.d.mts",
       "import": "./dist/adapters/*.mjs"
     },
     "./package.json": "./package.json"
@@ -49,18 +49,24 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@resolid/app": "workspace:^",
-    "drizzle-orm": "rc"
+    "@resolid/app": "workspace:^"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
     "@types/pg": "^8.23.1",
+    "kysely": "^0.29.7",
     "tsdown": "^0.23.1"
   },
   "peerDependencies": {
+    "better-sqlite3": "^13.0.3",
+    "kysely": "^0.29.7",
     "mysql2": "^3.24.6",
     "pg": "^8.23.1"
   },
   "peerDependenciesMeta": {
+    "better-sqlite3": {
+      "optional": true
+    },
     "mysql2": {
       "optional": true
     },

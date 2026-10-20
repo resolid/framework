@@ -52,6 +52,7 @@
     "@resolid/app": "workspace:^"
   },
   "devDependencies": {
+    "@logtape/file": "^2.4.2",
     "tsdown": "^0.23.1"
   },
   "peerDependencies": {

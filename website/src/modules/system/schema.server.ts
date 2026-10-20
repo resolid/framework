@@ -1,7 +1,14 @@
-import { int, varchar } from "@resolid/app-db/adapters/mysql";
-import { defineMySqlTable } from "~/foundation/schema.server";
+import type { Generated, Selectable } from "kysely";
 
-export const statusTable = defineMySqlTable("status", {
-  id: int().primaryKey().autoincrement(),
-  message: varchar({ length: 90 }).notNull().default(""),
-});
+export interface StatusTable {
+  id: Generated<number>;
+  message: string;
+}
+
+declare module "@resolid/app-db" {
+  interface Database {
+    status: StatusTable;
+  }
+}
+
+export type Status = Selectable<StatusTable>;

@@ -1,50 +1,62 @@
-import type { DrizzleConfig } from "drizzle-orm";
-import type { AnyRelations, EmptyRelations } from "drizzle-orm/relations";
+import { type Dialect, Kysely, type KyselyPlugin, type Logger } from "kysely";
+import { TablePrefixPlugin } from "../plugins/table-prefix-plugin";
+import { TableSnakeCasePlugin } from "../plugins/table-snake-case-plugin";
 
-export type Enhancer<P> = (pool: P) => P | void;
-export type DbConn<D, P> = D & { $client: P };
+export type CommonConfig = {
+  logger?: boolean | Logger;
+  plugins?: KyselyPlugin[];
+  tablePrefix?: string;
+  /**
+   * Yii-style physical table naming: camelCase (or PascalCase) schema keys are
+   * compiled to snake_case table names. Enabled by default; set to false to
+   * keep schema keys verbatim.
+   */
+  snakeCaseTables?: boolean;
+};
 
-export abstract class DatabaseConnection<
-  D,
-  P,
-  TSchema extends Record<string, unknown> = Record<string, never>,
-  TRelationConfigs extends AnyRelations = EmptyRelations,
-> {
-  private _db: DbConn<D, P> | undefined;
-  private readonly _enhancer: Enhancer<P> | false | undefined;
+export type ConnectionConfig<C> = C & CommonConfig;
 
-  constructor(enhancer?: Enhancer<P> | false) {
-    this._enhancer = enhancer;
+export abstract class DatabaseConnection<C> {
+  protected readonly config: ConnectionConfig<C>;
+  private _database: Kysely<unknown> | undefined;
+
+  constructor(config: ConnectionConfig<C>) {
+    this.config = config;
   }
 
-  get connected(): boolean {
-    return this._db !== undefined;
-  }
-
-  protected enhance(pool: P): P {
-    if (this._enhancer) {
-      const maybe = this._enhancer(pool);
-
-      if (maybe) {
-        return maybe;
-      }
-    }
-
-    return pool;
-  }
-
-  protected setDb(db: DbConn<D, P>): void {
-    this._db = db;
-  }
-
-  getDb(): DbConn<D, P> {
-    if (!this._db) {
+  get database(): Kysely<unknown> {
+    if (!this._database) {
       throw new Error("Database connection has not been initialized, call connect() first.");
     }
 
-    return this._db;
+    return this._database;
   }
 
-  abstract connect(drizzleConfig: DrizzleConfig<TSchema, TRelationConfigs>): Promise<void> | void;
-  abstract close(): Promise<void> | void;
+  get logger(): boolean | Logger | undefined {
+    return this.config.logger;
+  }
+
+  protected abstract createDialect(): Dialect;
+
+  connect(options: { logger?: Logger; plugins?: KyselyPlugin[] }): void {
+    this._database = new Kysely({
+      dialect: this.createDialect(),
+      plugins: [
+        ...(options.plugins ?? []),
+        ...(this.config.plugins ?? []),
+        ...(this.config.snakeCaseTables === false ? [] : [new TableSnakeCasePlugin()]),
+        ...(this.config.tablePrefix ? [new TablePrefixPlugin(this.config.tablePrefix)] : []),
+      ],
+      log: options.logger,
+    });
+  }
+
+  async close(): Promise<void> {
+    if (!this._database) {
+      return;
+    }
+
+    await this._database.destroy();
+    this._database = undefined;
+  }
 }

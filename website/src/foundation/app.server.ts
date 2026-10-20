@@ -1,11 +1,7 @@
 import { createApp, loadProviders } from "@resolid/app";
 import { createCacheExtension, MemoryCache } from "@resolid/app-cache";
 import { createDatabaseExtension } from "@resolid/app-db";
-import {
-  MySqlConnection,
-  type MySqlDatabase,
-  type MySqlClient,
-} from "@resolid/app-db/adapters/mysql";
+import { MySqlConnection } from "@resolid/app-db/adapters/mysql";
 import { createLogExtension, type LoggerEntity, LogService } from "@resolid/app-log";
 import { rotatingFileTarget } from "@resolid/app-log/targets";
 import { createMailExtension, createMailTransport } from "@resolid/app-mail";
@@ -42,20 +38,19 @@ export const app = await createApp({
           ? new RedisCache(env.RX_CACHE_REDIS)
           : new MemoryCache(),
     }),
-    createDatabaseExtension<MySqlDatabase, MySqlClient>({
-      connection: new MySqlConnection(
-        {
+    createDatabaseExtension({
+      connection: new MySqlConnection({
+        tablePrefix: env.RX_DB_TABLE_PREFIX,
+        poolOptions: {
           uri: env.RX_DB_URI,
           ssl: {
             ca: env.RX_DB_SSL_CA.replaceAll(/\\n/gm, "\n"),
             rejectUnauthorized: false,
           },
         },
-        attachDatabasePool,
-      ),
-      drizzleConfig: {
-        logger: __DEV__,
-      },
+        onPoolCreated: attachDatabasePool,
+      }),
+      logger: __DEV__,
     }),
     createMailExtension({
       from: env.RX_MAIL_FROM,

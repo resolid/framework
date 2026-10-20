@@ -1,53 +1,22 @@
-import type { AnyRelations, EmptyRelations } from "drizzle-orm/relations";
-import {
-  type DrizzleMySqlConfig,
-  mysqlTableCreator,
-  type MySqlTableFn,
-} from "drizzle-orm/mysql-core";
-import { drizzle, type MySql2Database } from "drizzle-orm/mysql2";
-import mysql, { type ConnectionOptions, type Pool } from "mysql2";
-import { DatabaseConnection, type Enhancer } from "../core/connection";
-import { Repository } from "../core/repository";
+import { MysqlDialect, type MysqlDialectConfig } from "kysely";
+import mysql, { type Pool, type PoolOptions } from "mysql2";
+import { DatabaseConnection } from "../core/connection";
 
-export type MySqlConfig = ConnectionOptions;
+export type MySqlConnectionConfig = {
+  poolOptions: PoolOptions;
+  dialectOptions?: Omit<MysqlDialectConfig, "pool">;
+  onPoolCreated?: (pool: Pool) => void;
+};
 
-export class MySqlConnection extends DatabaseConnection<MySql2Database, Pool> {
-  private readonly _config: MySqlConfig;
+export class MySqlConnection extends DatabaseConnection<MySqlConnectionConfig> {
+  protected createDialect(): MysqlDialect {
+    const pool = mysql.createPool({
+      charsetNumber: mysql.Charsets.UTF8MB4_0900_AI_CI,
+      ...this.config.poolOptions,
+    });
 
-  constructor(config: MySqlConfig, enhancer?: Enhancer<Pool> | false) {
-    super(enhancer);
+    this.config.onPoolCreated?.(pool);
 
-    this._config = config;
-  }
-
-  override connect(drizzleConfig: DrizzleMySqlConfig<EmptyRelations>): void {
-    const pool = this.enhance(
-      mysql.createPool({
-        charsetNumber: mysql.Charsets.UTF8MB4_0900_AI_CI,
-        ...this._config,
-      }),
-    );
-
-    this.setDb(drizzle({ client: pool, ...drizzleConfig }));
-  }
-
-  override close(): void {
-    if (this.connected) {
-      this.getDb().$client.end();
-    }
+    return new MysqlDialect({ pool, ...this.config.dialectOptions });
   }
 }
-
-export function createMySqlDefineTable(prefix = ""): MySqlTableFn {
-  return mysqlTableCreator((name) => prefix + name);
-}
-
-export abstract class MySqlRepository extends Repository<MySql2Database> {}
-
-export type MySqlDatabase<TRelations extends AnyRelations = EmptyRelations> =
-  MySql2Database<TRelations>;
-
-export type MySqlClient = Pool;
-
-// oxlint-disable-next-line import/export
-export * from "drizzle-orm/mysql-core";

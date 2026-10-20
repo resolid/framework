@@ -1,16 +1,18 @@
+import type { Kysely } from "kysely";
 import { inject } from "@resolid/app";
+import type { Database } from "./database";
 import { DatabaseService } from "./service";
 
-export abstract class Repository<T> {
+export abstract class Repository<DB = Database> {
   protected source?: string;
 
-  private readonly _database: DatabaseService<T>;
+  private readonly databaseService: DatabaseService;
 
-  constructor(database: DatabaseService<T> = inject(DatabaseService)) {
-    this._database = database;
+  constructor(databaseService: DatabaseService = inject(DatabaseService)) {
+    this.databaseService = databaseService;
   }
 
-  protected get db(): T {
-    return this._database.get<T>(this.source);
+  protected get db(): Kysely<DB> {
+    return this.databaseService.get(this.source);
   }
 }

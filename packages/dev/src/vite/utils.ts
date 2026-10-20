@@ -40,7 +40,7 @@ export function resolveReactRouterPluginConfig(
     appDir,
     buildDir: nodePath.relative(rootDirectory, reactRouterConfig.buildDirectory),
     assetsDir: config.build?.assetsDir ?? "assets",
-    ssrBuild: reactRouterConfig.ssr,
+    ssrBuild: reactRouterConfig.ssr !== false,
     basename: reactRouterConfig.basename,
     future: reactRouterConfig.future,
     buildManifest,
