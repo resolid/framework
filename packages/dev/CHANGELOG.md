@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.8.8
+
+### Patch Changes
+
+- [`28d28b8`](https://github.com/resolid/framework/commit/28d28b8b7b368f68145691028bab6663a03e391f) - fix(dev): fix SSR build option.
+
 ## 0.8.7
 
 ### Patch Changes
