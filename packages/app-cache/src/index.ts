@@ -67,13 +67,13 @@ type CacheExtensionBaseConfig = {
 type CacheExtensionConfigWithStore = {
   store?: StoreFactory | CacheStore;
   stores?: never;
-  defaultStore?: never;
+  defaultCache?: never;
 } & CacheExtensionBaseConfig;
 
 type CacheExtensionConfigWithStores = {
   store?: never;
   stores: Record<string, StoreFactory | CacheStore>;
-  defaultStore?: string;
+  defaultCache?: string;
 } & CacheExtensionBaseConfig;
 
 export type CacheExtensionConfig = CacheExtensionConfigWithStore | CacheExtensionConfigWithStores;
@@ -81,19 +81,19 @@ export type CacheExtensionConfig = CacheExtensionConfigWithStore | CacheExtensio
 const SINGLE_STORE_NAME = "main";
 
 export function createCacheExtension(config: CacheExtensionConfig = {}): ExtensionCreator {
-  const { store, stores, defaultStore, defaultTtl, serializer } = config;
+  const { store, stores, defaultCache, defaultTtl, serializer } = config;
 
-  const storeNames = stores ? Object.keys(stores) : [SINGLE_STORE_NAME];
+  const cacheNames = stores ? Object.keys(stores) : [SINGLE_STORE_NAME];
 
-  if (storeNames.length === 0) {
+  if (cacheNames.length === 0) {
     throw new Error("createCacheExtension requires at least one store.");
   }
 
-  const resolvedDefaultStore = defaultStore ?? storeNames[0]!;
+  const resolvedDefaultCache = defaultCache ?? cacheNames[0]!;
 
-  if (!storeNames.includes(resolvedDefaultStore)) {
+  if (!cacheNames.includes(resolvedDefaultCache)) {
     throw new Error(
-      `Default cache "${resolvedDefaultStore}" does not exist. Available caches: ${storeNames.join(", ")}.`,
+      `Default cache "${resolvedDefaultCache}" does not exist. Available caches: ${cacheNames.join(", ")}.`,
     );
   }
 
@@ -120,7 +120,7 @@ export function createCacheExtension(config: CacheExtensionConfig = {}): Extensi
             );
           }
 
-          return new CacheService({ caches, defaultCache: resolvedDefaultStore });
+          return new CacheService({ caches, defaultCache: resolvedDefaultCache });
         },
       },
     ],

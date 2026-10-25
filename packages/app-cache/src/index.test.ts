@@ -119,7 +119,7 @@ describe("createCacheExtension", () => {
     await app.dispose();
   });
 
-  it("defaults to the first store when defaultStore is omitted", async () => {
+  it("defaults to the first store when defaultCache is omitted", async () => {
     const app = await createTestApp({
       stores: { primary: new MemoryCache(), secondary: new MemoryCache() },
     });
@@ -132,10 +132,10 @@ describe("createCacheExtension", () => {
     await app.dispose();
   });
 
-  it("honours an explicit defaultStore", async () => {
+  it("honours an explicit defaultCache", async () => {
     const app = await createTestApp({
       stores: { primary: new MemoryCache(), secondary: new MemoryCache() },
-      defaultStore: "secondary",
+      defaultCache: "secondary",
     });
 
     await app.$.cache.set("key", "value");
@@ -146,9 +146,9 @@ describe("createCacheExtension", () => {
     await app.dispose();
   });
 
-  it("rejects a defaultStore that does not exist", () => {
+  it("rejects a defaultCache that does not exist", () => {
     expect(() =>
-      createCacheExtension({ stores: { primary: new MemoryCache() }, defaultStore: "missing" }),
+      createCacheExtension({ stores: { primary: new MemoryCache() }, defaultCache: "missing" }),
     ).toThrow('Default cache "missing" does not exist');
   });
 
