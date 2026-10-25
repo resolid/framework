@@ -1,9 +1,9 @@
 import { getHonoContext } from "@resolid/dev/http.server";
-import { mergeMeta } from "@resolid/dev/router";
+import { mergeMeta, SuspenseAwait } from "@resolid/dev/router";
 import { Alert, AlertDescription, AlertTitle, ClientOnly } from "@resolid/react-ui";
 import { deviceTimezone } from "@resolid/utils";
 import { formatDate } from "@resolid/utils/date";
-import { Suspense, useMemo } from "react";
+import { useMemo } from "react";
 import { SystemRepository } from "~/modules/system/repository.server";
 import type { Route } from "./+types/status";
 
@@ -14,16 +14,16 @@ export const meta = mergeMeta(() => [
 ]);
 
 export async function loader({ context }: Route.LoaderArgs) {
-  const honoContext = getHonoContext(context);
+  const hono = getHonoContext(context);
 
   return {
     ssr: {
       message: "服务器渲染正常",
       datetime: new Date().toISOString(),
-      requestId: honoContext.get("requestId"),
-      remoteAddr: honoContext.get("remoteAddr"),
+      requestId: hono.get("requestId"),
+      remoteAddr: hono.get("remoteAddr"),
     },
-    db: honoContext
+    db: hono
       .get("app")
       .get(SystemRepository)
       .getFirst()
@@ -56,19 +56,20 @@ export default function Status({ loaderData }: Route.ComponentProps) {
       <Alert className="my-5" color="success">
         <AlertTitle>{ssr.message}</AlertTitle>
       </Alert>
-      <Suspense
+      <SuspenseAwait
+        promise={db}
         fallback={
           <Alert color="warning" className="my-5">
             <AlertTitle>正在查询数据库</AlertTitle>
           </Alert>
         }
       >
-        {db.then((data) => (
+        {(data) => (
           <Alert color={data.success ? "success" : "danger"} className="my-5">
             <AlertTitle>{data.message}</AlertTitle>
           </Alert>
-        ))}
-      </Suspense>
+        )}
+      </SuspenseAwait>
       <Alert className="not-prose my-5" color="primary">
         <AlertDescription className="grid grid-cols-1 items-center gap-1 md:grid-cols-[max-content_1fr]">
           <dt>服务器时间：</dt>
