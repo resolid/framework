@@ -137,6 +137,7 @@ export abstract class AuthRepository<AT extends Auth, GT extends AuthGroup> exte
           .where("id", "=", sessionId)
           .where("expiredAt", ">", new Date()),
       )
+      .where("deletedAt", "is", null)
       .executeTakeFirst();
 
     if (auth == undefined || !withGroup) {

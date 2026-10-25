@@ -9,9 +9,9 @@ import {
 export const authColumns: {
   id: ColumnDefinition<Generated<number>>;
   groupId: ColumnDefinition<number>;
-  password: ColumnDefinition<Generated<string>>;
-  email: ColumnDefinition<Generated<string>>;
-  username: ColumnDefinition<Generated<string>>;
+  email: ColumnDefinition<string>;
+  password: ColumnDefinition<string>;
+  username: ColumnDefinition<string>;
   nickname: ColumnDefinition<Generated<string>>;
   avatar: ColumnDefinition<Generated<string>>;
   createdAt: ColumnDefinition<Generated<Timestamp>>;
@@ -20,9 +20,9 @@ export const authColumns: {
 } = {
   id: column<Generated<number>>(),
   groupId: column<number>(),
-  password: column<Generated<string>>(),
-  email: column<Generated<string>>(),
-  username: column<Generated<string>>(),
+  email: column<string>(),
+  password: column<string>(),
+  username: column<string>(),
   nickname: column<Generated<string>>(),
   avatar: column<Generated<string>>(),
   createdAt: column<Generated<Timestamp>>(),

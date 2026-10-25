@@ -3,6 +3,7 @@ import { defineConfig, type UserConfig } from "tsdown";
 const config: UserConfig = defineConfig({
   entry: {
     index: "src/index.ts",
+    utils: "src/utils.ts",
     validate: "src/validate.ts",
   },
   format: "esm",

@@ -1,3 +1,4 @@
+import { getIdentityDisplayName } from "@resolid/app-auth/utils";
 import { getHonoContext } from "@resolid/dev/http.server";
 import {
   Avatar,
@@ -20,8 +21,6 @@ import {
 import { omit, trimEnd } from "@resolid/utils";
 import { type MouseEventHandler, useState } from "react";
 import { createPath, Form, Link, Outlet, useLocation, type Location } from "react-router";
-import type { UserIdentity } from "~/modules/user/schema.server";
-import { AuthContext, useAuth } from "~/components/auth-provider";
 import { ColorModeToggle } from "~/components/color-mode-toggle";
 import { HistoryLink, HistoryNavLink } from "~/components/history-link";
 import { ResolidLogo } from "~/components/resolid-logo";
@@ -31,52 +30,177 @@ import { VercelAnalytics } from "~/extensions/vercel/vercel-analytics";
 import { VercelSpeedInsights } from "~/extensions/vercel/vercel-speed-insights";
 import { UserSessionService } from "~/modules/user/session.service.server";
 import type { Route } from "./+types/layout";
+import { AuthContext, useAuth } from "./auth";
+
+export async function loader({ request, context }: Route.LoaderArgs) {
+  const hono = getHonoContext(context);
+
+  return {
+    user: await hono.get("app").get(UserSessionService).getIdentity(request),
+    requestOrigin: hono.get("requestOrigin") ?? request.url,
+  };
+}
+
+export const meta = ({ loaderData }: Route.ComponentProps) => {
+  const ogImage = new URL("/images/og-image-v2.png", loaderData.requestOrigin).toString();
+  const ogUrl = trimEnd(new URL("", loaderData.requestOrigin).toString(), "/");
+  const siteName = "Resolid";
+  const title = siteName;
+  const description =
+    "使用 React Router 驱动的全栈网站，展示使用现代 Web 技术构建高性能、可扩展和用户友好的 Web 应用程序的最佳实践。";
+
+  return [
+    { title },
+    {
+      name: "description",
+      content: description,
+    },
+    {
+      property: "og:site_name",
+      content: siteName,
+    },
+    {
+      property: "og:title",
+      content: title,
+    },
+    {
+      property: "og:description",
+      content: description,
+    },
+    {
+      property: "og:url",
+      content: ogUrl,
+    },
+    {
+      property: "og:image",
+      content: ogImage,
+    },
+    {
+      property: "og:type",
+      content: "website",
+    },
+    {
+      property: "twitter:title",
+      content: title,
+    },
+    {
+      property: "twitter:description",
+      content: description,
+    },
+    {
+      property: "twitter:image",
+      content: ogImage,
+    },
+    {
+      property: "twitter:url",
+      content: ogUrl,
+    },
+    {
+      property: "twitter:card",
+      content: "summary_large_image",
+    },
+  ].filter(Boolean);
+};
+
+export default function SiteLayout({ loaderData }: Route.ComponentProps) {
+  const { user } = loaderData;
+
+  return (
+    <AuthContext value={user}>
+      <header className="sticky top-0 z-20 w-full border-b border-bd-normal bg-bg-normal">
+        <NavBar />
+      </header>
+      <div className="min-h-[calc(100vh-var(--spacing)*16-108px)]">
+        <Outlet />
+      </div>
+      <footer className="border-t border-bd-normal">
+        <div className="mx-auto flex max-w-288 flex-col gap-1 p-4 text-center text-sm text-fg-muted">
+          <p>Released under the MIT License</p>
+          <p>Copyright Ⓒ 2022-present Resolid Tech</p>
+          <p className="inline-flex items-center justify-center gap-2">
+            <Badge color="success" render={(props) => <HistoryLink {...props} to="status" />}>
+              <SpriteIcon className="me-1" name="status" />
+              运行状态
+            </Badge>
+            {import.meta.env.RESOLID_PLATFORM == "vercel" && (
+              <Badge className="pointer-events-none" color="neutral">
+                部署于 Vercel
+              </Badge>
+            )}
+            {import.meta.env.RESOLID_PLATFORM == "netlify" && (
+              <Badge className="pointer-events-none" color="secondary">
+                部署于 Netlify
+              </Badge>
+            )}
+          </p>
+        </div>
+      </footer>
+      {import.meta.env.RESOLID_PLATFORM == "vercel" && (
+        <>
+          <VercelAnalytics endpoint="/growth" scriptSrc="/growth/script.js" />
+          <VercelSpeedInsights
+            endpoint="/speed-growth/vitals"
+            scriptSrc="/speed-growth/script.js"
+          />
+        </>
+      )}
+    </AuthContext>
+  );
+}
 
 function NavUser() {
   const location = useLocation();
-  const { identity: user } = useAuth<UserIdentity>();
+  const user = useAuth();
 
-  return user ? (
-    <DropdownMenu placement="bottom">
-      <DropdownMenuTrigger
-        render={(props) => <Button {...props} variant="ghost" color="neutral" size="sm" iconOnly />}
-      >
-        <Avatar size={25} name={user.nickname || user.username}>
-          <AvatarImage src={user.avatar} />
-          <AvatarFallback />
-        </Avatar>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="text-sm">
-        <DropdownMenuLabel className="gap-2">
-          <Avatar size={42} name={user.nickname || user.username}>
+  if (user) {
+    const displayName = getIdentityDisplayName(user);
+
+    return (
+      <DropdownMenu placement="bottom">
+        <DropdownMenuTrigger
+          render={(props) => (
+            <Button {...props} variant="ghost" color="neutral" size="sm" iconOnly />
+          )}
+        >
+          <Avatar size={25} name={displayName}>
             <AvatarImage src={user.avatar} />
             <AvatarFallback />
           </Avatar>
-          <div className="flex flex-col text-left">
-            <span className="text-base font-medium">{user.nickname || user.username}</span>
-            <span className="text-fg-muted">{user.email}</span>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuItem
-          render={(props) => <HistoryLink {...props} to={`user/${user.username}`} />}
-        >
-          <SpriteIcon size="1rem" name="user" className="me-1.5" />
-          个人主页
-        </DropdownMenuItem>
-        <DropdownMenuItem render={(props) => <HistoryLink {...props} to="settings" />}>
-          <SpriteIcon size="1rem" name="setting" className="me-1.5" />
-          用户设置
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <Form action={createPath(getLoginTo("logout", location))} method="post">
-          <DropdownMenuItem render={(props) => <button {...props} type="submit" />}>
-            <SpriteIcon size="1rem" name="logout" className="me-1.5" />
-            退出登陆
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="text-sm">
+          <DropdownMenuLabel className="gap-2">
+            <Avatar size={42} name={displayName}>
+              <AvatarImage src={user.avatar} />
+              <AvatarFallback />
+            </Avatar>
+            <div className="flex flex-col text-left">
+              <span className="text-base font-medium">{displayName}</span>
+              <span className="text-fg-muted">{user.email}</span>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuItem
+            render={(props) => <HistoryLink {...props} to={`user/${user.username}`} />}
+          >
+            <SpriteIcon size="1rem" name="user" className="me-1.5" />
+            个人主页
           </DropdownMenuItem>
-        </Form>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ) : (
+          <DropdownMenuItem render={(props) => <HistoryLink {...props} to="settings" />}>
+            <SpriteIcon size="1rem" name="setting" className="me-1.5" />
+            用户设置
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <Form action={createPath(getLoginTo("logout", location))} method="post">
+            <DropdownMenuItem render={(props) => <button {...props} type="submit" />}>
+              <SpriteIcon size="1rem" name="logout" className="me-1.5" />
+              退出登陆
+            </DropdownMenuItem>
+          </Form>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  return (
     <Tooltip placement="bottom">
       <TooltipTrigger
         render={(props) => (
@@ -238,121 +362,5 @@ function NavBar() {
         </Button>
       </div>
     </nav>
-  );
-}
-
-export async function loader({ request, context }: Route.LoaderArgs) {
-  const honoContext = getHonoContext(context);
-
-  return {
-    user: await honoContext.get("app").get(UserSessionService).getIdentity(request),
-    requestOrigin: honoContext.get("requestOrigin") ?? request.url,
-  };
-}
-
-export const meta = ({ loaderData }: Route.ComponentProps) => {
-  const ogImage = new URL("/images/og-image-v2.png", loaderData.requestOrigin).toString();
-  const ogUrl = trimEnd(new URL("", loaderData.requestOrigin).toString(), "/");
-  const siteName = "Resolid";
-  const title = siteName;
-  const description =
-    "使用 React Router 驱动的全栈网站，展示使用现代 Web 技术构建高性能、可扩展和用户友好的 Web 应用程序的最佳实践。";
-
-  return [
-    { title },
-    {
-      name: "description",
-      content: description,
-    },
-    {
-      property: "og:site_name",
-      content: siteName,
-    },
-    {
-      property: "og:title",
-      content: title,
-    },
-    {
-      property: "og:description",
-      content: description,
-    },
-    {
-      property: "og:url",
-      content: ogUrl,
-    },
-    {
-      property: "og:image",
-      content: ogImage,
-    },
-    {
-      property: "og:type",
-      content: "website",
-    },
-    {
-      property: "twitter:title",
-      content: title,
-    },
-    {
-      property: "twitter:description",
-      content: description,
-    },
-    {
-      property: "twitter:image",
-      content: ogImage,
-    },
-    {
-      property: "twitter:url",
-      content: ogUrl,
-    },
-    {
-      property: "twitter:card",
-      content: "summary_large_image",
-    },
-  ].filter(Boolean);
-};
-
-export default function SiteLayout({ loaderData }: Route.ComponentProps) {
-  const { user } = loaderData;
-
-  return (
-    <AuthContext value={{ identity: user }}>
-      <header className="sticky top-0 z-20 w-full border-b border-bd-normal bg-bg-normal">
-        <NavBar />
-      </header>
-      <div className="min-h-[calc(100vh-var(--spacing)*16-108px)]">
-        <Outlet />
-      </div>
-      <footer className="border-t border-bd-normal">
-        <div className="mx-auto flex max-w-288 flex-col gap-1 p-4 text-center text-sm text-fg-muted">
-          <p>Released under the MIT License</p>
-          <p>Copyright Ⓒ 2022-present Resolid Tech</p>
-          <p className="inline-flex items-center justify-center gap-2">
-            <Badge color="success" render={(props) => <HistoryLink {...props} to="status" />}>
-              <SpriteIcon className="me-1" name="status" />
-              运行状态
-            </Badge>
-            {import.meta.env.RESOLID_PLATFORM == "vercel" && (
-              <Badge className="pointer-events-none" color="neutral">
-                部署于 Vercel
-              </Badge>
-            )}
-            {import.meta.env.RESOLID_PLATFORM == "netlify" && (
-              <Badge className="pointer-events-none" color="secondary">
-                部署于 Netlify
-              </Badge>
-            )}
-          </p>
-        </div>
-      </footer>
-      {import.meta.env.RESOLID_PLATFORM == "vercel" && (
-        <>
-          <VercelAnalytics endpoint="/growth" scriptSrc="/growth/script.js" />
-          <VercelSpeedInsights
-            endpoint="/speed-growth/vitals"
-            scriptSrc="/speed-growth/script.js"
-          />
-        </>
-      )}
-    </AuthContext>
   );
 }
