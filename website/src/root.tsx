@@ -6,6 +6,8 @@ import { ErrorComponent } from "~/components/error-component";
 import { RouteProcessBar } from "~/components/route-process-bar";
 import type { Route } from "../.react-router/types/src/+types/root";
 
+import "~/zod";
+
 import style from "./root.css?url";
 
 export function Layout({ children }: PropsWithChildren) {

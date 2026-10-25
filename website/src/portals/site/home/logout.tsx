@@ -1,0 +1,10 @@
+import { getHonoContext, httpRedirect } from "@resolid/dev/http.server";
+import { UserSessionService } from "~/modules/user/session.service.server";
+import type { Route } from "./+types/logout";
+
+export const action = async ({ request, context }: Route.ActionArgs) => {
+  httpRedirect(
+    new URL(request.url).searchParams.get("redirect") ?? "",
+    await getHonoContext(context).get("app").get(UserSessionService).destroySession(request),
+  );
+};

@@ -1,0 +1,141 @@
+import { getHonoContext, httpProblem, httpRedirect } from "@resolid/dev/http.server";
+import { mergeMeta } from "@resolid/dev/router";
+import { Button, Checkbox, Input } from "@resolid/react-ui";
+import { Controller } from "react-hook-form";
+import { Form, useSearchParams } from "react-router";
+import { parseFormData, useRemixForm } from "remix-hook-form";
+import { FormError } from "~/components/form-error";
+import { HistoryLink } from "~/components/history-link";
+import { UserService } from "~/modules/user/service.server";
+import { UserSessionService } from "~/modules/user/session.service.server";
+import { type UserLoginFormData, userLoginResolver } from "~/modules/user/validate";
+import type { Route } from "./+types/login";
+
+export const meta = mergeMeta(() => {
+  return [{ title: "登陆" }];
+});
+
+export const action = async ({ request, context }: Route.ActionArgs) => {
+  const honoContext = getHonoContext(context);
+  const remoteAddr = honoContext.get("remoteAddr");
+  const formData = await parseFormData<UserLoginFormData>(request);
+
+  const [errors, user] = await honoContext
+    .get("app")
+    .get(UserService)
+    .login(formData, userLoginResolver);
+
+  if (errors) {
+    return httpProblem(errors);
+  }
+
+  httpRedirect(
+    new URL(request.url).searchParams.get("redirect") ?? "/",
+    await honoContext
+      .get("app")
+      .get(UserSessionService)
+      .commitSession(request, user, remoteAddr, formData.rememberMe),
+  );
+};
+
+export default function Login() {
+  const [params] = useSearchParams();
+
+  const {
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    control,
+  } = useRemixForm<UserLoginFormData>({
+    mode: "onBlur",
+    resolver: userLoginResolver,
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: true,
+    },
+  });
+
+  return (
+    <div className="mx-auto flex max-w-96 flex-col gap-5 py-10">
+      <h3 className="text-center text-xl font-bold">登陆你的账号</h3>
+      <Form method="post" className="flex flex-col gap-7" onSubmit={handleSubmit} noValidate>
+        <div className="relative flex flex-col gap-1">
+          <label htmlFor="email">电子邮箱</label>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field: { name, onChange, onBlur, value, ref } }) => (
+              <Input
+                id={name}
+                name={name}
+                invalid={Boolean(errors.email?.message)}
+                type="email"
+                className="w-full"
+                placeholder="电子邮箱"
+                autoComplete="email"
+                onChange={onChange}
+                onBlur={onBlur}
+                value={value}
+                ref={ref}
+              />
+            )}
+          />
+          <FormError message={errors.email?.message} />
+        </div>
+        <div className="relative flex flex-col gap-1">
+          <label htmlFor="password">密码</label>
+          <Controller
+            name="password"
+            control={control}
+            render={({ field: { name, onChange, onBlur, value, ref } }) => (
+              <Input
+                id={name}
+                name={name}
+                invalid={Boolean(errors.password?.message)}
+                type="password"
+                className="w-full"
+                placeholder="密码"
+                autoComplete="current-password"
+                onChange={onChange}
+                onBlur={onBlur}
+                value={value}
+                ref={ref}
+              />
+            )}
+          />
+          <FormError message={errors.password?.message} />
+        </div>
+        <div className="flex flex-row items-center justify-between">
+          <Controller
+            name="rememberMe"
+            control={control}
+            render={({ field: { name, value, onChange } }) => (
+              <Checkbox checked={value} id={name} name={name} onChange={onChange}>
+                在这台电脑上保持登陆
+              </Checkbox>
+            )}
+          />
+
+          <HistoryLink
+            className="text-link hover:underline"
+            to={{ pathname: "/password-forgot", search: params.toString() }}
+          >
+            忘记密码
+          </HistoryLink>
+        </div>
+        <Button size="lg" className="w-full tracking-widest" loading={isSubmitting} type="submit">
+          登录
+        </Button>
+      </Form>
+      <div>
+        还没有账号?&nbsp;
+        <HistoryLink
+          className="text-link hover:underline"
+          to={{ pathname: "/signup", search: params.toString() }}
+        >
+          注册
+        </HistoryLink>
+      </div>
+    </div>
+  );
+}

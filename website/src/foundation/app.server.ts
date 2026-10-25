@@ -4,7 +4,7 @@ import { createDatabaseExtension } from "@resolid/app-db";
 import { MySqlConnection } from "@resolid/app-db/adapters/mysql";
 import { createLogExtension, type LoggerEntity, LogService } from "@resolid/app-log";
 import { rotatingFileTarget } from "@resolid/app-log/targets";
-import { createMailExtension, createMailTransport } from "@resolid/app-mail";
+import { MailService, createMailExtension, createMailTransport } from "@resolid/app-mail";
 import { FileCache } from "@resolid/cache-file";
 import { RedisCache } from "@resolid/cache-redis";
 import { __DEV__ } from "@resolid/utils";
@@ -70,15 +70,19 @@ export const app = await createApp({
   ],
   providers: loadProviders(
     Object.values(
-      import.meta.glob(["./**/repository.server.ts", "./**/service.server.ts"], {
-        base: "../modules",
-        import: "*",
-        eager: true,
-      }),
+      import.meta.glob(
+        ["./**/repository.server.ts", "./**/service.server.ts", "./**/*.service.server.ts"],
+        {
+          base: "../modules",
+          import: "*",
+          eager: true,
+        },
+      ),
     ),
   ),
   expose: {
     logger: LogService,
+    mailler: MailService,
   },
 });
 

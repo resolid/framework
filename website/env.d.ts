@@ -11,11 +11,16 @@ declare namespace NodeJS {
     readonly RX_DB_SSL_CA: string;
     readonly RX_DB_TABLE_PREFIX: string;
 
+    readonly RX_COOKIE_SECRET: string;
+    readonly RX_TURNSTILE_SECRET: string;
+
     readonly RX_MAIL_FROM: string;
     readonly RX_MAIL_HOST: string;
     readonly RX_MAIL_PORT: number;
     readonly RX_MAIL_USER: string;
     readonly RX_MAIL_PASSWORD: string;
+
+    readonly RX_SUPPORT_EMAIL: string;
 
     readonly RX_PROXY: number;
     readonly RX_PROXY_COUNT: number;
@@ -23,4 +28,12 @@ declare namespace NodeJS {
     readonly VERCEL: number;
     readonly NETLIFY: boolean;
   }
+}
+
+interface ImportMetaEnv {
+  readonly VITE_TURNSTILE_KEY: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
 }

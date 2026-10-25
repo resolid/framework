@@ -7,6 +7,9 @@
     "paths": {
       "~/*": ["./src/*"],
       "@resolid/app": ["../packages/app/src"],
+      "@resolid/app/validate": ["../packages/app/src/validate.ts"],
+      "@resolid/app-auth": ["../packages/app-auth/src"],
+      "@resolid/app-auth/validate": ["../packages/app-auth/src/validate.ts"],
       "@resolid/app-cache": ["../packages/app-cache/src"],
       "@resolid/app-db": ["../packages/app-db/src"],
       "@resolid/app-db/adapters/*": ["../packages/app-db/src/adapters/*"],

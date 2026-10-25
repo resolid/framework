@@ -1,16 +1,27 @@
 import { getHonoContext } from "@resolid/dev/http.server";
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
   Badge,
   Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   Tooltip,
   TooltipArrow,
   TooltipContent,
   TooltipTrigger,
   tx,
 } from "@resolid/react-ui";
-import { trimEnd } from "@resolid/utils";
+import { omit, trimEnd } from "@resolid/utils";
 import { type MouseEventHandler, useState } from "react";
-import { Link, Outlet } from "react-router";
+import { createPath, Form, Link, Outlet, useLocation, type Location } from "react-router";
+import type { UserIdentity } from "~/modules/user/schema.server";
+import { AuthContext, useAuth } from "~/components/auth-provider";
 import { ColorModeToggle } from "~/components/color-mode-toggle";
 import { HistoryLink, HistoryNavLink } from "~/components/history-link";
 import { ResolidLogo } from "~/components/resolid-logo";
@@ -18,7 +29,95 @@ import { ResolidUiLogo } from "~/components/resolid-ui-logo";
 import { SpriteIcon } from "~/components/sprite-icon";
 import { VercelAnalytics } from "~/extensions/vercel/vercel-analytics";
 import { VercelSpeedInsights } from "~/extensions/vercel/vercel-speed-insights";
+import { UserSessionService } from "~/modules/user/session.service.server";
 import type { Route } from "./+types/layout";
+
+function NavUser() {
+  const location = useLocation();
+  const { identity: user } = useAuth<UserIdentity>();
+
+  return user ? (
+    <DropdownMenu placement="bottom">
+      <DropdownMenuTrigger
+        render={(props) => <Button {...props} variant="ghost" color="neutral" size="sm" iconOnly />}
+      >
+        <Avatar size={25} name={user.nickname || user.username}>
+          <AvatarImage src={user.avatar} />
+          <AvatarFallback />
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="text-sm">
+        <DropdownMenuLabel className="gap-2">
+          <Avatar size={42} name={user.nickname || user.username}>
+            <AvatarImage src={user.avatar} />
+            <AvatarFallback />
+          </Avatar>
+          <div className="flex flex-col text-left">
+            <span className="text-base font-medium">{user.nickname || user.username}</span>
+            <span className="text-fg-muted">{user.email}</span>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuItem
+          render={(props) => <HistoryLink {...props} to={`user/${user.username}`} />}
+        >
+          <SpriteIcon size="1rem" name="user" className="me-1.5" />
+          个人主页
+        </DropdownMenuItem>
+        <DropdownMenuItem render={(props) => <HistoryLink {...props} to="settings" />}>
+          <SpriteIcon size="1rem" name="setting" className="me-1.5" />
+          用户设置
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <Form action={createPath(getLoginTo("logout", location))} method="post">
+          <DropdownMenuItem render={(props) => <button {...props} type="submit" />}>
+            <SpriteIcon size="1rem" name="logout" className="me-1.5" />
+            退出登陆
+          </DropdownMenuItem>
+        </Form>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ) : (
+    <Tooltip placement="bottom">
+      <TooltipTrigger
+        render={(props) => (
+          <Button
+            {...props}
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            iconOnly
+            render={(props) => <HistoryLink {...props} to={getLoginTo("login", location)} />}
+          />
+        )}
+        aria-label="用户登录"
+      >
+        <SpriteIcon size="1.5em" name="user" />
+      </TooltipTrigger>
+      <TooltipContent>
+        <TooltipArrow />
+        用户登录
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+const getLoginTo = (pathname: string, location: Location) => {
+  const to = {
+    pathname,
+    search: location.search,
+  };
+
+  if (
+    !location.pathname.endsWith("login") &&
+    !location.pathname.endsWith("signup") &&
+    !location.pathname.endsWith("logout") &&
+    !location.pathname.endsWith("password-forgot")
+  ) {
+    to.search = new URLSearchParams({ redirect: createPath(omit(location, ["hash"])) }).toString();
+  }
+
+  return to;
+};
 
 function NavMenu({ onClick }: { onClick?: MouseEventHandler<HTMLAnchorElement> }) {
   return (
@@ -72,6 +171,7 @@ function NavBar() {
         <NavMenu onClick={() => setOpened(false)} />
       </div>
       <div className="inline-flex items-center gap-1 text-fg-muted">
+        <NavUser />
         <ColorModeToggle />
         <Tooltip placement="bottom">
           <TooltipTrigger
@@ -142,8 +242,11 @@ function NavBar() {
 }
 
 export async function loader({ request, context }: Route.LoaderArgs) {
+  const honoContext = getHonoContext(context);
+
   return {
-    requestOrigin: getHonoContext(context).get("requestOrigin") ?? request.url,
+    user: await honoContext.get("app").get(UserSessionService).getIdentity(request),
+    requestOrigin: honoContext.get("requestOrigin") ?? request.url,
   };
 }
 
@@ -208,9 +311,11 @@ export const meta = ({ loaderData }: Route.ComponentProps) => {
   ].filter(Boolean);
 };
 
-export default function SiteLayout() {
+export default function SiteLayout({ loaderData }: Route.ComponentProps) {
+  const { user } = loaderData;
+
   return (
-    <>
+    <AuthContext value={{ identity: user }}>
       <header className="sticky top-0 z-20 w-full border-b border-bd-normal bg-bg-normal">
         <NavBar />
       </header>
@@ -248,6 +353,6 @@ export default function SiteLayout() {
           />
         </>
       )}
-    </>
+    </AuthContext>
   );
 }

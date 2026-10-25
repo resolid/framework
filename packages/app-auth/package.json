@@ -1,0 +1,70 @@
+{
+  "name": "@resolid/app-auth",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Auth module for Resolid applications",
+  "keywords": [
+    "auth",
+    "resolid"
+  ],
+  "homepage": "https://www.resolid.tech",
+  "license": "MIT",
+  "author": {
+    "name": "Huijie Wei",
+    "email": "hello@resolid.tech"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/resolid/framework.git",
+    "directory": "packages/app-auth"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./validate": {
+      "types": "./dist/validate.d.mts",
+      "import": "./dist/validate.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsdown",
+    "lint": "oxlint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@resolid/app": "workspace:^",
+    "@resolid/utils": "^1.7.3",
+    "type-fest": "^5.10.0"
+  },
+  "devDependencies": {
+    "@resolid/app-db": "workspace:^",
+    "kysely": "^0.29.7",
+    "react-router": "^8.5.0",
+    "tsdown": "^0.23.2",
+    "zod": "^4.6.7"
+  },
+  "peerDependencies": {
+    "@resolid/app-db": "workspace:^",
+    "@resolid/app-log": "workspace:^",
+    "kysely": "^0.29.7",
+    "react-hook-form": "^7.90.0",
+    "react-router": "^8.5.0",
+    "zod": "^4.6.7"
+  },
+  "engines": {
+    "node": "^22.22.0 || >=24"
+  }
+}

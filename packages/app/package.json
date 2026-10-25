@@ -29,6 +29,10 @@
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     },
+    "./validate": {
+      "types": "./dist/validate.d.mts",
+      "import": "./dist/validate.mjs"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -42,11 +46,17 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^6.0.0",
     "@resolid/di": "workspace:^",
     "@resolid/event": "workspace:^"
   },
   "devDependencies": {
-    "tsdown": "^0.23.1"
+    "react-hook-form": "^7.91.0",
+    "tsdown": "^0.23.2"
+  },
+  "peerDependencies": {
+    "react-hook-form": "^7.90.0",
+    "zod": "^4.6.7"
   },
   "engines": {
     "node": "^22.22.0 || >=24"

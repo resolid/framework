@@ -9,6 +9,7 @@ overrides:
 engineStrict: true
 allowBuilds:
   "@tailwindcss/oxide": true
+  esbuild: true
   lefthook: true
 minimumReleaseAge: 600
 minimumReleaseAgeExclude:

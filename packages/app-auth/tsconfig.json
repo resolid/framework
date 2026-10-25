@@ -1,0 +1,11 @@
+{
+  "extends": "@resolid/config/tsconfig/lib.json",
+  "include": ["src/**/*", "*.config.ts"],
+  "compilerOptions": {
+    "paths": {
+      "@resolid/app": ["../app/src"],
+      "@resolid/app/validate": ["../app/src/validate.ts"],
+      "@resolid/app-db": ["../app-db/src"]
+    }
+  }
+}
