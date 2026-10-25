@@ -5,11 +5,13 @@ import { TableSnakeCasePlugin } from "../plugins/table-snake-case-plugin";
 export type CommonConfig = {
   logger?: boolean | Logger;
   plugins?: KyselyPlugin[];
-  tablePrefix?: string;
-  snakeCaseTables?: boolean;
 };
 
-export type ConnectionConfig<C> = C & CommonConfig;
+export type ConnectionConfig<C> = C &
+  CommonConfig & {
+    tablePrefix?: string;
+    snakeCaseTables?: boolean;
+  };
 
 export abstract class DatabaseConnection<C> {
   protected readonly config: ConnectionConfig<C>;
