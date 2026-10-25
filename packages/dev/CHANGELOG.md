@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.9.0
+
+### Minor Changes
+
+- [`4a6076d`](https://github.com/resolid/framework/commit/4a6076dc12f29baece9a2559f6fd774aed5f8a04) - refactor: rename clientIp to remoteAddr and clarify context variable types
+
 ## 0.8.8
 
 ### Patch Changes
