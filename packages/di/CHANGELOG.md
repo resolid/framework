@@ -1,5 +1,11 @@
 # @resolid/di
 
+## 0.7.7
+
+### Patch Changes
+
+- [`22873fb`](https://github.com/resolid/framework/commit/22873fbded201af7d8519ee1cf7eadfc4d021f9b) - refactor: rename toString to describeToken
+
 ## 0.7.6
 
 ### Patch Changes
