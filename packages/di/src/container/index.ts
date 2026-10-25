@@ -1,5 +1,5 @@
 import { InjectionContext } from "../context";
-import { type Disposable, type Resolver, type Token, toString } from "../shared";
+import { type Disposable, type Resolver, type Token, describeToken } from "../shared";
 
 export type Scope = "singleton" | "transient";
 
@@ -17,7 +17,7 @@ export class Container implements Resolver, Disposable {
   private _checkCircularDependency(token: Token) {
     if (this._constructing.includes(token)) {
       throw new Error(
-        `Circular dependency detected ${[...this._constructing, token].map(toString).join(" -> ")}`,
+        `Circular dependency detected ${[...this._constructing, token].map(describeToken).join(" -> ")}`,
       );
     }
   }
@@ -29,7 +29,7 @@ export class Container implements Resolver, Disposable {
 
     if (provider === undefined) {
       if (!optional) {
-        throw new Error(`No provider found for ${toString(token)}`);
+        throw new Error(`No provider found for ${describeToken(token)}`);
       }
 
       return undefined;
@@ -95,7 +95,7 @@ export class Container implements Resolver, Disposable {
         } catch (err) {
           errorCount++;
           /* istanbul ignore next -- @preserve */
-          errorMsg += `${toString(token)}: ${err instanceof Error ? err.message : String(err)}; `;
+          errorMsg += `${describeToken(token)}: ${err instanceof Error ? err.message : String(err)}; `;
         }
       }
     }

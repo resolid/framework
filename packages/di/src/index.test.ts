@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { Container, inject } from "./index";
-import { toString } from "./shared";
+import { describeToken } from "./shared";
 
 describe("DI Container", () => {
   const TEST_TOKEN = Symbol("TEST");
@@ -475,16 +475,16 @@ describe("DI Container", () => {
     });
   });
 
-  describe("toString", () => {
+  describe("describeToken", () => {
     it("should return string representation of symbol without description", () => {
       const token = Symbol();
-      const result = toString(token);
+      const result = describeToken(token);
       expect(result).toBe("Symbol()");
     });
 
     it("should handle symbols with empty string description", () => {
       const token = Symbol("");
-      const result = toString(token);
+      const result = describeToken(token);
       expect(result).toBe("");
     });
   });

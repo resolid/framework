@@ -7,7 +7,7 @@ export type Token<T = unknown> =
       name: string;
     };
 
-export function toString<T>(token: Token<T>): string {
+export function describeToken<T>(token: Token<T>): string {
   return typeof token === "symbol" ? (token.description ?? String(token)) : token.name;
 }
 
