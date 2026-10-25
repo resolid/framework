@@ -14,7 +14,7 @@ export type InferTable<C> = {
   [K in keyof C]: C[K] extends ColumnDefinition<infer T> ? T : never;
 };
 
-type filteredData<T extends object, C> = Pick<T, Extract<keyof T, keyof C>>;
+type FilteredData<T extends object, C> = Pick<T, Extract<keyof T, keyof C>>;
 
 export type Table<
   C extends Record<string, ColumnDefinition<unknown>> = Record<string, ColumnDefinition<unknown>>,
@@ -24,7 +24,7 @@ export type Table<
   $insert: Insertable<InferTable<C>>;
   $select: Selectable<InferTable<C>>;
   $update: Updateable<InferTable<C>>;
-  filterData: <T extends object>(data: T) => filteredData<T, C>;
+  filterData: <T extends object>(data: T) => FilteredData<T, C>;
 };
 
 export function defineTable<const C extends Record<string, ColumnDefinition<unknown>>>(
@@ -37,7 +37,7 @@ export function defineTable<const C extends Record<string, ColumnDefinition<unkn
     $insert: undefined as unknown as Insertable<InferTable<C>>,
     $select: undefined as unknown as Selectable<InferTable<C>>,
     $update: undefined as unknown as Updateable<InferTable<C>>,
-    filterData<T extends object>(data: T): filteredData<T, C> {
+    filterData<T extends object>(data: T): FilteredData<T, C> {
       const result: Record<string, unknown> = {};
 
       for (const key of Object.keys(columns)) {
@@ -46,7 +46,7 @@ export function defineTable<const C extends Record<string, ColumnDefinition<unkn
         }
       }
 
-      return result as filteredData<T, C>;
+      return result as FilteredData<T, C>;
     },
   };
 }
