@@ -82,7 +82,7 @@ export const app = await createApp({
   ),
   expose: {
     logger: LogService,
-    mailler: MailService,
+    mailer: MailService,
   },
 });
 

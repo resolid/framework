@@ -2,7 +2,7 @@ import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import { createFieldErrors, isSuccessData } from "@resolid/app/validate";
 import { getHonoContext, httpProblem } from "@resolid/dev/http.server";
 import { HistoryLink, mergeMeta } from "@resolid/dev/router";
-import { Button, Input } from "@resolid/react-ui";
+import { Button } from "@resolid/react-ui";
 import { addDays, formatDate } from "@resolid/utils/date";
 import Bowser from "bowser";
 import { env } from "node:process";
@@ -10,7 +10,7 @@ import { useRef, useState } from "react";
 import { Controller } from "react-hook-form";
 import { Form, useSearchParams } from "react-router";
 import { parseFormData, useRemixForm } from "remix-hook-form";
-import { FormError } from "~/components/form-error";
+import { FormInputField } from "~/components/form-fields";
 import { passwordForgotEmail } from "~/extensions/email/password-forgot.server";
 import { TurnstileWidget } from "~/extensions/trunstile/trunstile-widget";
 import { trunstileVerify } from "~/extensions/trunstile/trunstile.server";
@@ -26,10 +26,10 @@ export const meta = mergeMeta(() => {
 });
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const honoContext = getHonoContext(context);
+  const hono = getHonoContext(context);
 
   const data = await parseFormData<UserPasswordForgotFormData>(request);
-  const verify = await trunstileVerify(data.captcha, honoContext.get("remoteAddr"));
+  const verify = await trunstileVerify(data.captcha, hono.get("remoteAddr"));
 
   if (!verify.success) {
     return httpProblem(createFieldErrors({ captcha: "验证失败" }));
@@ -38,23 +38,18 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   const expiredAt = addDays(null, 1);
   const userAgent = request.headers.get("user-agent") ?? "";
 
-  const [errors, result] = await honoContext
-    .get("app")
+  const app = hono.get("app");
+
+  const [errors, result] = await app
     .get(UserService)
-    .passwordForgot(
-      data,
-      expiredAt,
-      honoContext.get("remoteAddr"),
-      userAgent,
-      userPasswordForgotResolver,
-    );
+    .passwordForgot(data, expiredAt, hono.get("remoteAddr"), userAgent, userPasswordForgotResolver);
 
   if (errors) {
     return httpProblem(errors);
   }
 
   if (result.identity) {
-    const baseUrl = honoContext.get("requestOrigin") ?? request.url;
+    const baseUrl = hono.get("requestOrigin") ?? request.url;
     const resetUrl = new URL(`/password-reset?token=${result.resetId}`, baseUrl).toString();
 
     const { os, browser } = Bowser.parse(userAgent);
@@ -70,7 +65,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       browserName: browser.name ?? "未知浏览器",
     });
 
-    const sended = await honoContext.get("app").$.mailler.send({
+    const sent = await app.$.mailer.send({
       to: {
         name: displayName,
         address: result.identity.email,
@@ -80,11 +75,11 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       text: email.text,
     });
 
-    if (!sended.success) {
-      honoContext.get("app").$.logger.error(`密码重置邮件发送失败：${sended.message}`);
+    if (!sent.success) {
+      app.$.logger.error(`密码重置邮件发送失败：${sent.message}`);
     }
   } else {
-    honoContext.get("app").$.logger.warn(`密码重置邮件发送失败：${data.email} 不存在`);
+    app.$.logger.warn(`密码重置邮件发送失败：${data.email} 不存在`);
   }
 
   return { success: true };
@@ -100,7 +95,7 @@ export default function PasswordForgot({ actionData }: Route.ComponentProps) {
 
   const {
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
     control,
   } = useRemixForm<UserPasswordForgotFormData>({
     mode: "onSubmit",
@@ -117,28 +112,13 @@ export default function PasswordForgot({ actionData }: Route.ComponentProps) {
         输入你的电子邮箱，我们将向你发送用于重置密码的链接。
       </p>
       <Form method="post" className="flex flex-col gap-7" onSubmit={handleSubmit} noValidate>
-        <div className="relative flex flex-col gap-1">
-          <label htmlFor="email">电子邮箱</label>
-          <Controller
-            name="email"
-            control={control}
-            render={({ field: { name, onChange, onBlur, value, ref } }) => (
-              <Input
-                id={name}
-                name={name}
-                invalid={Boolean(errors.email?.message)}
-                type="email"
-                className="w-full"
-                placeholder="电子邮箱"
-                onChange={onChange}
-                onBlur={onBlur}
-                value={value}
-                ref={ref}
-              />
-            )}
-          />
-          <FormError message={errors.email?.message} />
-        </div>
+        <FormInputField
+          control={control}
+          name="email"
+          label="电子邮箱"
+          type="email"
+          autoComplete="email"
+        />
         <div className="flex justify-center">
           <Controller
             name="captcha"

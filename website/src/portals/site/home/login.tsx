@@ -1,10 +1,9 @@
 import { getHonoContext, httpProblem, httpRedirect } from "@resolid/dev/http.server";
 import { mergeMeta } from "@resolid/dev/router";
-import { Button, Checkbox, Input } from "@resolid/react-ui";
-import { Controller } from "react-hook-form";
+import { Button } from "@resolid/react-ui";
 import { Form, useSearchParams } from "react-router";
 import { parseFormData, useRemixForm } from "remix-hook-form";
-import { FormError } from "~/components/form-error";
+import { FormCheckboxField, FormInputField } from "~/components/form-fields";
 import { HistoryLink } from "~/components/history-link";
 import { UserService } from "~/modules/user/service.server";
 import { UserSessionService } from "~/modules/user/session.service.server";
@@ -16,14 +15,13 @@ export const meta = mergeMeta(() => {
 });
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const honoContext = getHonoContext(context);
-  const remoteAddr = honoContext.get("remoteAddr");
+  const hono = getHonoContext(context);
+  const remoteAddr = hono.get("remoteAddr");
   const formData = await parseFormData<UserLoginFormData>(request);
 
-  const [errors, user] = await honoContext
-    .get("app")
-    .get(UserService)
-    .login(formData, userLoginResolver);
+  const app = hono.get("app");
+
+  const [errors, user] = await app.get(UserService).login(formData, userLoginResolver);
 
   if (errors) {
     return httpProblem(errors);
@@ -31,10 +29,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 
   httpRedirect(
     new URL(request.url).searchParams.get("redirect") ?? "/",
-    await honoContext
-      .get("app")
-      .get(UserSessionService)
-      .commitSession(request, user, remoteAddr, formData.rememberMe),
+    await app.get(UserSessionService).commitSession(request, user, remoteAddr, formData.rememberMe),
   );
 };
 
@@ -43,7 +38,7 @@ export default function Login() {
 
   const {
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
     control,
   } = useRemixForm<UserLoginFormData>({
     mode: "onBlur",
@@ -59,63 +54,24 @@ export default function Login() {
     <div className="mx-auto flex max-w-96 flex-col gap-5 py-10">
       <h3 className="text-center text-xl font-bold">登陆你的账号</h3>
       <Form method="post" className="flex flex-col gap-7" onSubmit={handleSubmit} noValidate>
-        <div className="relative flex flex-col gap-1">
-          <label htmlFor="email">电子邮箱</label>
-          <Controller
-            name="email"
-            control={control}
-            render={({ field: { name, onChange, onBlur, value, ref } }) => (
-              <Input
-                id={name}
-                name={name}
-                invalid={Boolean(errors.email?.message)}
-                type="email"
-                className="w-full"
-                placeholder="电子邮箱"
-                autoComplete="email"
-                onChange={onChange}
-                onBlur={onBlur}
-                value={value}
-                ref={ref}
-              />
-            )}
-          />
-          <FormError message={errors.email?.message} />
-        </div>
-        <div className="relative flex flex-col gap-1">
-          <label htmlFor="password">密码</label>
-          <Controller
-            name="password"
-            control={control}
-            render={({ field: { name, onChange, onBlur, value, ref } }) => (
-              <Input
-                id={name}
-                name={name}
-                invalid={Boolean(errors.password?.message)}
-                type="password"
-                className="w-full"
-                placeholder="密码"
-                autoComplete="current-password"
-                onChange={onChange}
-                onBlur={onBlur}
-                value={value}
-                ref={ref}
-              />
-            )}
-          />
-          <FormError message={errors.password?.message} />
-        </div>
+        <FormInputField
+          control={control}
+          name="email"
+          label="电子邮箱"
+          type="email"
+          autoComplete="email"
+        />
+        <FormInputField
+          control={control}
+          name="password"
+          label="密码"
+          type="password"
+          autoComplete="current-password"
+        />
         <div className="flex flex-row items-center justify-between">
-          <Controller
-            name="rememberMe"
-            control={control}
-            render={({ field: { name, value, onChange } }) => (
-              <Checkbox checked={value} id={name} name={name} onChange={onChange}>
-                在这台电脑上保持登陆
-              </Checkbox>
-            )}
-          />
-
+          <FormCheckboxField control={control} name="rememberMe">
+            在这台电脑上保持登陆
+          </FormCheckboxField>
           <HistoryLink
             className="text-link hover:underline"
             to={{ pathname: "/password-forgot", search: params.toString() }}
