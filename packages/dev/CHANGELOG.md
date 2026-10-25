@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.9.1
+
+### Patch Changes
+
+- [`4083a93`](https://github.com/resolid/framework/commit/4083a9392624ebf0158acfcadb1f00d274caf4f5) - feat: add SuspenseAwait component to router utilities
+
 ## 0.9.0
 
 ### Minor Changes
