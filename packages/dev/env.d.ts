@@ -9,14 +9,14 @@ interface ImportMeta {
 }
 
 // oxlint-disable-next-line typescript/no-empty-object-type
-export interface AppVariableMap {}
+export interface AppContextVariables {}
 
-type ClientVariables = {
-  clientIp: string;
+type BuiltinContextVariables = {
+  remoteAddr: string;
   requestOrigin: string | undefined;
 } & RequestIdVariables;
 
 declare module "hono" {
   // oxlint-disable-next-line typescript/no-empty-object-type
-  interface ContextVariableMap extends ClientVariables, AppVariableMap {}
+  interface ContextVariableMap extends BuiltinContextVariables, AppContextVariables {}
 }

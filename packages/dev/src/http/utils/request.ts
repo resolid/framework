@@ -1,12 +1,16 @@
 import type { Socket } from "node:net";
 
-export interface GetClientIpOptions {
+export interface GetRemoteAddrOptions {
   proxy?: boolean;
   proxyCount?: number;
   ipHeaders?: string;
 }
 
-export function getRemoteAddr(req: Request, socket: Socket, options?: GetClientIpOptions): string {
+export function getRemoteAddr(
+  req: Request,
+  socket: Socket,
+  options?: GetRemoteAddrOptions,
+): string {
   const { proxy = false, proxyCount = 0, ipHeaders = "x-forwarded-for" } = options ?? {};
 
   const val = req.headers.get(ipHeaders);

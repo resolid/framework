@@ -20,8 +20,8 @@ export async function loader({ context }: Route.LoaderArgs) {
     ssr: {
       message: "服务器渲染正常",
       datetime: new Date().toISOString(),
-      clientIp: honoContext.get("clientIp"),
       requestId: honoContext.get("requestId"),
+      remoteAddr: honoContext.get("remoteAddr"),
     },
     db: honoContext
       .get("app")
@@ -76,7 +76,7 @@ export default function Status({ loaderData }: Route.ComponentProps) {
             <ClientOnly>{() => formatDatetime(ssr.datetime)}</ClientOnly>
           </dd>
           <dt>客户端地址：</dt>
-          <dd className="font-mono text-sm">{ssr.clientIp}</dd>
+          <dd className="font-mono text-sm">{ssr.remoteAddr}</dd>
           <dt>客户端时间：</dt>
           <dd className="font-mono text-sm">
             <ClientOnly>{() => formatDatetime(null)}</ClientOnly>

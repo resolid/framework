@@ -12,7 +12,7 @@ import { type App, app } from "~/foundation/app.server";
 await app.run();
 
 declare module "@resolid/dev/env" {
-  interface AppVariableMap {
+  interface AppContextVariables {
     app: App;
   }
 }

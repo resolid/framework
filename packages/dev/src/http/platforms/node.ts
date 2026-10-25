@@ -5,7 +5,7 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { logger } from "hono/logger";
 import { networkInterfaces } from "node:os";
 import { env } from "node:process";
-import { clientIp } from "../middlewares/client-ip";
+import { remoteAddr } from "../middlewares/remote-addr";
 import { requestId } from "../middlewares/request-id";
 import { requestOrigin } from "../middlewares/request-origin";
 import { getRemoteAddr, getRequestOrigin } from "../utils/request";
@@ -76,7 +76,7 @@ export async function createHonoNodeServer(
       }
 
       hono.use(
-        clientIp((ctx) =>
+        remoteAddr((ctx) =>
           getRemoteAddr(ctx.req.raw, ctx.env.incoming.socket, { proxy, proxyCount, ipHeaders }),
         ),
         requestId(),
