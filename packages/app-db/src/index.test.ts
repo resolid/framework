@@ -12,8 +12,9 @@ import {
 } from "kysely";
 import { describe, expect, it } from "vitest";
 import { SqliteConnection } from "./adapters/sqlite";
+import { BaseRepository } from "./base/repository";
+import { BaseService } from "./base/service";
 import { DatabaseConnection } from "./core/connection";
-import { Repository } from "./core/repository";
 import { createDatabaseExtension, DatabaseService } from "./core/service";
 
 const fakeDialect: Dialect = {
@@ -69,9 +70,20 @@ interface FakeDatabase {
   };
 }
 
-class FakeRepository extends Repository<FakeDatabase> {
+class FakeRepository extends BaseRepository<FakeDatabase> {
   async findFirstUser(): Promise<FakeDatabase["user"] | undefined> {
     return this.db.selectFrom("user").selectAll().limit(1).executeTakeFirst();
+  }
+}
+
+class FakeService extends BaseService {
+  async findFirstUser(): Promise<FakeDatabase["user"] | undefined> {
+    return this.database
+      .get<FakeDatabase>()
+      .selectFrom("user")
+      .selectAll()
+      .limit(1)
+      .executeTakeFirst();
   }
 }
 
@@ -124,7 +136,7 @@ describe("DatabaseService", () => {
     const { app, connection } = await createTestApp();
 
     await app.run();
-    await app.get(DatabaseService).start();
+    await app.get(DatabaseService).init();
 
     expect(connection.connectCount).toBe(1);
   });
@@ -150,7 +162,7 @@ describe("DatabaseService", () => {
     expect(connection.connectOptions?.plugins ?? []).toContain(pluginStub);
   });
 
-  it("should emit db:query with the source name", async () => {
+  it("should emit db:query with the connection name", async () => {
     const { app, connection } = await createTestApp();
 
     await app.run();
@@ -171,10 +183,10 @@ describe("DatabaseService", () => {
       queryDurationMillis: 12,
     });
 
-    expect(events).toEqual([["main", "select 1", 12]]);
+    expect(events).toEqual([["default", "select 1", 12]]);
   });
 
-  it("should throw for an unknown source", async () => {
+  it("should throw for an unknown connectionName", async () => {
     const { app } = await createTestApp();
 
     await app.run();
@@ -187,7 +199,9 @@ describe("DatabaseService", () => {
   it("should throw when not started yet", async () => {
     const { app } = await createTestApp();
 
-    expect(() => app.get(DatabaseService).get()).toThrow("does not exist");
+    expect(() => app.get(DatabaseService).get()).toThrow(
+      "Database connection has not been initialized",
+    );
   });
 });
 
@@ -246,7 +260,7 @@ describe("DatabaseService with multiple connections", () => {
   });
 });
 
-describe("Repository", () => {
+describe("BaseRepository", () => {
   it("should resolve the service through dependency injection", async () => {
     const app = await createApp({
       name: "TestApp",
@@ -266,6 +280,28 @@ describe("Repository", () => {
   });
 });
 
+describe("BaseService", () => {
+  it("should resolve the database through dependency injection", async () => {
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [
+        createDatabaseExtension({
+          connection: new FakeConnection("main"),
+        }),
+      ],
+      providers: [{ token: FakeService, factory: () => new FakeService() }],
+    });
+
+    await app.run();
+
+    const user = await app.get(FakeService).findFirstUser();
+
+    expect(user).toBeUndefined();
+
+    await app.dispose();
+  });
+});
+
 interface TestDatabase {
   user: {
     id: Generated<number>;
@@ -275,6 +311,165 @@ interface TestDatabase {
     id: Generated<number>;
   };
 }
+
+class SqliteUserRepository extends BaseRepository<TestDatabase> {
+  async insert(name: string): Promise<void> {
+    await this.db.insertInto("user").values({ name }).execute();
+  }
+
+  async selectAll(): Promise<{ id: number; name: string }[]> {
+    return this.db.selectFrom("user").selectAll().execute();
+  }
+}
+
+class SqliteUserService extends BaseService {
+  async create(name: string): Promise<void> {
+    await this.database.transaction<TestDatabase>(async (trx) => {
+      const users = new SqliteUserRepository(trx);
+
+      await users.insert(name);
+    });
+  }
+
+  async createAndFail(name: string): Promise<void> {
+    await this.database.transaction<TestDatabase>(async (trx) => {
+      const users = new SqliteUserRepository(trx);
+
+      await users.insert(name);
+
+      throw new Error("rollback");
+    });
+  }
+}
+
+async function createSqliteAppWithUserTable() {
+  const app = await createApp({
+    name: "TestApp",
+    extensions: [
+      createDatabaseExtension({
+        connection: new SqliteConnection({ databaseFile: ":memory:" }),
+      }),
+    ],
+    expose: { database: DatabaseService },
+    providers: [{ token: SqliteUserService, factory: () => new SqliteUserService() }],
+  });
+
+  await app.run();
+
+  const database = app.get(DatabaseService);
+
+  await database
+    .get<TestDatabase>()
+    .schema.createTable("user")
+    .addColumn("id", "integer", (col) => col.primaryKey().autoIncrement())
+    .addColumn("name", "text", (col) => col.notNull())
+    .execute();
+
+  return { app, database };
+}
+
+describe("Database transactions", () => {
+  it("should share the transaction between a service and its repository", async () => {
+    const { app, database } = await createSqliteAppWithUserTable();
+
+    await app.get(SqliteUserService).create("committed");
+
+    const users = new SqliteUserRepository(database.get<TestDatabase>());
+
+    expect(await users.selectAll()).toEqual([{ id: 1, name: "committed" }]);
+
+    await app.dispose();
+  });
+
+  it("should roll back repository writes when the service transaction fails", async () => {
+    const { app, database } = await createSqliteAppWithUserTable();
+
+    await expect(app.get(SqliteUserService).createAndFail("rolled-back")).rejects.toThrow(
+      "rollback",
+    );
+
+    const users = new SqliteUserRepository(database.get<TestDatabase>());
+
+    expect(await users.selectAll()).toEqual([]);
+
+    await app.dispose();
+  });
+
+  it("should run a transaction on the requested connectionName", async () => {
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [
+        createDatabaseExtension({
+          connections: {
+            main: new FakeConnection("main"),
+            replica: new FakeConnection("replica"),
+          },
+          plugins: [],
+        }),
+      ],
+      expose: { database: DatabaseService },
+    });
+
+    await app.run();
+
+    const events: [string, string][] = [];
+
+    app.emitter.on("db:query", (name, query) => {
+      events.push([name, query]);
+    });
+
+    const result = await app.get(DatabaseService).transaction<TestDatabase>(async (trx) => {
+      await trx.selectFrom("user").selectAll().execute();
+
+      return "done";
+    }, "replica");
+
+    expect(result).toBe("done");
+    expect(events.length).toBeGreaterThan(0);
+    expect(events.every(([name]) => name === "replica")).toBe(true);
+
+    await app.dispose();
+  });
+
+  it("should roll back on the requested connectionName when the handler fails", async () => {
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [
+        createDatabaseExtension({
+          connections: {
+            main: new FakeConnection("main"),
+            replica: new FakeConnection("replica"),
+          },
+          plugins: [],
+        }),
+      ],
+      expose: { database: DatabaseService },
+    });
+
+    await app.run();
+
+    const events: [string, string][] = [];
+
+    app.emitter.on("db:query", (name, query) => {
+      events.push([name, query]);
+    });
+
+    await expect(
+      app.get(DatabaseService).transaction<TestDatabase>(async (trx) => {
+        await trx.selectFrom("user").selectAll().execute();
+
+        throw new Error("rollback");
+      }, "replica"),
+    ).rejects.toThrow("rollback");
+
+    expect(events.some(([name, query]) => name === "replica" && query.includes("select"))).toBe(
+      true,
+    );
+    expect(events.every(([name]) => name === "replica")).toBe(true);
+
+    await app.dispose();
+  });
+});
 
 describe("SqliteConnection", () => {
   it("should run kysely queries through the sqlite dialect", async () => {
@@ -292,8 +487,8 @@ describe("SqliteConnection", () => {
 
     const events: [string, string][] = [];
 
-    app.emitter.on("db:query", (source, query) => {
-      events.push([source, query]);
+    app.emitter.on("db:query", (name, query) => {
+      events.push([name, query]);
     });
 
     const db = app.get(DatabaseService).get<TestDatabase>();
@@ -310,7 +505,7 @@ describe("SqliteConnection", () => {
 
     expect(users).toEqual([{ id: 1, name: "resolid" }]);
     expect(events.some(([, query]) => query.includes("create table"))).toBe(true);
-    expect(events.filter(([source]) => source === "main").length).toBeGreaterThan(0);
+    expect(events.filter(([name]) => name === "default").length).toBeGreaterThan(0);
 
     await app.dispose();
   });
@@ -333,8 +528,8 @@ describe("SqliteConnection", () => {
 
     const events: [string, string][] = [];
 
-    app.emitter.on("db:query", (source, query) => {
-      events.push([source, query]);
+    app.emitter.on("db:query", (name, query) => {
+      events.push([name, query]);
     });
 
     const db = app.get(DatabaseService).get<TestDatabase>();
@@ -372,8 +567,8 @@ describe("SqliteConnection", () => {
 
     const events: [string, string][] = [];
 
-    app.emitter.on("db:query", (source, query) => {
-      events.push([source, query]);
+    app.emitter.on("db:query", (name, query) => {
+      events.push([name, query]);
     });
 
     const db = app.get(DatabaseService).get<TestDatabase>();
@@ -406,8 +601,8 @@ describe("SqliteConnection", () => {
 
     const events: [string, string][] = [];
 
-    app.emitter.on("db:query", (source, query) => {
-      events.push([source, query]);
+    app.emitter.on("db:query", (name, query) => {
+      events.push([name, query]);
     });
 
     const db = app.get(DatabaseService).get<TestDatabase>();

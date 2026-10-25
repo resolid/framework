@@ -6,11 +6,6 @@ export type CommonConfig = {
   logger?: boolean | Logger;
   plugins?: KyselyPlugin[];
   tablePrefix?: string;
-  /**
-   * Yii-style physical table naming: camelCase (or PascalCase) schema keys are
-   * compiled to snake_case table names. Enabled by default; set to false to
-   * keep schema keys verbatim.
-   */
   snakeCaseTables?: boolean;
 };
 
@@ -38,16 +33,16 @@ export abstract class DatabaseConnection<C> {
 
   protected abstract createDialect(): Dialect;
 
-  connect(options: { logger?: Logger; plugins?: KyselyPlugin[] }): void {
+  connect(context: { logger?: Logger; plugins?: KyselyPlugin[] }): void {
     this._database = new Kysely({
       dialect: this.createDialect(),
       plugins: [
-        ...(options.plugins ?? []),
+        ...(context.plugins ?? []),
         ...(this.config.plugins ?? []),
         ...(this.config.snakeCaseTables === false ? [] : [new TableSnakeCasePlugin()]),
         ...(this.config.tablePrefix ? [new TablePrefixPlugin(this.config.tablePrefix)] : []),
       ],
-      log: options.logger,
+      log: context.logger,
     });
   }
 

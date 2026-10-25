@@ -5,10 +5,10 @@ export interface StatusTable {
   message: string;
 }
 
+export type Status = Selectable<StatusTable>;
+
 declare module "@resolid/app-db" {
   interface Database {
     status: StatusTable;
   }
 }
-
-export type Status = Selectable<StatusTable>;

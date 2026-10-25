@@ -1,61 +1,74 @@
 import type { AppContext, Emitter, ExtensionCreator } from "@resolid/app";
 import type { Kysely } from "kysely";
 import type { CommonConfig, DatabaseConnection } from "./connection";
+import type { Database } from "./database";
 import { type AppDbEvents, createLoggerFactory } from "./utils";
 
-export type DatabaseConfig = {
-  connection?: DatabaseConnection<unknown>;
-  connections?: Record<string, DatabaseConnection<unknown>>;
-} & CommonConfig;
+export type DatabaseConfig<
+  C extends DatabaseConnection<unknown> | Record<string, DatabaseConnection<unknown>>,
+> = (C extends Record<string, DatabaseConnection<unknown>>
+  ? {
+      connections: C;
+      default?: keyof C & string;
+      connection?: never;
+    }
+  : {
+      connection: C;
+      connections?: never;
+      default?: never;
+    }) &
+  CommonConfig;
 
 declare module "@resolid/app" {
   // oxlint-disable-next-line typescript/no-empty-object-type
   export interface AppEvents extends AppDbEvents {}
 }
 
-export class DatabaseService {
+export class DatabaseService<
+  C extends DatabaseConnection<unknown> | Record<string, DatabaseConnection<unknown>> =
+    | DatabaseConnection<unknown>
+    | Record<string, DatabaseConnection<unknown>>,
+> {
   private readonly _emitter: Emitter<AppDbEvents>;
-  private readonly _config: DatabaseConfig;
-  private readonly _connections: Map<string, DatabaseConnection<unknown>> = new Map();
-  private readonly _defaultSource = "main";
+  private readonly _config: DatabaseConfig<C>;
+  private readonly _connections: Record<string, DatabaseConnection<unknown>>;
+  private readonly _defaultName: string;
 
-  private _started = false;
+  private _inited = false;
 
-  constructor(config: DatabaseConfig, context: AppContext) {
+  constructor(config: DatabaseConfig<C>, context: AppContext) {
     this._config = config;
     this._emitter = context.emitter;
+    this._defaultName = config.connection
+      ? "default"
+      : (config.default ?? Object.keys(config.connections)[0]!);
+    this._connections = config.connection ? { default: config.connection } : config.connections;
   }
 
-  async start(): Promise<void> {
-    if (this._started) {
+  async init(): Promise<void> {
+    if (this._inited) {
       return;
     }
 
-    const connections = this._config.connections ?? {
-      [this._defaultSource]: this._config.connection,
-    };
-
     const loggerFactory = createLoggerFactory(this._emitter, this._config.logger);
 
-    for (const [name, conn] of Object.entries(connections)) {
-      if (!conn) {
-        continue;
-      }
-
-      conn.connect({ logger: loggerFactory(name, conn.logger), plugins: this._config.plugins });
-      this._connections.set(name, conn);
+    for (const [name, connection] of Object.entries(this._connections)) {
+      connection.connect({
+        logger: loggerFactory(name, connection.logger),
+        plugins: this._config.plugins,
+      });
     }
 
-    this._started = true;
+    this._inited = true;
   }
 
   async dispose(): Promise<void> {
-    const connections = [...this._connections.values()];
+    const connections = Object.values(this._connections);
 
-    this._connections.clear();
-    this._started = false;
+    const results = await Promise.allSettled(connections.map((connection) => connection.close()));
 
-    const results = await Promise.allSettled(connections.map(async (conn) => conn.close()));
+    this._inited = false;
+
     const errors = results.filter((result) => result.status === "rejected");
 
     if (errors.length > 0) {
@@ -69,30 +82,40 @@ export class DatabaseService {
     }
   }
 
-  get<DB>(source: string = this._defaultSource): Kysely<DB> {
-    const conn = this._connections.get(source);
+  get<DB>(name?: string): Kysely<DB> {
+    const key = name ?? this._defaultName;
+    const connection = this._connections[key];
 
-    if (!conn) {
-      throw new Error(`Connection with name ${source} does not exist.`);
+    if (!connection) {
+      throw new Error(`Connection with name ${key} does not exist.`);
     }
 
-    return conn.database as Kysely<DB>;
+    return connection.database as Kysely<DB>;
+  }
+
+  transaction<DB = Database, T = unknown>(
+    handler: (executor: Kysely<DB>) => Promise<T>,
+    name: string = this._defaultName,
+  ): Promise<T> {
+    return this.get<DB>(name).transaction().execute(handler);
   }
 }
 
-export function createDatabaseExtension(config: DatabaseConfig): ExtensionCreator {
+export function createDatabaseExtension<
+  C extends DatabaseConnection<unknown> | Record<string, DatabaseConnection<unknown>>,
+>(config: DatabaseConfig<C>): ExtensionCreator {
   return (context) => ({
     name: "resolid-db-module",
     providers: [
       {
         token: DatabaseService,
         factory() {
-          return new DatabaseService(config, context);
+          return new DatabaseService<C>(config, context);
         },
       },
     ],
     async bootstrap() {
-      await context.container.get(DatabaseService).start();
+      await context.container.get(DatabaseService).init();
     },
   });
 }
