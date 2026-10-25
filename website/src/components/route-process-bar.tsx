@@ -8,7 +8,10 @@ export function RouteProcessBar() {
     <div
       aria-hidden={!active}
       aria-valuetext={active ? "正在加载" : undefined}
-      className="pointer-events-none fixed inset-x-0 top-0 z-99 h-1 animate-pulse"
+      className={tx(
+        "pointer-events-none fixed inset-x-0 top-0 z-99 h-1",
+        active && "animate-pulse motion-reduce:animate-none",
+      )}
     >
       <div
         ref={ref}

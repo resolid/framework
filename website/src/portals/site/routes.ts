@@ -12,6 +12,7 @@ export default [
     route("password-reset", "./home/password-reset.tsx"),
     route("terms-service", "./home/terms-service.tsx"),
     route("privacy-policy", "./home/privacy-policy.tsx"),
+    route("about", "./home/about.tsx"),
     route("status", "./home/status.tsx"),
     route("*", "../catchall.tsx", { id: "site-not-found-page" }),
   ]),
