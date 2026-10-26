@@ -1,6 +1,6 @@
 // oxlint-disable-next-line no-unused-vars
 import { isRouteErrorResponse } from "react-router";
-import { HistoryBack } from "~/components/history-link";
+import { HistoryBack } from "~/components/history-back";
 
 export function ErrorComponent({ error }: { error: unknown }) {
   if (isRouteErrorResponse(error) && error.status == 404) {
