@@ -12,8 +12,8 @@ import { Form, useSearchParams } from "react-router";
 import { parseFormData, useRemixForm } from "remix-hook-form";
 import { FormInputField } from "~/components/form-fields";
 import { passwordForgotEmail } from "~/extensions/email/password-forgot.server";
-import { TurnstileWidget } from "~/extensions/trunstile/trunstile-widget";
-import { trunstileVerify } from "~/extensions/trunstile/trunstile.server";
+import { TurnstileWidget } from "~/extensions/turnstile/turnstile-widget";
+import { turnstileVerify } from "~/extensions/turnstile/turnstile.server";
 import { UserService } from "~/modules/user/service.server";
 import {
   userPasswordForgotResolver,
@@ -35,7 +35,7 @@ export function headers() {
 export async function action({ request, context }: Route.ActionArgs) {
   const hono = getHonoContext(context);
   const data = await parseFormData<UserPasswordForgotFormData>(request);
-  const verify = await trunstileVerify(data.captcha, hono.get("remoteAddr"));
+  const verify = await turnstileVerify(data.captcha, hono.get("remoteAddr"));
 
   if (!verify.success) {
     return httpProblem(createFieldErrors({ captcha: "验证失败" }));

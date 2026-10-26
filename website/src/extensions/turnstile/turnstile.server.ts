@@ -1,7 +1,7 @@
 import type { TurnstileServerValidationResponse } from "@marsidev/react-turnstile";
 import { env } from "node:process";
 
-export async function trunstileVerify(token: string, remoteAddr?: string) {
+export async function turnstileVerify(token: string, remoteAddr?: string) {
   const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
     method: "POST",
     headers: {
