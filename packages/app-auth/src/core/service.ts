@@ -21,19 +21,19 @@ type AuthPasswordForgotFormData = z.infer<typeof authPasswordForgotSchema>;
 
 type AuthPasswordResetFormData = z.infer<typeof authPasswordResetSchema>;
 
-export const omitIdentity = <AT extends Auth, GT extends AuthGroup>(
-  identity: AT | AuthWithGroup<AT, GT>,
-): AuthIdentity<AT, GT> => {
+export const omitIdentity = <TAuth extends Auth, TGroup extends AuthGroup>(
+  identity: TAuth | AuthWithGroup<TAuth, TGroup>,
+): AuthIdentity<TAuth, TGroup> => {
   return omit(identity, ["password", "createdAt", "updatedAt", "deletedAt"]) as AuthIdentity<
-    AT,
-    GT
+    TAuth,
+    TGroup
   >;
 };
 
 export abstract class AuthService<
-  AT extends Auth,
-  GT extends AuthGroup,
-  R extends AuthRepository<AT, GT> = AuthRepository<AT, GT>,
+  TAuth extends Auth,
+  TGroup extends AuthGroup,
+  R extends AuthRepository<TAuth, TGroup> = AuthRepository<TAuth, TGroup>,
 > extends BaseService {
   private _repository: R;
 
@@ -49,7 +49,7 @@ export abstract class AuthService<
   async login<T extends AuthLoginFormData>(
     data: T,
     resolver: Resolver<T>,
-  ): Promise<ServiceResult<T, AuthIdentity<AT, GT>>> {
+  ): Promise<ServiceResult<T, AuthIdentity<TAuth, TGroup>>> {
     const result = await validateData<T>(data, resolver);
 
     if (!result.success) {
@@ -69,19 +69,21 @@ export abstract class AuthService<
       return [createFieldErrors<T>({ password: "邮箱或密码错误" }), undefined];
     }
 
-    return [undefined, omitIdentity<AT, GT>(identity)];
+    return [undefined, omitIdentity<TAuth, TGroup>(identity)];
   }
 
   async signup<T extends AuthSignupFormData>(
     data: T,
     defaultGroupId: number,
     resolver: Resolver<T>,
-  ): Promise<ServiceResult<T, AuthIdentity<AT, GT>>> {
+  ): Promise<ServiceResult<T, AuthIdentity<TAuth, TGroup>>> {
     const result = await validateData<T>(data, resolver);
 
     if (!result.success) {
       return [result.errors, undefined];
     }
+
+    const passwordHash = await hashPassword(result.values.password);
 
     return await this.database.transaction(async (trx) => {
       const repository = this._repository.withExecutor(trx);
@@ -106,13 +108,13 @@ export abstract class AuthService<
 
       const identity = await repository.create({
         ...result.values,
-        password: await hashPassword(result.values.password),
+        password: passwordHash,
         groupId: group.id,
-      } as AT);
+      } as TAuth);
 
       return [
         undefined,
-        omitIdentity<AT, GT>({
+        omitIdentity<TAuth, TGroup>({
           ...identity,
           group,
         }),
@@ -120,7 +122,7 @@ export abstract class AuthService<
     });
   }
 
-  async getIdentity(sessionId: string): Promise<AuthIdentity<AT, GT> | undefined> {
+  async getIdentity(sessionId: string): Promise<AuthIdentity<TAuth, TGroup> | undefined> {
     const identity = await this._repository.findBySessionId(sessionId, true);
 
     if (!identity) {
@@ -130,7 +132,7 @@ export abstract class AuthService<
     return omitIdentity(identity);
   }
 
-  async createSession(session: AuthSessionData<AT, GT>, expiredAt: Date): Promise<string> {
+  async createSession(session: AuthSessionData<TAuth, TGroup>, expiresAt: Date): Promise<string> {
     const sessionId = random();
 
     await this._repository.createSession({
@@ -138,7 +140,7 @@ export abstract class AuthService<
       identityId: session.identity.id,
       remoteAddr: session.remoteAddr,
       userAgent: session.userAgent,
-      expiredAt,
+      expiresAt,
     });
 
     return sessionId;
@@ -146,14 +148,14 @@ export abstract class AuthService<
 
   async updateSession(
     id: string,
-    session: AuthSessionData<AT, GT>,
-    expiredAt: Date,
+    session: AuthSessionData<TAuth, TGroup>,
+    expiresAt: Date,
   ): Promise<void> {
     const update = {
       identityId: session.identity.id,
       remoteAddr: session.remoteAddr,
       userAgent: session.userAgent,
-      expiredAt,
+      expiresAt,
     };
 
     await this._repository.updateSession(id, update);
@@ -165,11 +167,13 @@ export abstract class AuthService<
 
   async passwordForgot<T extends AuthPasswordForgotFormData>(
     data: T,
-    expiredAt: Date,
+    expiresAt: Date,
     remoteAddr: string,
     userAgent: string,
     resolver: Resolver<T>,
-  ): Promise<ServiceResult<T, { identity: AuthIdentity<AT, GT> | undefined; resetId: string }>> {
+  ): Promise<
+    ServiceResult<T, { identity: AuthIdentity<TAuth, TGroup> | undefined; resetId: string }>
+  > {
     const result = await validateData<T>(data, resolver);
 
     if (!result.success) {
@@ -190,7 +194,7 @@ export abstract class AuthService<
       await repository.createPasswordReset({
         id: resetId,
         identityId: identity.id,
-        expiredAt,
+        expiresAt,
         remoteAddr,
         userAgent,
       });
@@ -214,6 +218,8 @@ export abstract class AuthService<
       return [result.errors, undefined];
     }
 
+    const passwordHash = await hashPassword(result.values.password);
+
     return await this.database.transaction(async (trx) => {
       const repository = this._repository.withExecutor(trx);
 
@@ -223,8 +229,11 @@ export abstract class AuthService<
         return [createFieldErrors<T>({ token: "密码重置无效" }), undefined];
       }
 
-      await repository.updatePassword(reset.identityId, await hashPassword(result.values.password));
-      await repository.redeemedPasswordReset(reset.id);
+      if (!(await repository.consumePasswordReset(reset.id))) {
+        return [createFieldErrors<T>({ token: "密码重置无效" }), undefined];
+      }
+
+      await repository.updatePassword(reset.identityId, passwordHash);
 
       return [undefined, true];
     });

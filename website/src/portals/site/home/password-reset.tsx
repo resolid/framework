@@ -13,9 +13,14 @@ export const meta = mergeMeta(() => {
   return [{ title: "密码重置" }];
 });
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const hono = getHonoContext(context);
+export function headers() {
+  return {
+    "Referrer-Policy": "no-referrer",
+  };
+}
 
+export async function action({ request, context }: Route.ActionArgs) {
+  const hono = getHonoContext(context);
   const data = await parseFormData<UserPasswordResetFormData>(request);
 
   const [errors] = await hono
@@ -28,7 +33,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   }
 
   return { success: true };
-};
+}
 
 export default function PasswordReset({ actionData }: Route.ComponentProps) {
   const {

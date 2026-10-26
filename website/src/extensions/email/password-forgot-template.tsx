@@ -16,7 +16,7 @@ export type PasswordForgotEmailProps = {
   baseUrl: string;
   resetUrl: string;
   displayName: string;
-  expiredAt: string;
+  expiresAt: string;
   supportEmail: string;
   deviceOs: string;
   browserName: string;
@@ -26,7 +26,7 @@ export function PasswordForgotEmailTemplate({
   baseUrl,
   resetUrl,
   displayName,
-  expiredAt,
+  expiresAt,
   supportEmail,
   deviceOs: uaOs,
   browserName: uaBrowser,
@@ -47,7 +47,7 @@ export function PasswordForgotEmailTemplate({
             <Text style={text}>你好 {displayName}，</Text>
             <Text style={text}>
               您最近请求重置您的 Resolid 帐户的密码。使用下面的按钮来重置它。此密码重置在{" "}
-              {expiredAt} 前有效。
+              {expiresAt} 前有效。
             </Text>
             <Button style={button} href={resetUrl}>
               重置密码

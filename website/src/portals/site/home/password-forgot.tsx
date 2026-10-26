@@ -3,7 +3,7 @@ import { createFieldErrors, isSuccessData } from "@resolid/app/validate";
 import { getHonoContext, httpProblem } from "@resolid/dev/http.server";
 import { HistoryLink, mergeMeta } from "@resolid/dev/router";
 import { Button } from "@resolid/react-ui";
-import { addDays, formatDate } from "@resolid/utils/date";
+import { addMinutes, formatDate } from "@resolid/utils/date";
 import Bowser from "bowser";
 import { env } from "node:process";
 import { useRef, useState } from "react";
@@ -25,9 +25,15 @@ export const meta = mergeMeta(() => {
   return [{ title: "忘记密码" }];
 });
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const hono = getHonoContext(context);
+export function headers() {
+  return {
+    "X-Stretchy-Pants": "its for fun",
+    "Cache-Control": "max-age=300, s-maxage=3600",
+  };
+}
 
+export async function action({ request, context }: Route.ActionArgs) {
+  const hono = getHonoContext(context);
   const data = await parseFormData<UserPasswordForgotFormData>(request);
   const verify = await trunstileVerify(data.captcha, hono.get("remoteAddr"));
 
@@ -35,14 +41,13 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     return httpProblem(createFieldErrors({ captcha: "验证失败" }));
   }
 
-  const expiredAt = addDays(null, 1);
+  const expiresAt = addMinutes(null, 30);
   const userAgent = request.headers.get("user-agent") ?? "";
-
   const app = hono.get("app");
 
   const [errors, result] = await app
     .get(UserService)
-    .passwordForgot(data, expiredAt, hono.get("remoteAddr"), userAgent, userPasswordForgotResolver);
+    .passwordForgot(data, expiresAt, hono.get("remoteAddr"), userAgent, userPasswordForgotResolver);
 
   if (errors) {
     return httpProblem(errors);
@@ -59,7 +64,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       baseUrl,
       resetUrl,
       displayName,
-      expiredAt: formatDate(expiredAt, "YYYY-MM-DD HH:mm"),
+      expiresAt: formatDate(expiresAt, "YYYY-MM-DD HH:mm"),
       supportEmail: env.RX_SUPPORT_EMAIL,
       deviceOs: os.name ?? "未知设备",
       browserName: browser.name ?? "未知浏览器",
@@ -83,14 +88,12 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   }
 
   return { success: true };
-};
+}
 
 export default function PasswordForgot({ actionData }: Route.ComponentProps) {
   const [params] = useSearchParams();
-
-  const [captchaVerified, setCaptchaVerified] = useState(false);
   const captchaRef = useRef<TurnstileInstance>(null);
-
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   const isActionSuccess = isSuccessData(actionData);
 
   const {

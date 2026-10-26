@@ -53,7 +53,7 @@ export const authSessionColumns: {
   identityId: ColumnDefinition<number>;
   createdAt: ColumnDefinition<Generated<Timestamp>>;
   updatedAt: ColumnDefinition<Timestamp | null>;
-  expiredAt: ColumnDefinition<Timestamp>;
+  expiresAt: ColumnDefinition<Timestamp>;
   remoteAddr: ColumnDefinition<Generated<string>>;
   userAgent: ColumnDefinition<Generated<string>>;
 } = {
@@ -61,7 +61,7 @@ export const authSessionColumns: {
   identityId: column<number>(),
   createdAt: column<Generated<Timestamp>>(),
   updatedAt: column<Timestamp | null>(),
-  expiredAt: column<Timestamp>(),
+  expiresAt: column<Timestamp>(),
   remoteAddr: column<Generated<string>>(),
   userAgent: column<Generated<string>>(),
 };
@@ -71,17 +71,17 @@ export type AuthSessionTable = InferTable<typeof authSessionColumns>;
 export const authPasswordResetColumns: {
   id: ColumnDefinition<string>;
   identityId: ColumnDefinition<number>;
-  redeemed: ColumnDefinition<Generated<number>>;
+  usedAt: ColumnDefinition<Timestamp | null>;
   createdAt: ColumnDefinition<Generated<Timestamp>>;
-  expiredAt: ColumnDefinition<Timestamp | null>;
+  expiresAt: ColumnDefinition<Timestamp | null>;
   remoteAddr: ColumnDefinition<Generated<string>>;
   userAgent: ColumnDefinition<Generated<string>>;
 } = {
   id: column<string>(),
   identityId: column<number>(),
-  redeemed: column<Generated<number>>(),
+  usedAt: column<Timestamp | null>(),
   createdAt: column<Generated<Timestamp>>(),
-  expiredAt: column<Timestamp | null>(),
+  expiresAt: column<Timestamp | null>(),
   remoteAddr: column<Generated<string>>(),
   userAgent: column<Generated<string>>(),
 };

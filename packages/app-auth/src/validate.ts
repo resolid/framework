@@ -6,7 +6,7 @@ export const usernameValidator: ZodString = z
   .nonempty("用户名不能为空")
   .min(4, "用户名不能少于4个字符")
   .max(32, "用户名不能超过32个字符")
-  .regex(/^[a-z][a-z0-9_\\.]*$/, "用户名必须以字母开头不能包含特殊字符")
+  .regex(/^[a-z][a-z0-9_.]*$/, "用户名必须以字母开头不能包含特殊字符")
   .refine(
     (value) =>
       ![

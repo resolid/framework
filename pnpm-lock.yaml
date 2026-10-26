@@ -357,10 +357,10 @@ importers:
     dependencies:
       '@hono/netlify':
         specifier: ^1.0.2
-        version: 1.0.2(hono@4.13.13)
+        version: 1.0.2(hono@4.13.14)
       '@hono/node-server':
         specifier: ^2.1.5
-        version: 2.1.5(hono@4.13.13)
+        version: 2.1.5(hono@4.13.14)
       '@resolid/utils':
         specifier: ^1.7.3
         version: 1.7.3
@@ -368,8 +368,8 @@ importers:
         specifier: ^1.11.0
         version: 1.11.0
       hono:
-        specifier: ^4.13.13
-        version: 4.13.13
+        specifier: ^4.13.14
+        version: 4.13.14
       isbot:
         specifier: ^5.2.2
         version: 5.2.2
@@ -424,7 +424,7 @@ importers:
     dependencies:
       '@hono/netlify':
         specifier: ^1.0.2
-        version: 1.0.2(hono@4.13.13)
+        version: 1.0.2(hono@4.13.14)
       '@logtape/file':
         specifier: ^2.4.2
         version: 2.4.2(@logtape/logtape@2.4.2)
@@ -2361,8 +2361,8 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
-  baseline-browser-mapping@2.11.32:
-    resolution: {integrity: sha512-UvuxFU9P3hM29LrQdwu0cD6w6/+SFr+UlB9s/knI7+O2rK9xFxKUwSDWxGdbbqQ9/V7BJ5s0NI5nQAE4uJp3gQ==}
+  baseline-browser-mapping@2.11.33:
+    resolution: {integrity: sha512-yiVKDX+qCMRKBE084lXvq9EcwFUhKZ2nU8TK1EQQuOgPNR/lmbGxXOeDdlGUqC2Zz11Cs9rk1d/8NfgBmlkt0w==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -2783,8 +2783,8 @@ packages:
     resolution: {integrity: sha512-iZyKG96/JwPz1N55vj2Ie2vXbhu440zfUfJvSwEqEbeLluk7NnapfGqa7LH0mOsnDxTF85Mx8/dyR6HfqcbmbQ==}
     engines: {node: '>=20'}
 
-  hono@4.13.13:
-    resolution: {integrity: sha512-CQ46U0ZkAGmbT/4UxdzzGJpacP2IeKgY4a5/tOI9AABbpOMfK739wfDXmv1usCk+3RkKj1hQy4/fjhiwa2xlrA==}
+  hono@4.13.14:
+    resolution: {integrity: sha512-yhRLQ21U6qa9Hsu2N7Qcbh8tE+WKEcoErjIo56LeSGiGXGp9sA7UpE86Ui9uexb61KakiGwuHMn2QdV7w6i6kQ==}
     engines: {node: '>=16.9.0'}
 
   hookable@6.1.2:
@@ -3702,8 +3702,8 @@ packages:
   stubborn-utils@1.0.2:
     resolution: {integrity: sha512-zOh9jPYI+xrNOyisSelgym4tolKTJCQd5GBhK0+0xJvcYDcwlOoxF/rnFKQ2KRZknXSG9jWAp66fwP6AxN9STg==}
 
-  tabbable@6.5.0:
-    resolution: {integrity: sha512-wieBHXygIm7OyQOu5hQlkk62/WyCFYGlWg7L6/ZCUZwx0o398Zkn4pVmMyfYhfMG8kGrj/Krt8eIk6UKC6VzwA==}
+  tabbable@6.5.1:
+    resolution: {integrity: sha512-dMCuwDUY6Noz3zVKLefBC4wq+aJV20yc7vWmM7uTNGwtQSFF5kX7OUIUsxuVajz/bdt5Xqdah3/0NLjth+cM5A==}
 
   tagged-tag@1.0.0:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
@@ -4625,17 +4625,17 @@ snapshots:
       '@floating-ui/utils': 0.2.12
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
-      tabbable: 6.5.0
+      tabbable: 6.5.1
 
   '@floating-ui/utils@0.2.12': {}
 
-  '@hono/netlify@1.0.2(hono@4.13.13)':
+  '@hono/netlify@1.0.2(hono@4.13.14)':
     dependencies:
-      hono: 4.13.13
+      hono: 4.13.14
 
-  '@hono/node-server@2.1.5(hono@4.13.13)':
+  '@hono/node-server@2.1.5(hono@4.13.14)':
     dependencies:
-      hono: 4.13.13
+      hono: 4.13.14
 
   '@hookform/resolvers@6.0.0(ajv@8.20.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.1))(valibot@1.5.0(typescript@7.0.2))(zod@4.6.7)':
     dependencies:
@@ -5465,7 +5465,7 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  baseline-browser-mapping@2.11.32: {}
+  baseline-browser-mapping@2.11.33: {}
 
   better-sqlite3@13.0.3:
     dependencies:
@@ -5483,7 +5483,7 @@ snapshots:
 
   browserslist@4.29.4:
     dependencies:
-      baseline-browser-mapping: 2.11.32
+      baseline-browser-mapping: 2.11.33
       caniuse-lite: 1.0.30001819
       electron-to-chromium: 1.5.464
       node-releases: 2.0.60
@@ -5888,7 +5888,7 @@ snapshots:
     dependencies:
       hookified: 1.15.1
 
-  hono@4.13.13: {}
+  hono@4.13.14: {}
 
   hookable@6.1.2: {}
 
@@ -6681,7 +6681,7 @@ snapshots:
 
   stubborn-utils@1.0.2: {}
 
-  tabbable@6.5.0: {}
+  tabbable@6.5.1: {}
 
   tagged-tag@1.0.0: {}
 

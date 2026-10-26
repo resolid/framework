@@ -22,9 +22,9 @@ export const getCookieExpires = <T extends IntRange<1, 366> | undefined>(
 type Cookie = SessionIdStorageStrategy["cookie"];
 
 export abstract class AuthSessionService<
-  AT extends Auth,
-  GT extends AuthGroup,
-  S extends AuthService<AT, GT> = AuthService<AT, GT>,
+  TAuth extends Auth,
+  TGroup extends AuthGroup,
+  S extends AuthService<TAuth, TGroup> = AuthService<TAuth, TGroup>,
 > {
   private readonly _service: S;
   private readonly _storage: SessionStorage;
@@ -34,14 +34,14 @@ export abstract class AuthSessionService<
     this._storage = createSessionStorage({
       cookie,
       async createData(data, expires) {
-        const expiredAt = expires ?? getCookieExpires(1);
+        const expiresAt = expires ?? getCookieExpires(1);
 
-        return await service.createSession(data as AuthSessionData<AT, GT>, expiredAt);
+        return await service.createSession(data as AuthSessionData<TAuth, TGroup>, expiresAt);
       },
       async updateData(id, data, expires) {
-        const expiredAt = expires ?? getCookieExpires(1);
+        const expiresAt = expires ?? getCookieExpires(1);
 
-        await service.updateSession(id, data as AuthSessionData<AT, GT>, expiredAt);
+        await service.updateSession(id, data as AuthSessionData<TAuth, TGroup>, expiresAt);
       },
       async readData(id) {
         const identity = await service.getIdentity(id);
@@ -58,7 +58,7 @@ export abstract class AuthSessionService<
     return this._service;
   }
 
-  async getIdentity(request: Request): Promise<AuthIdentity<AT, GT> | undefined> {
+  async getIdentity(request: Request): Promise<AuthIdentity<TAuth, TGroup> | undefined> {
     const session = await this._storage.getSession(request.headers.get("Cookie"));
 
     return session.has("identity") ? session.data.identity : undefined;
@@ -66,7 +66,7 @@ export abstract class AuthSessionService<
 
   async commitSession(
     request: Request,
-    identity: AuthIdentity<AT, GT>,
+    identity: AuthIdentity<TAuth, TGroup>,
     remoteAddr: string,
     rememberMe: boolean,
   ): Promise<string> {

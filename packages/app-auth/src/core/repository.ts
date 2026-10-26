@@ -10,7 +10,10 @@ interface AuthDatabase {
   authPasswordReset: AuthPasswordResetTable;
 }
 
-export abstract class AuthRepository<AT extends Auth, GT extends AuthGroup> extends BaseRepository {
+export abstract class AuthRepository<
+  TAuth extends Auth,
+  TGroup extends AuthGroup,
+> extends BaseRepository {
   private get authDb(): Kysely<AuthDatabase> {
     return this.db as never as Kysely<AuthDatabase>;
   }
@@ -36,12 +39,12 @@ export abstract class AuthRepository<AT extends Auth, GT extends AuthGroup> exte
     return this.authPasswordResetTable.name as "authPasswordReset";
   }
 
-  async create(auth: AT): Promise<AT> {
+  async create(auth: TAuth): Promise<TAuth> {
     return (await insertOne(
       this.authDb,
       this.authTableName,
       this.authTable.filterData(auth),
-    )) as AT;
+    )) as TAuth;
   }
 
   async updatePassword(id: number, password: string): Promise<void> {
@@ -82,15 +85,18 @@ export abstract class AuthRepository<AT extends Auth, GT extends AuthGroup> exte
     return auth != undefined;
   }
 
-  async findGroupById(groupId: number): Promise<GT | undefined> {
+  async findGroupById(groupId: number): Promise<TGroup | undefined> {
     return (await this.authDb
       .selectFrom(this.authGroupTableName)
       .selectAll()
       .where("id", "=", groupId)
-      .executeTakeFirst()) as GT;
+      .executeTakeFirst()) as TGroup;
   }
 
-  async findById(id: number, withGroup = false): Promise<AT | AuthWithGroup<AT, GT> | undefined> {
+  async findById(
+    id: number,
+    withGroup = false,
+  ): Promise<TAuth | AuthWithGroup<TAuth, TGroup> | undefined> {
     const auth = await this.authDb
       .selectFrom(this.authTableName)
       .selectAll()
@@ -99,16 +105,19 @@ export abstract class AuthRepository<AT extends Auth, GT extends AuthGroup> exte
       .executeTakeFirst();
 
     if (auth == undefined || !withGroup) {
-      return auth as AT | undefined;
+      return auth as TAuth | undefined;
     }
 
-    return { ...auth, group: await this.findGroupById(auth.groupId) } as AuthWithGroup<AT, GT>;
+    return { ...auth, group: await this.findGroupById(auth.groupId) } as AuthWithGroup<
+      TAuth,
+      TGroup
+    >;
   }
 
   async findByEmail(
     email: string,
     withGroup = false,
-  ): Promise<AT | AuthWithGroup<AT, GT> | undefined> {
+  ): Promise<TAuth | AuthWithGroup<TAuth, TGroup> | undefined> {
     const auth = await this.authDb
       .selectFrom(this.authTableName)
       .selectAll()
@@ -117,16 +126,19 @@ export abstract class AuthRepository<AT extends Auth, GT extends AuthGroup> exte
       .executeTakeFirst();
 
     if (auth == undefined || !withGroup) {
-      return auth as AT | undefined;
+      return auth as TAuth | undefined;
     }
 
-    return { ...auth, group: await this.findGroupById(auth.groupId) } as AuthWithGroup<AT, GT>;
+    return { ...auth, group: await this.findGroupById(auth.groupId) } as AuthWithGroup<
+      TAuth,
+      TGroup
+    >;
   }
 
   async findBySessionId(
     sessionId: string,
     withGroup = false,
-  ): Promise<AT | AuthWithGroup<AT, GT> | undefined> {
+  ): Promise<TAuth | AuthWithGroup<TAuth, TGroup> | undefined> {
     const auth = await this.authDb
       .selectFrom(this.authTableName)
       .selectAll()
@@ -135,16 +147,19 @@ export abstract class AuthRepository<AT extends Auth, GT extends AuthGroup> exte
           .selectFrom(this.authSessionTableName)
           .select("identityId")
           .where("id", "=", sessionId)
-          .where("expiredAt", ">", new Date()),
+          .where("expiresAt", ">", new Date()),
       )
       .where("deletedAt", "is", null)
       .executeTakeFirst();
 
     if (auth == undefined || !withGroup) {
-      return auth as AT | undefined;
+      return auth as TAuth | undefined;
     }
 
-    return { ...auth, group: await this.findGroupById(auth.groupId) } as AuthWithGroup<AT, GT>;
+    return { ...auth, group: await this.findGroupById(auth.groupId) } as AuthWithGroup<
+      TAuth,
+      TGroup
+    >;
   }
 
   async createSession(sessionData: Insertable<AuthSessionTable>): Promise<void> {
@@ -175,18 +190,22 @@ export abstract class AuthRepository<AT extends Auth, GT extends AuthGroup> exte
       .selectFrom(this.authPasswordResetTableName)
       .selectAll()
       .where("id", "=", resetId)
-      .where("redeemed", "=", 0)
-      .where("expiredAt", ">", new Date())
+      .where("usedAt", "is", null)
+      .where("expiresAt", ">", new Date())
       .executeTakeFirst();
   }
 
-  async redeemedPasswordReset(resetId: string): Promise<void> {
-    await this.authDb
+  async consumePasswordReset(resetId: string): Promise<boolean> {
+    const now = new Date();
+
+    const result = await this.authDb
       .updateTable(this.authPasswordResetTableName)
-      .set({
-        redeemed: 1,
-      })
+      .set({ usedAt: now })
       .where("id", "=", resetId)
+      .where("usedAt", "is", null)
+      .where("expiresAt", ">", now)
       .executeTakeFirst();
+
+    return result.numUpdatedRows > 0;
   }
 }

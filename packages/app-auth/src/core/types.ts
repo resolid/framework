@@ -6,18 +6,16 @@ export type AuthGroup = Selectable<AuthGroupTable>;
 export type AuthSession = Selectable<AuthSessionTable>;
 export type AuthPasswordReset = Selectable<AuthPasswordResetTable>;
 
-export type AuthWithGroup<AT extends Auth, GT extends AuthGroup> = Simplify<
-  AT & {
-    group?: GT;
-  }
+export type AuthWithGroup<TAuth extends Auth, TGroup extends AuthGroup> = TAuth & {
+  group: TGroup;
+};
+
+export type AuthIdentity<TAuth extends Auth, TGroup extends AuthGroup> = Simplify<
+  Omit<AuthWithGroup<TAuth, TGroup>, "password" | "createdAt" | "updatedAt" | "deletedAt">
 >;
 
-export type AuthIdentity<AT extends Auth, GT extends AuthGroup> = Simplify<
-  Omit<AT, "password" | "createdAt" | "updatedAt" | "deletedAt"> & { group?: GT }
->;
-
-export type AuthSessionData<AT extends Auth, GT extends AuthGroup> = {
-  identity: AuthIdentity<AT, GT>;
+export type AuthSessionData<TAuth extends Auth, TGroup extends AuthGroup> = {
+  identity: AuthIdentity<TAuth, TGroup>;
   remoteAddr: string;
   userAgent: string;
 };

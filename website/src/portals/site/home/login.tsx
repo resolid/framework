@@ -14,11 +14,10 @@ export const meta = mergeMeta(() => {
   return [{ title: "登陆" }];
 });
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
+export async function action({ request, context }: Route.ActionArgs) {
   const hono = getHonoContext(context);
   const remoteAddr = hono.get("remoteAddr");
   const formData = await parseFormData<UserLoginFormData>(request);
-
   const app = hono.get("app");
 
   const [errors, user] = await app.get(UserService).login(formData, userLoginResolver);
@@ -31,7 +30,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     new URL(request.url).searchParams.get("redirect") ?? "/",
     await app.get(UserSessionService).commitSession(request, user, remoteAddr, formData.rememberMe),
   );
-};
+}
 
 export default function Login() {
   const [params] = useSearchParams();

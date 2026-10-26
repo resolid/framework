@@ -43,7 +43,7 @@ export default function Status({ loaderData }: Route.ComponentProps) {
     return "";
   }, []);
 
-  const formatDatetime = (datetime: Date | string | null) =>
+  const formatDatetime = (datetime?: Date | string) =>
     // oxlint-disable-next-line react/purity
     formatDate(datetime ?? new Date(), "YYYY-MM-DD HH:mm", { timezone: clientTimeZone });
 
@@ -80,7 +80,7 @@ export default function Status({ loaderData }: Route.ComponentProps) {
           <dd className="font-mono text-sm">{ssr.remoteAddr}</dd>
           <dt>客户端时间：</dt>
           <dd className="font-mono text-sm">
-            <ClientOnly>{() => formatDatetime(null)}</ClientOnly>
+            <ClientOnly>{() => formatDatetime()}</ClientOnly>
           </dd>
           <dt>客户端时区：</dt>
           <dd className="font-mono text-sm">

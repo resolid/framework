@@ -32,15 +32,6 @@ import { UserSessionService } from "~/modules/user/session.service.server";
 import type { Route } from "./+types/layout";
 import { AuthContext, useAuth } from "./auth";
 
-export async function loader({ request, context }: Route.LoaderArgs) {
-  const hono = getHonoContext(context);
-
-  return {
-    user: await hono.get("app").get(UserSessionService).getIdentity(request),
-    requestOrigin: hono.get("requestOrigin") ?? request.url,
-  };
-}
-
 export const meta = ({ loaderData }: Route.ComponentProps) => {
   const ogImage = new URL("/images/og-image-v2.png", loaderData.requestOrigin).toString();
   const ogUrl = trimEnd(new URL("", loaderData.requestOrigin).toString(), "/");
@@ -101,6 +92,15 @@ export const meta = ({ loaderData }: Route.ComponentProps) => {
     },
   ].filter(Boolean);
 };
+
+export async function loader({ request, context }: Route.LoaderArgs) {
+  const hono = getHonoContext(context);
+
+  return {
+    user: await hono.get("app").get(UserSessionService).getIdentity(request),
+    requestOrigin: hono.get("requestOrigin") ?? request.url,
+  };
+}
 
 export default function SiteLayout({ loaderData }: Route.ComponentProps) {
   const { user } = loaderData;

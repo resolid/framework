@@ -15,11 +15,9 @@ export const meta = mergeMeta(() => {
   return [{ title: "注册" }];
 });
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
+export async function action({ request, context }: Route.ActionArgs) {
   const hono = getHonoContext(context);
-
   const data = await parseFormData<UserSignupFormData>(request);
-
   const remoteAddr = hono.get("remoteAddr");
   const app = hono.get("app");
 
@@ -39,7 +37,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     new URL(request.url).searchParams.get("redirect") ?? "/",
     await app.get(UserSessionService).commitSession(request, user, remoteAddr, data.rememberMe),
   );
-};
+}
 
 export default function Signup() {
   const [params] = useSearchParams();

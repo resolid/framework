@@ -6,7 +6,7 @@
  * schema is assembled automatically without a central registration file:
  *
  * ```ts
- * import type { Generated } from "kysely";
+ * import type { Generated } from "@resolid/app-db";
  *
  * export interface StatusTable {
  *   id: Generated<number>;
