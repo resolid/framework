@@ -1,7 +1,7 @@
 import { useRouteProgress } from "@resolid/dev/router";
 import { tx } from "@resolid/react-ui";
 
-export function RouteProcessBar() {
+export function RouteProgressBar() {
   const { ref, active, animating, state } = useRouteProgress();
 
   return (

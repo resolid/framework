@@ -3,7 +3,7 @@ import { ConfigProvider } from "@resolid/react-ui";
 import zhCN from "@resolid/react-ui/locales/zh-CN";
 import { Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { ErrorComponent } from "~/components/error-component";
-import { RouteProcessBar } from "~/components/route-process-bar";
+import { RouteProgressBar } from "~/components/route-progress-bar";
 import type { Route } from "../.react-router/types/src/+types/root";
 
 import "~/zod";
@@ -11,7 +11,6 @@ import "~/zod";
 import style from "./root.css?url";
 
 export function Layout({ children }: PropsWithChildren) {
-  // noinspection HtmlRequiredTitleElement
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
@@ -27,7 +26,7 @@ export function Layout({ children }: PropsWithChildren) {
         <link rel="stylesheet" precedence="default" href={style} />
       </head>
       <body className="min-h-screen overflow-y-scroll">
-        <RouteProcessBar />
+        <RouteProgressBar />
         <ConfigProvider locale={zhCN} colorMode={{ disableTransition: true }}>
           {children}
         </ConfigProvider>
