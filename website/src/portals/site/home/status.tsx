@@ -1,5 +1,5 @@
-import { getHonoContext } from "@resolid/dev/http.server";
-import { mergeMeta, SuspenseAwait } from "@resolid/dev/router";
+import { getHonoContext } from "@resolid/dev/http";
+import { mergeMeta, SuspenseAwait } from "@resolid/dev/react";
 import { Alert, AlertDescription, AlertTitle, ClientOnly } from "@resolid/react-ui";
 import { deviceTimezone } from "@resolid/utils";
 import { formatDate } from "@resolid/utils/date";

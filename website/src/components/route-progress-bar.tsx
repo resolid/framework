@@ -1,4 +1,4 @@
-import { useRouteProgress } from "@resolid/dev/router";
+import { useRouteProgress } from "@resolid/dev/react";
 import { tx } from "@resolid/react-ui";
 
 export function RouteProgressBar() {

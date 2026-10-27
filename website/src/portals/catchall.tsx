@@ -1,5 +1,5 @@
-import { httpNotFound } from "@resolid/dev/http.server";
-import { mergeMeta } from "@resolid/dev/router";
+import { httpNotFound } from "@resolid/dev/http";
+import { mergeMeta } from "@resolid/dev/react";
 import { ErrorComponent } from "~/components/error-component";
 import type { Route } from "../../.react-router/types/src/portals/+types/catchall";
 

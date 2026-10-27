@@ -81,7 +81,17 @@ export function createExcludePatterns(appDir: string, userExclude?: (string | Re
 }
 
 export function shouldExcludeUrl(url: string, patterns: RegExp[]): boolean {
-  if (url.includes("/node_modules/") || url.startsWith("/@") || url.includes("?import")) {
+  if (
+    url.includes("/node_modules/") ||
+    url.startsWith("/.vite") ||
+    url.startsWith("/__devtools") ||
+    url.startsWith("/__devframes") ||
+    url.startsWith("/static") ||
+    url.startsWith("/@") ||
+    url.includes("?import") ||
+    url == "favicon.svg" ||
+    url == "favicon.ico"
+  ) {
     return true;
   }
 

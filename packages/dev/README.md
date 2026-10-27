@@ -19,8 +19,9 @@ pnpm add -D @resolid/dev @react-router/dev
 - `resolidVite` (`@resolid/dev/vite`): combine Resolid plugin behavior with React Router Vite
   plugin.
 - Route helpers (`@resolid/dev/routes`):`flexRoutes`, `relativeFactory`.
-- Router helpers (`@resolid/dev/router`): `mergeMeta`.
-- HTTP platform adapters (`@resolid/dev/http.server`): `createHonoNodeServer`,
+- React helpers (`@resolid/dev/react`): `mergeMeta`, `HistoryLink`, `SuspenseAwait`,
+  `useHistoryBack`, `useRouteProgress`.
+- HTTP platform adapters (`@resolid/dev/http`): `createHonoNodeServer`,
   `createHonoNetlifyServer`, `createHonoVercelServer`.
 
 ## Usage patterns
@@ -70,7 +71,7 @@ export default reactRouterConfig;
 
 ```ts
 // src/server.ts
-import { createHonoVercelServer, createHonoNodeServer } from "@resolid/dev/http.server";
+import { createHonoVercelServer, createHonoNodeServer } from "@resolid/dev/http";
 
 export default await (import.meta.env.RESOLID_PLATFORM == "vercel"
   ? createHonoVercelServer()

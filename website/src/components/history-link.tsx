@@ -1,1 +1,1 @@
-export { HistoryLink, HistoryNavLink } from "@resolid/dev/router";
+export { HistoryLink, HistoryNavLink } from "@resolid/dev/react";

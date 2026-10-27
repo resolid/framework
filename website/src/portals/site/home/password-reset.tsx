@@ -1,6 +1,6 @@
 import { isSuccessData } from "@resolid/app/validate";
-import { getHonoContext, httpProblem } from "@resolid/dev/http.server";
-import { mergeMeta } from "@resolid/dev/router";
+import { getHonoContext, httpProblem } from "@resolid/dev/http";
+import { mergeMeta } from "@resolid/dev/react";
 import { Button } from "@resolid/react-ui";
 import { Form } from "react-router";
 import { parseFormData, useRemixForm } from "remix-hook-form";

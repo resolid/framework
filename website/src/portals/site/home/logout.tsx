@@ -1,4 +1,4 @@
-import { getHonoContext, httpRedirect } from "@resolid/dev/http.server";
+import { getHonoContext, httpRedirect } from "@resolid/dev/http";
 import { UserSessionService } from "~/modules/user/session.service.server";
 import type { Route } from "./+types/logout";
 

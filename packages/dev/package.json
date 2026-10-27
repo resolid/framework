@@ -37,13 +37,13 @@
     "./env": {
       "types": "./env.d.ts"
     },
-    "./http.server": {
+    "./http": {
       "types": "./dist/http.d.mts",
       "import": "./dist/http.mjs"
     },
-    "./router": {
-      "types": "./dist/router.d.mts",
-      "import": "./dist/router.mjs"
+    "./react": {
+      "types": "./dist/react.d.mts",
+      "import": "./dist/react.mjs"
     },
     "./routes": {
       "types": "./dist/routes.d.mts",

@@ -5,7 +5,7 @@ import {
   createHonoVercelServer,
   type Env,
   type Hono,
-} from "@resolid/dev/http.server";
+} from "@resolid/dev/http";
 import { env } from "node:process";
 import { type App, app } from "~/foundation/app.server";
 

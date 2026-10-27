@@ -4,7 +4,7 @@ const config: UserConfig = defineConfig({
   entry: {
     index: "src/index.ts",
     http: "src/http/index.ts",
-    router: "src/router/index.ts",
+    react: "src/react/index.ts",
     routes: "src/routes/index.ts",
     vite: "src/vite/index.ts",
   },

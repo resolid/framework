@@ -7,7 +7,7 @@ import type {
   UserConfig,
 } from "vite";
 import { getRequestListener } from "@hono/node-server";
-import { existsSync, statSync } from "node:fs";
+import { statSync } from "node:fs";
 import nodePath from "node:path";
 import type { VitePluginOptions } from "../config";
 import {
@@ -18,7 +18,7 @@ import {
 } from "./utils";
 
 export function resolidViteDev(options: VitePluginOptions): VitePlugin {
-  let publicDirPath = "";
+  let publicDir = "";
   let reactRouterConfig: ReactRouterPluginConfig | undefined;
 
   return {
@@ -42,7 +42,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
           noExternal: ["@resolid/dev"],
         },
         optimizeDeps: {
-          exclude: ["@resolid/dev/http.server"],
+          exclude: ["@resolid/dev/http"],
         },
       };
 
@@ -71,7 +71,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
     },
 
     configResolved(config) {
-      publicDirPath = config.publicDir;
+      ({ publicDir } = config);
 
       if (reactRouterConfig?.buildManifest?.serverBundles) {
         for (const key of Object.keys(reactRouterConfig.buildManifest.serverBundles)) {
@@ -98,20 +98,14 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
           next: Connect.NextFunction,
         ): Promise<void> => {
           if (req.url) {
-            const filePath = nodePath.join(publicDirPath, req.url);
-
-            try {
-              // oxlint-disable-next-line node/no-sync
-              if (existsSync(filePath) && statSync(filePath).isFile()) {
-                return next();
-              }
-            } catch {
-              // do nothing
+            if (shouldExcludeUrl(req.url, excludePatterns)) {
+              return next();
             }
-          }
 
-          if (req.url && shouldExcludeUrl(req.url, excludePatterns)) {
-            return next();
+            // oxlint-disable-next-line node/no-sync
+            if (statSync(nodePath.join(publicDir, req.url), { throwIfNoEntry: false })?.isFile()) {
+              return next();
+            }
           }
 
           const entry = reactRouterConfig!.entryFile;

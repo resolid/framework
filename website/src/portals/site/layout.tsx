@@ -1,5 +1,5 @@
 import { getIdentityDisplayName } from "@resolid/app-auth/utils";
-import { getHonoContext } from "@resolid/dev/http.server";
+import { getHonoContext } from "@resolid/dev/http";
 import {
   Avatar,
   AvatarFallback,

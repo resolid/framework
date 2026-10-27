@@ -1,5 +1,5 @@
-import { getHonoContext, httpProblem, httpRedirect } from "@resolid/dev/http.server";
-import { mergeMeta } from "@resolid/dev/router";
+import { getHonoContext, httpProblem, httpRedirect } from "@resolid/dev/http";
+import { mergeMeta } from "@resolid/dev/react";
 import { Button } from "@resolid/react-ui";
 import { Form, useSearchParams } from "react-router";
 import { parseFormData, useRemixForm } from "remix-hook-form";

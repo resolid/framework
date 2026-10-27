@@ -1,4 +1,5 @@
 import type { BuildManifest } from "@react-router/dev/config";
+import type { ResolvedConfig } from "vite";
 import { existsSync } from "node:fs";
 import {
   cp,
@@ -12,10 +13,6 @@ import {
   writeFile,
 } from "node:fs/promises";
 import nodePath from "node:path";
-import { build } from "rolldown";
-import { esmExternalRequirePlugin } from "rolldown/plugins";
-import { glob } from "tinyglobby";
-import { type ResolvedConfig, searchForWorkspaceRoot } from "vite";
 import type { NodeVersion, ServerPlatform } from "../types";
 
 type OptionalToUndefined<T> = {
@@ -65,6 +62,12 @@ export async function buildPreset<BuildContext>({
   buildStart,
   buildBundleEnd,
 }: BuildPresetOptions<BuildContext>): Promise<void> {
+  const [{ build }, { esmExternalRequirePlugin }, { glob }] = await Promise.all([
+    import("rolldown"),
+    import("rolldown/plugins"),
+    import("tinyglobby"),
+  ]);
+
   const rootPath = viteConfig.root;
   const { assetsDir } = viteConfig.build;
   const packageJson = JSON.parse(
@@ -323,9 +326,12 @@ export async function copyFilesToFunction(
   destPath: string,
   nftCache: object,
 ): Promise<string> {
-  const base = searchForWorkspaceRoot(bundleFile);
+  const [{ nodeFileTrace }, { searchForWorkspaceRoot }] = await Promise.all([
+    import("@vercel/nft"),
+    import("vite"),
+  ]);
 
-  const { nodeFileTrace } = await import("@vercel/nft");
+  const base = searchForWorkspaceRoot(bundleFile);
 
   const traced = await nodeFileTrace([bundleFile], {
     base,

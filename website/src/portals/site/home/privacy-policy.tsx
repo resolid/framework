@@ -1,4 +1,4 @@
-import { mergeMeta } from "@resolid/dev/router";
+import { mergeMeta } from "@resolid/dev/react";
 
 export const meta = mergeMeta(() => {
   return [{ title: "隐私政策" }];
