@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.10.0
+
+### Minor Changes
+
+- [`9ee5cf6`](https://github.com/resolid/framework/commit/9ee5cf642bff742142e62a2ca9dd2408c88b9945) - refactor!: rename http and react entries and load build dependencies lazily
+
 ## 0.9.1
 
 ### Patch Changes
