@@ -55,7 +55,7 @@
     "@types/better-sqlite3": "^9.6.0",
     "@types/pg": "^8.23.1",
     "kysely": "^0.29.7",
-    "tsdown": "^0.23.2"
+    "tsdown": "^0.23.3"
   },
   "peerDependencies": {
     "better-sqlite3": "^13.0.3",
