@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.10.1
+
+### Patch Changes
+
+- [`d667556`](https://github.com/resolid/framework/commit/d667556410dfccf14dcee33274042c37ce744ff9) - fix: serve built server bundles in vite preview for prerendering
+
 ## 0.10.0
 
 ### Minor Changes
