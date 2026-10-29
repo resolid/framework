@@ -1,13 +1,8 @@
 import type { BuildManifest, Preset } from "@react-router/dev/config";
 import { cp, rm, writeFile } from "node:fs/promises";
 import nodePath from "node:path";
-import {
-  buildPreset,
-  copyFilesToFunction,
-  createDir,
-  getServerRoutes,
-  type PresetBaseOptions,
-} from "../utils";
+import { getServerBundleInfos } from "../../base/utils";
+import { buildPreset, copyFilesToFunction, createDir, type PresetBaseOptions } from "../utils";
 
 type VercelPresetOptions = PresetBaseOptions;
 
@@ -32,6 +27,7 @@ export function vercelPreset({ nodeVersion, includeFiles }: VercelPresetOptions)
                 vercelOutput,
               );
               await writeVercelConfigJson(
+                reactRouterConfig.basename,
                 viteConfig.build.assetsDir,
                 buildManifest,
                 nodePath.join(vercelOutput, "config.json"),
@@ -89,6 +85,7 @@ async function copyStaticFiles(outDir: string, vercelOutDir: string) {
 }
 
 async function writeVercelConfigJson(
+  basename: string,
   assetsDir: string,
   buildManifest: BuildManifest | undefined,
   vercelConfigFile: string,
@@ -114,20 +111,13 @@ async function writeVercelConfigJson(
     },
   );
 
-  const serverRoutes = getServerRoutes(buildManifest);
+  const serverBundlesInfo = getServerBundleInfos(buildManifest, basename);
 
-  for (const bundle of serverRoutes) {
-    if (bundle.path.length > 0) {
-      configJson.routes.push({
-        src: `^${bundle.path}(?:/.*)?$`,
-        dest: `_${bundle.bundleId}`,
-      });
-    } else {
-      configJson.routes.push({
-        src: "^/.*$",
-        dest: `_${bundle.bundleId}`,
-      });
-    }
+  for (const bundle of serverBundlesInfo) {
+    configJson.routes.push({
+      src: bundle.prefix === "/" ? "^/.*$" : `^${bundle.prefix}(?:/.*)?$`,
+      dest: `_${bundle.id}`,
+    });
   }
 
   await writeFile(vercelConfigFile, JSON.stringify(configJson, null, 2), "utf-8");

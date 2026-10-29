@@ -1,15 +1,11 @@
-import type http from "node:http";
-import type {
-  Connect,
-  RunnableDevEnvironment,
-  ViteDevServer,
-  Plugin as VitePlugin,
-  UserConfig,
-} from "vite";
+import type { RunnableDevEnvironment, Plugin as VitePlugin, UserConfig } from "vite";
 import { getRequestListener } from "@hono/node-server";
 import { statSync } from "node:fs";
 import nodePath from "node:path";
+import { pathToFileURL } from "node:url";
+import { id } from "rolldown/filter";
 import type { VitePluginOptions } from "../config";
+import { getServerBundleInfos } from "../base/utils";
 import {
   createExcludePatterns,
   type ReactRouterPluginConfig,
@@ -83,71 +79,134 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
       }
     },
 
-    async configureServer(server) {
+    configureServer(server) {
       if (!reactRouterConfig) {
         return;
       }
 
-      const excludePatterns = createExcludePatterns(reactRouterConfig.appDir, options.devExclude);
+      const { appDir, entryFile } = reactRouterConfig;
 
-      const createMiddleware =
-        async (devServer: ViteDevServer): Promise<Connect.HandleFunction> =>
-        async (
-          req: http.IncomingMessage,
-          res: http.ServerResponse,
-          next: Connect.NextFunction,
-        ): Promise<void> => {
-          if (req.url) {
-            if (shouldExcludeUrl(req.url, excludePatterns)) {
-              return next();
-            }
+      const excludePatterns = createExcludePatterns(appDir, options.devExclude);
 
-            // oxlint-disable-next-line node/no-sync
-            if (statSync(nodePath.join(publicDir, req.url), { throwIfNoEntry: false })?.isFile()) {
-              return next();
-            }
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url) {
+          if (shouldExcludeUrl(req.url, excludePatterns)) {
+            return next();
           }
 
-          const entry = reactRouterConfig!.entryFile;
-
-          const { default: app } = await (
-            devServer.environments.ssr as RunnableDevEnvironment
-          ).runner.import(entry);
-
-          if (!app) {
-            return next(new Error(`Failed to find default export from ${entry}`));
+          // oxlint-disable-next-line node/no-sync
+          if (statSync(nodePath.join(publicDir, req.url), { throwIfNoEntry: false })?.isFile()) {
+            return next();
           }
+        }
 
-          await getRequestListener(
-            async (request) => {
-              const response = await app.fetch(request, { incoming: req, outgoing: res });
+        const { default: app } = await (
+          server.environments.ssr as RunnableDevEnvironment
+        ).runner.import(entryFile);
 
-              if (!(response instanceof Response)) {
-                throw response;
+        if (!app) {
+          return next(new Error(`Failed to find default export from ${entryFile}`));
+        }
+
+        await getRequestListener(
+          async (request) => {
+            const response = await app.fetch(request, { incoming: req, outgoing: res });
+
+            if (!(response instanceof Response)) {
+              throw response;
+            }
+
+            return response;
+          },
+          {
+            overrideGlobalObjects: false,
+            errorHandler: (e) => {
+              let err: Error;
+              if (e instanceof Error) {
+                err = e;
+                server.ssrFixStacktrace(err);
+              } else if (typeof e === "string") {
+                err = new Error(`The response is not an instance of "Response", but: ${e}`);
+              } else {
+                err = new Error(`Unknown error: ${String(e)}`);
               }
 
-              return response;
+              next(err);
             },
+          },
+        )(req, res);
+      });
+    },
+
+    configurePreviewServer(server) {
+      if (!reactRouterConfig) {
+        return;
+      }
+
+      const { basename, buildManifest, buildDir, serverBuildFile } = reactRouterConfig;
+
+      const buildInfo = buildManifest?.serverBundles
+        ? getServerBundleInfos(buildManifest, basename).map((info) => ({
+            id: info.id,
+            prefix: info.prefix,
+            file: buildManifest.serverBundles[info.id]?.file,
+          }))
+        : [
             {
-              overrideGlobalObjects: false,
-              errorHandler: (e) => {
-                let err: Error;
-                if (e instanceof Error) {
-                  err = e;
-                  devServer.ssrFixStacktrace(err);
-                } else if (typeof e === "string") {
-                  err = new Error(`The response is not an instance of "Response", but: ${e}`);
-                } else {
-                  err = new Error(`Unknown error: ${String(e)}`);
-                }
-
-                next(err);
-              },
+              id: "site",
+              prefix: basename,
+              file: nodePath.join(buildDir, "server", serverBuildFile),
             },
-          )(req, res);
-        };
+          ];
 
-      server.middlewares.use(await createMiddleware(server));
+      function getBundleFile(pathname: string): string | undefined {
+        return buildInfo.find((info) => {
+          return (
+            info.prefix === "/" ||
+            pathname === info.prefix ||
+            pathname.startsWith(`${info.prefix}/`)
+          );
+        })?.file;
+      }
+
+      server.middlewares.use(async (req, res, next) => {
+        const { pathname } = new URL(req.url ?? "/", "http://localhost");
+
+        const bundleFile = getBundleFile(pathname.replace(/\.data$/, "").replace(/\/_$/, "/"));
+
+        if (bundleFile) {
+          try {
+            const mod = await import(pathToFileURL(nodePath.resolve(bundleFile)).href);
+            const app = mod.default;
+
+            const headers = new Headers();
+            for (const [name, value] of Object.entries(req.headers)) {
+              for (const item of Array.isArray(value) ? value : [value]) {
+                if (item !== undefined) {
+                  headers.append(name, item);
+                }
+              }
+            }
+
+            const request = new Request(
+              `http://${req.headers.host ?? "localhost"}${req.url ?? "/"}`,
+              {
+                method: req.method,
+                headers,
+              },
+            );
+
+            const response = await app.fetch(request, { incoming: req, outgoing: res });
+
+            res.end(Buffer.from(await response.arrayBuffer()));
+          } catch (error) {
+            console.log(error);
+            next(error);
+          }
+        } else {
+          next();
+        }
+      });
     },
 
     handleHotUpdate({ server, modules }) {

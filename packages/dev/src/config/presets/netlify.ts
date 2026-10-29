@@ -2,13 +2,8 @@ import type { Preset } from "@react-router/dev/config";
 import { writeFile } from "node:fs/promises";
 import nodePath from "node:path";
 import { name, version } from "../../../package.json";
-import {
-  buildPreset,
-  copyFilesToFunction,
-  createDir,
-  getServerRoutes,
-  type PresetBaseOptions,
-} from "../utils";
+import { type BundleInfo, getServerBundleInfos } from "../../base/utils";
+import { buildPreset, copyFilesToFunction, createDir, type PresetBaseOptions } from "../utils";
 
 type NetlifyPresetOptions = PresetBaseOptions;
 
@@ -21,7 +16,7 @@ export function netlifyPreset({ nodeVersion, includeFiles }: NetlifyPresetOption
           await buildPreset<{
             netlifyRoot: string;
             netlifyFunctionDir: string;
-            serverRoutes: { path: string; bundleId: string }[];
+            serverBundlesInfo: BundleInfo[];
             nftCache: object;
           }>({
             nodeVersion,
@@ -40,9 +35,12 @@ export function netlifyPreset({ nodeVersion, includeFiles }: NetlifyPresetOption
 
               const netlifyFunctionDir = await createDir([netlifyRoot, "functions"]);
 
-              const serverRoutes = getServerRoutes(buildManifest);
+              const serverBundlesInfo = getServerBundleInfos(
+                buildManifest,
+                reactRouterConfig.basename,
+              );
 
-              return { netlifyRoot, netlifyFunctionDir, serverRoutes, nftCache: {} };
+              return { netlifyRoot, netlifyFunctionDir, serverBundlesInfo, nftCache: {} };
             },
             async buildBundleEnd(context, _buildPath, bundleId, bundleFile) {
               console.log(`Coping Netlify function files for ${bundleId}...`);
@@ -53,20 +51,15 @@ export function netlifyPreset({ nodeVersion, includeFiles }: NetlifyPresetOption
                 context.nftCache,
               );
 
-              const serverRoutePath = context.serverRoutes.find(
-                (r) => r.bundleId == bundleId,
-              )?.path;
-
-              const pathPattern = serverRoutePath
-                ? [serverRoutePath, `${serverRoutePath}/*`]
-                : "/*";
+              const prefix = context.serverBundlesInfo.find((r) => r.id == bundleId)?.prefix;
+              const paths = prefix && prefix !== "/" ? [prefix, `${prefix}/*`] : "/*";
 
               await writeFile(
                 nodePath.join(context.netlifyFunctionDir, `${bundleId}.mjs`),
                 `export { default } from "./${nodePath.join(bundleId, handleFile)}";
 
 export const config = {
-  path: ${Array.isArray(pathPattern) ? JSON.stringify(pathPattern) : `"${pathPattern}"`},
+  path: ${Array.isArray(paths) ? JSON.stringify(paths) : `"${paths}"`},
   displayName: "${bundleId} server",
   generator: "${name}@${version}",
   preferStatic: true,

@@ -13,7 +13,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import nodePath from "node:path";
-import type { NodeVersion, ServerPlatform } from "../types";
+import type { NodeVersion, ServerPlatform } from "../base/types";
 
 type OptionalToUndefined<T> = {
   [K in keyof T]: T[K] | undefined;
@@ -236,88 +236,6 @@ export async function createDir(paths: string[], rmBefore = false): Promise<stri
   await mkdir(presetRoot, { recursive: true });
 
   return presetRoot;
-}
-
-export function getServerRoutes(buildManifest: BuildManifest | undefined): {
-  path: string;
-  bundleId: string;
-}[] {
-  if (!buildManifest?.routeIdToServerBundleId) {
-    return [{ path: "", bundleId: "site" }];
-  }
-
-  const { routes, routeIdToServerBundleId } = buildManifest;
-
-  const routePaths: Map<string, string> = new Map();
-
-  for (const route of Object.values(routes)) {
-    if (route.id == "root") {
-      continue;
-    }
-
-    const path = [...getRoutePathsFromParentId(routes, route.parentId), route.path].join("/");
-
-    routePaths.set(route.id, `/${path}`);
-  }
-
-  const bundlePaths: Record<string, string[]> = {};
-
-  for (const [routeId, bundleId] of Object.entries(routeIdToServerBundleId)) {
-    const path = routePaths.get(routeId);
-
-    if (path !== undefined) {
-      (bundlePaths[bundleId] ??= []).push(path);
-    }
-  }
-
-  const bundleRoutes: Record<string, { path: string; bundleId: string }> = {};
-
-  for (const [bundleId, paths] of Object.entries(bundlePaths)) {
-    // Shortest first, so a parent path always precedes its children.
-    paths.sort((a, b) => a.length - b.length);
-
-    const addedPaths: string[] = [];
-
-    for (const path of paths) {
-      if (bundleRoutes[path] || addedPaths.some((addedPath) => path.startsWith(addedPath))) {
-        continue;
-      }
-
-      bundleRoutes[path] = { path, bundleId };
-      addedPaths.push(path);
-    }
-  }
-
-  return Object.values(bundleRoutes)
-    .map((route) => ({
-      path: route.path.endsWith("/") ? route.path.slice(0, -1) : route.path,
-      bundleId: route.bundleId,
-    }))
-    .sort((a, b) => b.path.length - a.path.length);
-}
-
-function getRoutePathsFromParentId(routes: BuildManifest["routes"], parentId: string | undefined) {
-  if (parentId == undefined) {
-    return [];
-  }
-
-  const paths: string[] = [];
-
-  const findPath = (routeId: string) => {
-    const route = routes[routeId]!;
-
-    if (route.parentId) {
-      findPath(route.parentId);
-    }
-
-    if (route.path) {
-      paths.push(route.path);
-    }
-  };
-
-  findPath(parentId);
-
-  return paths;
 }
 
 // from: https://github.com/sveltejs/kit/blob/main/packages/adapter-vercel/index.js

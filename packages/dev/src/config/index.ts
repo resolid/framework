@@ -1,6 +1,6 @@
 import type { Config } from "@react-router/dev/config";
 import type { Simplify } from "@resolid/utils";
-import type { NodeVersion, ServerPlatform } from "../types";
+import type { NodeVersion, ServerPlatform } from "../base/types";
 import { netlifyPreset } from "./presets/netlify";
 import { nodePreset } from "./presets/node";
 import { vercelPreset } from "./presets/vercel";

@@ -22,6 +22,8 @@ export type HonoNodeServerOptions = HonoServerOptions<NodeEnv> & {
   port?: number;
   defaultLogger?: boolean;
   listeningListener?: (info: AddressInfo) => void;
+  overrideGlobalObjects?: boolean;
+  autoCleanupIncoming?: boolean;
   onShutdown?: () => Promise<void> | void;
   proxy?: boolean;
   proxyCount?: number;
@@ -37,7 +39,7 @@ export async function createHonoNodeServer(
 
   const { port, defaultLogger, proxy, proxyCount, ipHeaders, ...restOptions } = options;
 
-  const mergedOptions: HonoNodeServerOptions = {
+  const mergedOptions: HonoNodeServerOptions & { port: number } = {
     port: port ?? 3000,
     listeningListener: (info) => {
       console.log(`🚀 Server started on port ${info.port}`);
@@ -88,14 +90,21 @@ export async function createHonoNodeServer(
     honoOptions: mergedOptions.honoOptions,
   });
 
-  if (isProduction) {
+  const shouldStartServer = isProduction && env.IS_RR_BUILD_REQUEST !== "yes";
+
+  if (shouldStartServer) {
     server = serve(
       {
         fetch: app.fetch,
         port: mergedOptions.port,
+        overrideGlobalObjects: mergedOptions.overrideGlobalObjects,
+        autoCleanupIncoming: mergedOptions.autoCleanupIncoming,
       },
       mergedOptions.listeningListener,
     );
+
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
   }
 
   function closeServer(): Promise<void> {
@@ -138,11 +147,6 @@ export async function createHonoNodeServer(
     console.log("[resolid] Node server shutdown.");
 
     process.exit(exitCode);
-  }
-
-  if (isProduction) {
-    process.on("SIGTERM", shutdown);
-    process.on("SIGINT", shutdown);
   }
 
   return app;

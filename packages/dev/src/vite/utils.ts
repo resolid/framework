@@ -20,6 +20,7 @@ export interface ReactRouterPluginConfig {
   future: ReactRouterConfig["future"];
   ssrBuild: boolean;
   buildManifest: BuildManifest | null;
+  serverBuildFile: string;
 }
 
 export function resolveReactRouterPluginConfig(
@@ -44,6 +45,7 @@ export function resolveReactRouterPluginConfig(
     basename: reactRouterConfig.basename,
     future: reactRouterConfig.future,
     buildManifest,
+    serverBuildFile: reactRouterConfig.serverBuildFile,
   };
 }
 
