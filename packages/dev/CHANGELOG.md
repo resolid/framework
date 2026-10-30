@@ -1,5 +1,16 @@
 # @resolid/dev
 
+## 0.11.0
+
+### Minor Changes
+
+- [`eb04d21`](https://github.com/resolid/framework/commit/eb04d21cc3bf4559172a006c534c1607d8af43ee) - refactor!: replace getHonoContext with getRouteContext
+  
+  getRouteContext returns the Hono variable map plus `env` instead of the whole
+  Hono context, so route code destructures `const { app, requestId } = getRouteContext(ctx)`.
+  
+  Also accept a null build manifest and support Node 26.
+
 ## 0.10.1
 
 ### Patch Changes
