@@ -1,5 +1,5 @@
 import { isSuccessData } from "@resolid/app/validate";
-import { getHonoContext, httpProblem } from "@resolid/dev/http";
+import { getRouteContext, httpProblem } from "@resolid/dev/http";
 import { mergeMeta } from "@resolid/dev/react";
 import { Button } from "@resolid/react-ui";
 import { Form } from "react-router";
@@ -20,11 +20,10 @@ export function headers() {
 }
 
 export async function action({ request, context }: Route.ActionArgs) {
-  const hono = getHonoContext(context);
+  const { app } = getRouteContext(context);
   const data = await parseFormData<UserPasswordResetFormData>(request);
 
-  const [errors] = await hono
-    .get("app")
+  const [errors] = await app
     .get(UserService)
     .passwordReset(data, new URL(request.url).searchParams.get("token"), userPasswordResetResolver);
 

@@ -6,7 +6,7 @@ export type BundleInfo = {
 };
 
 export function getServerBundleInfos(
-  manifest: BuildManifest | null,
+  manifest: BuildManifest | undefined | null,
   basename: string,
 ): BundleInfo[] {
   if (!manifest?.routeIdToServerBundleId) {

@@ -87,7 +87,7 @@ async function copyStaticFiles(outDir: string, vercelOutDir: string) {
 async function writeVercelConfigJson(
   basename: string,
   assetsDir: string,
-  buildManifest: BuildManifest | undefined,
+  buildManifest: BuildManifest | undefined | null,
   vercelConfigFile: string,
 ) {
   console.log("Writing Vercel config file...");

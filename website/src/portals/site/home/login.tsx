@@ -1,4 +1,4 @@
-import { getHonoContext, httpProblem, httpRedirect } from "@resolid/dev/http";
+import { getRouteContext, httpProblem, httpRedirect } from "@resolid/dev/http";
 import { mergeMeta } from "@resolid/dev/react";
 import { Button } from "@resolid/react-ui";
 import { Form, useSearchParams } from "react-router";
@@ -15,10 +15,9 @@ export const meta = mergeMeta(() => {
 });
 
 export async function action({ request, context }: Route.ActionArgs) {
-  const hono = getHonoContext(context);
-  const remoteAddr = hono.get("remoteAddr");
+  const { app, remoteAddr } = getRouteContext(context);
+
   const formData = await parseFormData<UserLoginFormData>(request);
-  const app = hono.get("app");
 
   const [errors, user] = await app.get(UserService).login(formData, userLoginResolver);
 

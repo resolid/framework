@@ -3,7 +3,6 @@ import { getRequestListener } from "@hono/node-server";
 import { statSync } from "node:fs";
 import nodePath from "node:path";
 import { pathToFileURL } from "node:url";
-import { id } from "rolldown/filter";
 import type { VitePluginOptions } from "../config";
 import { getServerBundleInfos } from "../base/utils";
 import {

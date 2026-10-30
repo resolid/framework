@@ -1,4 +1,4 @@
-import { getHonoContext } from "@resolid/dev/http";
+import { getRouteContext } from "@resolid/dev/http";
 import { mergeMeta, SuspenseAwait } from "@resolid/dev/react";
 import { Alert, AlertDescription, AlertTitle, ClientOnly } from "@resolid/react-ui";
 import { deviceTimezone } from "@resolid/utils";
@@ -14,17 +14,16 @@ export const meta = mergeMeta(() => [
 ]);
 
 export async function loader({ context }: Route.LoaderArgs) {
-  const hono = getHonoContext(context);
+  const { app, requestId, remoteAddr } = getRouteContext(context);
 
   return {
     ssr: {
       message: "服务器渲染正常",
       datetime: new Date().toISOString(),
-      requestId: hono.get("requestId"),
-      remoteAddr: hono.get("remoteAddr"),
+      requestId,
+      remoteAddr,
     },
-    db: hono
-      .get("app")
+    db: app
       .get(SystemRepository)
       .getFirst()
       .then(() => ({ success: true, message: "数据库访问正常" }))

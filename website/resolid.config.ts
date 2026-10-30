@@ -3,7 +3,7 @@ import { env } from "node:process";
 
 export const { vitePluginOptions, reactRouterConfig } = defineDevConfig({
   appDirectory: "src",
-  nodeVersion: 24,
+  nodeVersion: env.NETLIFY ? 24 : 26,
   platform: env.VERCEL == 1 ? "vercel" : env.NETLIFY ? "netlify" : "node",
   reactRouterConfig: {
     future: {

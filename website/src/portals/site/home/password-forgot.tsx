@@ -1,10 +1,10 @@
 import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import { createFieldErrors, isSuccessData } from "@resolid/app/validate";
-import { getHonoContext, httpProblem } from "@resolid/dev/http";
+import { getRouteContext, httpProblem } from "@resolid/dev/http";
 import { HistoryLink, mergeMeta } from "@resolid/dev/react";
 import { Button } from "@resolid/react-ui";
 import { addMinutes, formatDate } from "@resolid/utils/date";
-import Bowser from "bowser";
+import { parse } from "bowser";
 import { env } from "node:process";
 import { useRef, useState } from "react";
 import { Controller } from "react-hook-form";
@@ -33,9 +33,9 @@ export function headers() {
 }
 
 export async function action({ request, context }: Route.ActionArgs) {
-  const hono = getHonoContext(context);
+  const { app, remoteAddr, requestOrigin } = getRouteContext(context);
   const data = await parseFormData<UserPasswordForgotFormData>(request);
-  const verify = await turnstileVerify(data.captcha, hono.get("remoteAddr"));
+  const verify = await turnstileVerify(data.captcha, remoteAddr);
 
   if (!verify.success) {
     return httpProblem(createFieldErrors({ captcha: "验证失败" }));
@@ -43,21 +43,20 @@ export async function action({ request, context }: Route.ActionArgs) {
 
   const expiresAt = addMinutes(null, 30);
   const userAgent = request.headers.get("user-agent") ?? "";
-  const app = hono.get("app");
 
   const [errors, result] = await app
     .get(UserService)
-    .passwordForgot(data, expiresAt, hono.get("remoteAddr"), userAgent, userPasswordForgotResolver);
+    .passwordForgot(data, expiresAt, remoteAddr, userAgent, userPasswordForgotResolver);
 
   if (errors) {
     return httpProblem(errors);
   }
 
   if (result.identity) {
-    const baseUrl = hono.get("requestOrigin") ?? request.url;
+    const baseUrl = requestOrigin ?? request.url;
     const resetUrl = new URL(`/password-reset?token=${result.resetId}`, baseUrl).toString();
 
-    const { os, browser } = Bowser.parse(userAgent);
+    const { os, browser } = parse(userAgent);
     const displayName = result.identity.nickname || result.identity.username;
 
     const email = await passwordForgotEmail({

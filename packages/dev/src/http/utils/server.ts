@@ -43,13 +43,13 @@ export async function createHonoServer<E extends Env>(
   // @ts-expect-error - Virtual module provided by React Router at build time
   const build = import("virtual:react-router/server-build");
 
-  // Build the request handler once, lazily, instead of on every request.
   let requestHandler: Promise<RequestHandler> | undefined;
 
   app.use(async (ctx) => {
     requestHandler ??= build.then((serverBuild) => createRequestHandler(serverBuild, mode));
 
     const handleRequest = await requestHandler;
+
     const loadContext = new RouterContextProvider();
     loadContext.set(honoContext, ctx);
 

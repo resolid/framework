@@ -5,7 +5,7 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", "build/**", ".vercel/**", ".netlify/**"],
-      "env": ["NETLIFY", "VERCEL"]
+      "env": ["NETLIFY", "VERCEL", "VITE_TURNSTILE_KEY"]
     },
     "test": {
       "dependsOn": ["build"],

@@ -35,7 +35,7 @@ export interface PresetBaseOptions {
 type BuildPresetOptions<BuildContext> = OptionalToUndefined<PresetBaseOptions> & {
   nodeVersion: NodeVersion;
   serverPlatform: ServerPlatform;
-  buildManifest: BuildManifest | undefined;
+  buildManifest: BuildManifest | undefined | null;
   reactRouterConfig: Readonly<{
     appDirectory: string;
     buildDirectory: string;

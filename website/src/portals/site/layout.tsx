@@ -1,5 +1,5 @@
 import { getIdentityDisplayName } from "@resolid/app-auth/utils";
-import { getHonoContext } from "@resolid/dev/http";
+import { getRouteContext } from "@resolid/dev/http";
 import {
   Avatar,
   AvatarFallback,
@@ -94,11 +94,11 @@ export const meta = ({ loaderData }: Route.ComponentProps) => {
 };
 
 export async function loader({ request, context }: Route.LoaderArgs) {
-  const hono = getHonoContext(context);
+  const { app, requestOrigin } = getRouteContext(context);
 
   return {
-    user: await hono.get("app").get(UserSessionService).getIdentity(request),
-    requestOrigin: hono.get("requestOrigin") ?? request.url,
+    user: await app.get(UserSessionService).getIdentity(request),
+    requestOrigin: requestOrigin ?? request.url,
   };
 }
 
