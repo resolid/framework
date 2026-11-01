@@ -13,7 +13,7 @@ export interface AppContextVariables {}
 
 type BuiltinContextVariables = {
   remoteAddr: string;
-  requestOrigin: string | undefined;
+  publicOrigin: string;
 } & RequestIdVariables;
 
 declare module "hono" {

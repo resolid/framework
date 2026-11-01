@@ -1,6 +1,6 @@
 import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import { createFieldErrors, isSuccessData } from "@resolid/app/validate";
-import { getRouteContext, httpProblem } from "@resolid/dev/http";
+import { getRouteContext, validationError } from "@resolid/dev/http";
 import { HistoryLink, mergeMeta } from "@resolid/dev/react";
 import { Button } from "@resolid/react-ui";
 import { addMinutes, formatDate } from "@resolid/utils/date";
@@ -33,12 +33,12 @@ export function headers() {
 }
 
 export async function action({ request, context }: Route.ActionArgs) {
-  const { app, remoteAddr, requestOrigin } = getRouteContext(context);
+  const { app, remoteAddr, publicOrigin } = getRouteContext(context);
   const data = await parseFormData<UserPasswordForgotFormData>(request);
   const verify = await turnstileVerify(data.captcha, remoteAddr);
 
   if (!verify.success) {
-    return httpProblem(createFieldErrors({ captcha: "验证失败" }));
+    validationError(createFieldErrors({ captcha: "验证失败" }));
   }
 
   const expiresAt = addMinutes(null, 30);
@@ -49,19 +49,16 @@ export async function action({ request, context }: Route.ActionArgs) {
     .passwordForgot(data, expiresAt, remoteAddr, userAgent, userPasswordForgotResolver);
 
   if (errors) {
-    return httpProblem(errors);
+    return validationError(errors);
   }
 
   if (result.identity) {
-    const baseUrl = requestOrigin ?? request.url;
-    const resetUrl = new URL(`/password-reset?token=${result.resetId}`, baseUrl).toString();
-
     const { os, browser } = parse(userAgent);
     const displayName = result.identity.nickname || result.identity.username;
 
     const email = await passwordForgotEmail({
-      baseUrl,
-      resetUrl,
+      baseUrl: publicOrigin,
+      resetUrl: new URL(`/password-reset?token=${result.resetId}`, publicOrigin).href,
       displayName,
       expiresAt: formatDate(expiresAt, "YYYY-MM-DD HH:mm"),
       supportEmail: env.RX_SUPPORT_EMAIL,

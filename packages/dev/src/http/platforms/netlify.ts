@@ -1,8 +1,7 @@
 import type { Context as NetlifyContext } from "@netlify/types";
 import type { Context, Hono } from "hono";
-import { remoteAddr } from "../middlewares/remote-addr";
 import { requestId } from "../middlewares/request-id";
-import { requestOrigin } from "../middlewares/request-origin";
+import { requestInfo } from "../middlewares/request-info";
 import { createHonoServer, type HonoServerOptions, resolveServerMode } from "../utils/server";
 
 export type NetlifyEnv = {
@@ -27,9 +26,11 @@ export async function createHonoNetlifyServer(
   const app = await createHonoServer<NetlifyEnv>(mode, {
     honoConfig: async (hono) => {
       hono.use(
-        remoteAddr((ctx: Context<NetlifyEnv>) => ctx.env.context.ip),
         requestId((ctx: Context<NetlifyEnv>) => ctx.env.context.requestId),
-        requestOrigin((ctx: Context<NetlifyEnv>) => ctx.env.context.site.url),
+        requestInfo((ctx: Context<NetlifyEnv>) => ({
+          remoteAddr: ctx.env.context.ip,
+          publicOrigin: ctx.env.context.site.url ?? new URL(ctx.req.url).origin,
+        })),
       );
 
       await honoConfig?.(hono);

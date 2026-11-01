@@ -33,8 +33,8 @@ import type { Route } from "./+types/layout";
 import { AuthContext, useAuth } from "./auth";
 
 export const meta = ({ loaderData }: Route.ComponentProps) => {
-  const ogImage = new URL("/images/og-image-v2.png", loaderData.requestOrigin).toString();
-  const ogUrl = trimEnd(new URL("", loaderData.requestOrigin).toString(), "/");
+  const ogUrl = trimEnd(loaderData.publicOrigin, "/");
+  const ogImage = new URL("/images/og-image-v2.png", loaderData.publicOrigin).href;
   const siteName = "Resolid";
   const title = siteName;
   const description =
@@ -94,11 +94,11 @@ export const meta = ({ loaderData }: Route.ComponentProps) => {
 };
 
 export async function loader({ request, context }: Route.LoaderArgs) {
-  const { app, requestOrigin } = getRouteContext(context);
+  const { app, publicOrigin } = getRouteContext(context);
 
   return {
     user: await app.get(UserSessionService).getIdentity(request),
-    requestOrigin: requestOrigin ?? request.url,
+    publicOrigin,
   };
 }
 

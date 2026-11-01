@@ -1,5 +1,5 @@
 import { RX_DEFAULT_AUTH_GROUP_ID } from "@resolid/app-auth";
-import { getRouteContext, httpProblem, httpRedirect } from "@resolid/dev/http";
+import { getRouteContext, validationError, httpRedirect } from "@resolid/dev/http";
 import { mergeMeta } from "@resolid/dev/react";
 import { Button } from "@resolid/react-ui";
 import { Form, useSearchParams } from "react-router";
@@ -28,7 +28,7 @@ export async function action({ request, context }: Route.ActionArgs) {
     );
 
   if (errors) {
-    return httpProblem(errors);
+    return validationError(errors);
   }
 
   httpRedirect(

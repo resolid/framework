@@ -1,14 +1,13 @@
-import type { Hono, MiddlewareHandler } from "hono";
+import type { Context, Hono, MiddlewareHandler } from "hono";
 import type { AddressInfo } from "node:net";
 import { serve, type ServerType } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { logger } from "hono/logger";
 import { networkInterfaces } from "node:os";
 import { env } from "node:process";
-import { remoteAddr } from "../middlewares/remote-addr";
 import { requestId } from "../middlewares/request-id";
-import { requestOrigin } from "../middlewares/request-origin";
-import { getRemoteAddr, getRequestOrigin } from "../utils/request";
+import { requestInfo } from "../middlewares/request-info";
+import { getRequestInfo, type TrustProxy } from "../utils/forwarded";
 import {
   createHonoServer,
   type HonoServerOptions,
@@ -20,14 +19,11 @@ export type { NodeEnv } from "../utils/server";
 
 export type HonoNodeServerOptions = HonoServerOptions<NodeEnv> & {
   port?: number;
+  hostname?: string;
+  trustProxy?: TrustProxy;
   defaultLogger?: boolean;
   listeningListener?: (info: AddressInfo) => void;
-  overrideGlobalObjects?: boolean;
-  autoCleanupIncoming?: boolean;
   onShutdown?: () => Promise<void> | void;
-  proxy?: boolean;
-  proxyCount?: number;
-  ipHeaders?: string;
 };
 
 export async function createHonoNodeServer(
@@ -37,7 +33,7 @@ export async function createHonoNodeServer(
   const isProduction = mode == "production";
   const basename = import.meta.env.RESOLID_BASENAME;
 
-  const { port, defaultLogger, proxy, proxyCount, ipHeaders, ...restOptions } = options;
+  const { port, defaultLogger, trustProxy = false, onShutdown, ...restOptions } = options;
 
   const mergedOptions: HonoNodeServerOptions & { port: number } = {
     port: port ?? 3000,
@@ -55,8 +51,6 @@ export async function createHonoNodeServer(
     defaultLogger: defaultLogger ?? !isProduction,
     ...restOptions,
   };
-
-  let server: ServerType | null = null;
 
   const app = await createHonoServer(mode, {
     honoConfig: async (hono) => {
@@ -78,11 +72,15 @@ export async function createHonoNodeServer(
       }
 
       hono.use(
-        remoteAddr((ctx) =>
-          getRemoteAddr(ctx.req.raw, ctx.env.incoming.socket, { proxy, proxyCount, ipHeaders }),
-        ),
         requestId(),
-        requestOrigin((ctx) => getRequestOrigin(ctx.req.raw, ctx.env.incoming.socket, proxy)),
+        requestInfo((ctx: Context<NodeEnv>) => {
+          return getRequestInfo(
+            trustProxy,
+            ctx.env.incoming.socket.remoteAddress,
+            ctx.req.url,
+            ctx.req.raw.headers,
+          );
+        }),
       );
 
       await mergedOptions.honoConfig?.(hono);
@@ -93,63 +91,80 @@ export async function createHonoNodeServer(
   const shouldStartServer = isProduction && env.IS_RR_BUILD_REQUEST !== "yes";
 
   if (shouldStartServer) {
-    server = serve(
+    const server = serve(
       {
         fetch: app.fetch,
         port: mergedOptions.port,
-        overrideGlobalObjects: mergedOptions.overrideGlobalObjects,
-        autoCleanupIncoming: mergedOptions.autoCleanupIncoming,
+        hostname: mergedOptions.hostname,
       },
       mergedOptions.listeningListener,
     );
 
-    process.on("SIGTERM", shutdown);
-    process.on("SIGINT", shutdown);
-  }
-
-  function closeServer(): Promise<void> {
-    return new Promise((resolve) => {
-      if (!server) {
-        resolve();
-        return;
-      }
-
-      if ("closeIdleConnections" in server) {
-        server.closeIdleConnections();
-      }
-
-      server.close(() => resolve());
-    });
-  }
-
-  let shutdownPromise: Promise<void> | null = null;
-
-  function shutdown(): Promise<void> {
-    shutdownPromise ??= performShutdown();
-
-    return shutdownPromise;
-  }
-
-  async function performShutdown(): Promise<void> {
-    process.removeListener("SIGINT", shutdown);
-    process.removeListener("SIGTERM", shutdown);
-
-    let exitCode = 0;
-
-    try {
-      await closeServer();
-      await mergedOptions.onShutdown?.();
-    } catch (error) {
-      exitCode = 1;
-      console.error("[resolid] Error during shutdown:", error);
-    }
-
-    console.log("[resolid] Node server shutdown.");
-
-    process.exit(exitCode);
+    gracefulShutdown(server, { onShutdown });
   }
 
   return app;
+}
+
+type GracefulShutdownOptions = {
+  timeout?: number;
+  onShutdown?: () => void | Promise<void>;
+};
+
+function gracefulShutdown(
+  server: ServerType,
+  { timeout = 10000, onShutdown }: GracefulShutdownOptions = {},
+) {
+  let closing = false;
+
+  function shutdown() {
+    if (closing) {
+      return;
+    }
+
+    closing = true;
+
+    const timer = setTimeout(() => {
+      console.error("[resolid] Shutdown timed out, forcing exit.");
+
+      if ("closeAllConnections" in server) {
+        server.closeAllConnections();
+      }
+
+      process.exit(1);
+    }, timeout).unref();
+
+    server.close(async (err) => {
+      let exitCode = 0;
+
+      if (err) {
+        console.error("[resolid] Failed to shut down server:", err);
+        exitCode = 1;
+      }
+
+      try {
+        await onShutdown?.();
+      } catch (e) {
+        console.error("[resolid] onShutdown failed:", e);
+        exitCode = 1;
+      }
+
+      if (exitCode === 0) {
+        console.log("[resolid] Server shut down.");
+      }
+
+      clearTimeout(timer);
+      process.exitCode = exitCode;
+    });
+
+    if ("closeIdleConnections" in server) {
+      server.closeIdleConnections();
+    }
+  }
+
+  for (const sig of ["SIGINT", "SIGTERM"] as const) {
+    globalThis.process.on(sig, shutdown);
+  }
 }
 
 export function cacheControl(seconds: number, immutable = false): MiddlewareHandler {

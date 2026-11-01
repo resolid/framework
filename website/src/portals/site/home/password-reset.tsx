@@ -1,5 +1,5 @@
 import { isSuccessData } from "@resolid/app/validate";
-import { getRouteContext, httpProblem } from "@resolid/dev/http";
+import { getRouteContext, validationError } from "@resolid/dev/http";
 import { mergeMeta } from "@resolid/dev/react";
 import { Button } from "@resolid/react-ui";
 import { Form } from "react-router";
@@ -28,7 +28,7 @@ export async function action({ request, context }: Route.ActionArgs) {
     .passwordReset(data, new URL(request.url).searchParams.get("token"), userPasswordResetResolver);
 
   if (errors) {
-    return httpProblem(errors);
+    return validationError(errors);
   }
 
   return { success: true };

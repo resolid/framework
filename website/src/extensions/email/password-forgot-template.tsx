@@ -38,7 +38,7 @@ export function PasswordForgotEmailTemplate({
       <Body style={main}>
         <Container style={container}>
           <Img
-            src={new URL("/images/resolid.png", baseUrl).toString()}
+            src={new URL("/images/resolid.png", baseUrl).href}
             width="200"
             height="30"
             alt="Resolid Tech"

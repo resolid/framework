@@ -1,6 +1,6 @@
 import { data, type UNSAFE_DataWithResponseInit } from "react-router";
 
-export function httpProblem<E>(errors: E): UNSAFE_DataWithResponseInit<{
+export function validationError<E>(errors: E): UNSAFE_DataWithResponseInit<{
   errors: E;
 }> {
   return data({ errors }, 422);

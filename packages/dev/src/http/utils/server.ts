@@ -1,4 +1,4 @@
-import type { Http2Bindings, HttpBindings } from "@hono/node-server";
+import type { HttpBindings } from "@hono/node-server";
 import type { MaybePromise } from "@resolid/utils";
 import type { HonoOptions } from "hono/hono-base";
 import { type Context, type Env, Hono } from "hono";
@@ -14,7 +14,7 @@ import {
 export const honoContext: RouterContext<Context> = createContext<Context>();
 
 export type NodeEnv = {
-  Bindings: HttpBindings | Http2Bindings;
+  Bindings: HttpBindings;
 };
 
 export interface HonoServerOptions<E extends Env> {
@@ -40,7 +40,6 @@ export async function createHonoServer<E extends Env>(
     strict: false,
   });
 
-  // @ts-expect-error - Virtual module provided by React Router at build time
   const build = import("virtual:react-router/server-build");
 
   let requestHandler: Promise<RequestHandler> | undefined;
