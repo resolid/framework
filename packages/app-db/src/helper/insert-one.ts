@@ -1,5 +1,6 @@
 import type { Kysely, Insertable, Selectable } from "kysely";
 import type { DatabaseExecutor } from "../core/types";
+import { PrimaryPlugin } from "../plugins/primary-plugin";
 
 export async function insertOne<DB, T extends keyof DB & string>(
   db: DatabaseExecutor<DB>,
@@ -25,6 +26,7 @@ export async function insertOne<DB, T extends keyof DB & string>(
   const id = insertId && insertId > 0n ? insertId : (values as Record<string, unknown>)[pk];
 
   return (await k
+    .withPlugin(new PrimaryPlugin())
     .selectFrom(table)
     .selectAll()
     .where(db.dynamic.ref(pk), "=", id)

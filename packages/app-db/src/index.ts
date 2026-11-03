@@ -12,3 +12,7 @@ export * from "./helper/insert-one";
 
 export * from "./plugins/table-prefix-plugin";
 export * from "./plugins/table-snake-case-plugin";
+
+export type { ReplicaStrategy } from "kysely-replication";
+export { RandomReplicaStrategy } from "kysely-replication/strategy/random";
+export { RoundRobinReplicaStrategy } from "kysely-replication/strategy/round-robin";

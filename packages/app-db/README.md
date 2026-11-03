@@ -71,6 +71,54 @@ createDatabaseExtension({
 
 Repositories select a named connection via their protected `connectionName` property; services pass the name to `this.database.get(name)` or `this.database.transaction(handler, name)`. Both fall back to the default connection.
 
+### Read replicas
+
+PostgreSQL and MySQL connections can send reads to replicas. Pass `replicas` next to `poolOptions`; each replica takes its own `poolOptions` and `dialectOptions`:
+
+```ts
+createDatabaseExtension({
+  connection: new PostgresConnection({
+    poolOptions: { connectionString: env.RX_DB_URI },
+    replicas: [
+      { poolOptions: { connectionString: env.RX_DB_REPLICA_1_URI } },
+      { poolOptions: { connectionString: env.RX_DB_REPLICA_2_URI } },
+    ],
+    onPoolCreated: (pool) => pool.on("error", (error) => logger.error(error)),
+  }),
+});
+```
+
+`onPoolCreated` is connection-level: it runs for the primary pool and for every replica pool, so error handlers and pool metrics only need to be registered once. `replicaStrategy` controls which replica serves a read and defaults to `new RoundRobinReplicaStrategy({ onTransaction: "error" })`. A custom strategy is an object with `next(replicaCount): Promise<number>` and an optional `onTransaction` setting:
+
+```ts
+import type { ReplicaStrategy } from "@resolid/app-db";
+
+const strategy: ReplicaStrategy = {
+  next: async (replicaCount) => Math.floor(Math.random() * replicaCount),
+  onTransaction: "error",
+};
+```
+
+Routing:
+
+- `select` without a lock, and `stream` — replica
+- `insert`, `update`, `delete`, `merge`, DDL, raw statements executed with Kysely's `sql` template, and transactions — primary
+
+Reads are eventually consistent: a row written on the primary may not be visible on a replica yet. To read after a write, force the primary for that query. The `withPrimary()`/`withReplica()` helpers are opt-in, because they patch the Kysely prototypes; import the separate entry once in your app:
+
+```ts
+import "@resolid/app-db/replication";
+
+await db.withPrimary().selectFrom("order").selectAll().execute();
+await db.withReplica(1).selectFrom("order").selectAll().execute();
+```
+
+`insertOne` already reads its fallback row back from the primary, so the insert-then-select path on MySQL is not affected by replication lag.
+
+Row locks are not routed automatically: `.forUpdate()` / `.forShare()` stay `select` queries and therefore still use a replica. Run them with `withPrimary()` (or inside a transaction, which always uses the primary) when you need the lock on the primary.
+
+SQLite has a single file and does not support `replicas`; passing it is a type error.
+
 ## Defining tables
 
 Every module (and every published package) owns its table types and merges them into the shared `Database` interface with `declare module` augmentation:
@@ -264,7 +312,7 @@ const status = await insertOne(db, "status", { message: "ok" });
 
 - PostgreSQL and SQLite use `returning` and read the row in one statement.
 - Dialects with `output` support (such as SQL Server) use `output inserted`.
-- MySQL (and any dialect without either) takes `insertId` from the result and selects the row by primary key; when there is no auto-increment id, the value from `values[pk]` is used.
+- MySQL (and any dialect without either) takes `insertId` from the result and selects the row by primary key; when there is no auto-increment id, the value from `values[pk]` is used. That read-back is forced to the primary connection, so it is not affected by replica lag.
 
 The primary key defaults to `id`; pass a fourth argument for another name:
 

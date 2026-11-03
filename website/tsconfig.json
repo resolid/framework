@@ -13,6 +13,7 @@
       "@resolid/app-auth/utils": ["../packages/app-auth/src/utils.ts"],
       "@resolid/app-cache": ["../packages/app-cache/src"],
       "@resolid/app-db": ["../packages/app-db/src"],
+      "@resolid/app-db/replication": ["../packages/app-db/src/replication.ts"],
       "@resolid/app-db/adapters/*": ["../packages/app-db/src/adapters/*"],
       "@resolid/app-log": ["../packages/app-log/src"],
       "@resolid/app-log/targets": ["../packages/app-log/src/targets.ts"],

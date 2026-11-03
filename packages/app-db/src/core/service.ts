@@ -1,5 +1,5 @@
 import type { AppContext, Emitter, ExtensionCreator } from "@resolid/app";
-import type { Kysely } from "kysely";
+import type { Kysely, Transaction } from "kysely";
 import type { CommonConfig, DatabaseConnection } from "./connection";
 import type { Database } from "./database";
 import { type AppDbEvents, createLoggerFactory } from "./utils";
@@ -94,7 +94,7 @@ export class DatabaseService<
   }
 
   transaction<DB = Database, T = unknown>(
-    handler: (executor: Kysely<DB>) => Promise<T>,
+    handler: (trx: Transaction<DB>) => Promise<T>,
     name: string = this._defaultName,
   ): Promise<T> {
     return this.get<DB>(name).transaction().execute(handler);

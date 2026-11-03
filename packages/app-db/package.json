@@ -32,6 +32,10 @@
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     },
+    "./replication": {
+      "types": "./dist/replication.d.mts",
+      "import": "./dist/replication.mjs"
+    },
     "./adapters/*": {
       "types": "./dist/adapters/*.d.mts",
       "import": "./dist/adapters/*.mjs"
@@ -49,7 +53,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@resolid/app": "workspace:^"
+    "@resolid/app": "workspace:^",
+    "kysely-replication": "^0.4.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",

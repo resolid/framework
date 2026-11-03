@@ -1,6 +1,13 @@
 import { type Dialect, Kysely, type KyselyPlugin, type Logger } from "kysely";
+import { KyselyReplicationDialect, type ReplicaStrategy } from "kysely-replication";
+import { RoundRobinReplicaStrategy } from "kysely-replication/strategy/round-robin";
 import { TablePrefixPlugin } from "../plugins/table-prefix-plugin";
 import { TableSnakeCasePlugin } from "../plugins/table-snake-case-plugin";
+
+export type ReplicationConfig = {
+  /** 默认 RoundRobinReplicaStrategy({ onTransaction: "error" }) */
+  replicaStrategy?: ReplicaStrategy;
+};
 
 export type CommonConfig = {
   logger?: boolean | Logger;
@@ -33,11 +40,19 @@ export abstract class DatabaseConnection<C> {
     return this.config.logger;
   }
 
+  protected get replicaStrategy(): ReplicaStrategy | undefined {
+    return undefined;
+  }
+
   protected abstract createDialect(): Dialect;
+
+  protected createReplicaDialects(): Dialect[] {
+    return [];
+  }
 
   connect(context: { logger?: Logger; plugins?: KyselyPlugin[] }): void {
     this._database = new Kysely({
-      dialect: this.createDialect(),
+      dialect: this._createConfiguredDialect(),
       plugins: [
         ...(context.plugins ?? []),
         ...(this.config.plugins ?? []),
@@ -45,6 +60,22 @@ export abstract class DatabaseConnection<C> {
         ...(this.config.tablePrefix ? [new TablePrefixPlugin(this.config.tablePrefix)] : []),
       ],
       log: context.logger,
+    });
+  }
+
+  private _createConfiguredDialect() {
+    const primaryDialect = this.createDialect();
+    const [firstReplica, ...otherReplicas] = this.createReplicaDialects();
+
+    if (!firstReplica) {
+      return primaryDialect;
+    }
+
+    return new KyselyReplicationDialect({
+      primaryDialect,
+      replicaDialects: [firstReplica, ...otherReplicas],
+      replicaStrategy:
+        this.replicaStrategy ?? new RoundRobinReplicaStrategy({ onTransaction: "error" }),
     });
   }
 

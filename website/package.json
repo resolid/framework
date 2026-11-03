@@ -34,7 +34,7 @@
     "@resolid/utils": "^1.7.3",
     "@tailwindcss/typography": "^0.5.20",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/functions": "^3.10.5",
+    "@vercel/functions": "^3.10.6",
     "@vercel/speed-insights": "^2.0.0",
     "bowser": "^2.15.0",
     "isbot": "^5.2.2",
@@ -46,7 +46,7 @@
     "react-hook-form": "^7.91.0",
     "react-router": "^8.5.1",
     "remix-hook-form": "^7.3.0",
-    "tailwindcss": "^4.3.3",
+    "tailwindcss": "^4.3.4",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -55,7 +55,7 @@
     "@react-router/dev": "^8.5.1",
     "@resolid/dev": "workspace:^",
     "@rolldown/plugin-babel": "^0.2.4",
-    "@tailwindcss/vite": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.2.1",
