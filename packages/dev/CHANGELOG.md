@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.12.1
+
+### Patch Changes
+
+- [`65cfe16`](https://github.com/resolid/framework/commit/65cfe1670942e12d36690d33bcb26f14353b853d) - chore: upgrade @resolid/utils to v2
+
 ## 0.12.0
 
 ### Minor Changes
