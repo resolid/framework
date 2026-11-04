@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.12.2
+
+### Patch Changes
+
+- [`c859071`](https://github.com/resolid/framework/commit/c8590711fe1e2951042479c5f3f7358d86ab6216) - fix: accept generated meta args in mergeMeta
+
 ## 0.12.1
 
 ### Patch Changes
