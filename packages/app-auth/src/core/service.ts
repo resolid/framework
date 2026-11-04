@@ -1,6 +1,5 @@
 import type { Resolver } from "react-hook-form";
 import type * as z from "zod";
-import { BaseService } from "@resolid/app-db";
 import { createFieldErrors, validateData, type ServiceResult } from "@resolid/app/validate";
 import { omit, random } from "@resolid/utils";
 import { verifyPassword, hashPassword } from "@resolid/utils/password";
@@ -34,11 +33,10 @@ export abstract class AuthService<
   TAuth extends Auth,
   TGroup extends AuthGroup,
   R extends AuthRepository<TAuth, TGroup> = AuthRepository<TAuth, TGroup>,
-> extends BaseService {
+> {
   private _repository: R;
 
   protected constructor(repository: R) {
-    super();
     this._repository = repository;
   }
 
@@ -85,28 +83,26 @@ export abstract class AuthService<
 
     const passwordHash = await hashPassword(result.values.password);
 
-    return await this.database.transaction(async (trx) => {
-      const repository = this._repository.withExecutor(trx);
-
-      if (result.values.email && (await repository.existsByEmail(result.values.email))) {
+    return await this._repository.transaction(async (repo) => {
+      if (result.values.email && (await repo.existsByEmail(result.values.email))) {
         return [createFieldErrors<T>({ email: "邮箱已存在" }), undefined];
       }
 
-      if (result.values.username && (await repository.existsByUsername(result.values.username))) {
+      if (result.values.username && (await repo.existsByUsername(result.values.username))) {
         return [createFieldErrors<T>({ username: "用户名已存在" }), undefined];
       }
 
-      if (result.values.nickname && (await repository.existsByNickname(result.values.nickname))) {
+      if (result.values.nickname && (await repo.existsByNickname(result.values.nickname))) {
         return [createFieldErrors<T>({ nickname: "昵称已存在" }), undefined];
       }
 
-      const group = await repository.findGroupById(defaultGroupId);
+      const group = await repo.findGroupById(defaultGroupId);
 
       if (!group) {
         return [createFieldErrors<T>({ groupId: "默认组不存在" }), undefined];
       }
 
-      const identity = await repository.create({
+      const identity = await repo.create({
         ...result.values,
         password: passwordHash,
         groupId: group.id,
@@ -182,16 +178,14 @@ export abstract class AuthService<
 
     const resetId = random();
 
-    return await this.database.transaction(async (trx) => {
-      const repository = this._repository.withExecutor(trx);
-
-      const identity = await repository.findByEmail(result.values.email);
+    return await this._repository.transaction(async (repo) => {
+      const identity = await repo.findByEmail(result.values.email);
 
       if (!identity) {
         return [undefined, { identity: undefined, resetId }];
       }
 
-      await repository.createPasswordReset({
+      await repo.createPasswordReset({
         id: resetId,
         identityId: identity.id,
         expiresAt,
@@ -220,20 +214,18 @@ export abstract class AuthService<
 
     const passwordHash = await hashPassword(result.values.password);
 
-    return await this.database.transaction(async (trx) => {
-      const repository = this._repository.withExecutor(trx);
-
-      const reset = await repository.findPasswordResetById(resetId);
+    return await this._repository.transaction(async (repo) => {
+      const reset = await repo.findPasswordResetById(resetId);
 
       if (reset == undefined) {
         return [createFieldErrors<T>({ token: "密码重置无效" }), undefined];
       }
 
-      if (!(await repository.consumePasswordReset(reset.id))) {
+      if (!(await repo.consumePasswordReset(reset.id))) {
         return [createFieldErrors<T>({ token: "密码重置无效" }), undefined];
       }
 
-      await repository.updatePassword(reset.identityId, passwordHash);
+      await repo.updatePassword(reset.identityId, passwordHash);
 
       return [undefined, true];
     });

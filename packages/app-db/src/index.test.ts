@@ -6,14 +6,16 @@ import {
   SqliteAdapter,
   SqliteIntrospector,
   SqliteQueryCompiler,
+  type DatabaseConnection as KyselyDatabaseConnection,
   type Dialect,
   type KyselyPlugin,
   type Logger,
+  type TransactionSettings,
 } from "kysely";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
+import type { DatabaseExecutor, DatabaseTransaction } from "./core/types";
 import { SqliteConnection } from "./adapters/sqlite";
 import { BaseRepository } from "./base/repository";
-import { BaseService } from "./base/service";
 import { DatabaseConnection } from "./core/connection";
 import { createDatabaseExtension, DatabaseService } from "./core/service";
 
@@ -64,6 +66,32 @@ class FakeConnection extends DatabaseConnection<Record<string, never>> {
   }
 }
 
+class RecordingDriver extends DummyDriver {
+  readonly settings: TransactionSettings[] = [];
+
+  override async beginTransaction(
+    _connection?: KyselyDatabaseConnection,
+    settings?: TransactionSettings,
+  ): Promise<void> {
+    if (settings) {
+      this.settings.push(settings);
+    }
+  }
+}
+
+class RecordingConnection extends DatabaseConnection<Record<string, never>> {
+  readonly driver = new RecordingDriver();
+
+  protected override createDialect(): Dialect {
+    return {
+      createAdapter: () => new SqliteAdapter(),
+      createDriver: () => this.driver,
+      createIntrospector: (db) => new SqliteIntrospector(db),
+      createQueryCompiler: () => new SqliteQueryCompiler(),
+    };
+  }
+}
+
 interface FakeDatabase {
   user: {
     name: string;
@@ -73,17 +101,6 @@ interface FakeDatabase {
 class FakeRepository extends BaseRepository<FakeDatabase> {
   async findFirstUser(): Promise<FakeDatabase["user"] | undefined> {
     return this.db.selectFrom("user").selectAll().limit(1).executeTakeFirst();
-  }
-}
-
-class FakeService extends BaseService {
-  async findFirstUser(): Promise<FakeDatabase["user"] | undefined> {
-    return this.database
-      .get<FakeDatabase>()
-      .selectFrom("user")
-      .selectAll()
-      .limit(1)
-      .executeTakeFirst();
   }
 }
 
@@ -280,28 +297,6 @@ describe("BaseRepository", () => {
   });
 });
 
-describe("BaseService", () => {
-  it("should resolve the database through dependency injection", async () => {
-    const app = await createApp({
-      name: "TestApp",
-      extensions: [
-        createDatabaseExtension({
-          connection: new FakeConnection("main"),
-        }),
-      ],
-      providers: [{ token: FakeService, factory: () => new FakeService() }],
-    });
-
-    await app.run();
-
-    const user = await app.get(FakeService).findFirstUser();
-
-    expect(user).toBeUndefined();
-
-    await app.dispose();
-  });
-});
-
 interface TestDatabase {
   user: {
     id: Generated<number>;
@@ -322,24 +317,53 @@ class SqliteUserRepository extends BaseRepository<TestDatabase> {
   }
 }
 
-class SqliteUserService extends BaseService {
-  async create(name: string): Promise<void> {
-    await this.database.transaction<TestDatabase>(async (trx) => {
-      const users = new SqliteUserRepository(trx);
+class AnalyticsRepository extends BaseRepository<TestDatabase, "analytics"> {
+  protected override connectionName = "analytics" as const;
 
-      await users.insert(name);
-    });
+  async selectAll(): Promise<{ id: number; name: string }[]> {
+    return this.db.selectFrom("user").selectAll().execute();
   }
+}
 
-  async createAndFail(name: string): Promise<void> {
-    await this.database.transaction<TestDatabase>(async (trx) => {
-      const users = new SqliteUserRepository(trx);
+class MainRepository extends BaseRepository<TestDatabase, "main"> {
+  protected override connectionName = "main" as const;
+}
 
-      await users.insert(name);
+class ReplicaRepository extends BaseRepository<TestDatabase, "replica"> {
+  protected override connectionName = "replica" as const;
+}
 
-      throw new Error("rollback");
-    });
-  }
+function constructMainFromAnalytics(executor: DatabaseExecutor<TestDatabase, "analytics">) {
+  // @ts-expect-error - a main repository cannot use an analytics executor
+  return new MainRepository(executor);
+}
+
+function constructMainFromService(service: DatabaseService) {
+  // @ts-expect-error - the executor is scoped to the analytics connection
+  return new MainRepository(service.get<TestDatabase, "analytics">("analytics"));
+}
+
+function withMainExecutor(
+  repository: MainRepository,
+  executor: DatabaseExecutor<TestDatabase, "analytics">,
+) {
+  // @ts-expect-error - withExecutor keeps the repository connection
+  return repository.withExecutor(executor);
+}
+
+function constructAnalytics(executor: DatabaseExecutor<TestDatabase, "analytics">) {
+  return new AnalyticsRepository(executor);
+}
+
+function constructAnalyticsFromService(service: DatabaseService) {
+  return new AnalyticsRepository(service.get<TestDatabase, "analytics">("analytics"));
+}
+
+function withAnalyticsExecutor(
+  repository: AnalyticsRepository,
+  executor: DatabaseExecutor<TestDatabase, "analytics">,
+) {
+  return repository.withExecutor(executor);
 }
 
 async function createSqliteAppWithUserTable() {
@@ -351,7 +375,6 @@ async function createSqliteAppWithUserTable() {
       }),
     ],
     expose: { database: DatabaseService },
-    providers: [{ token: SqliteUserService, factory: () => new SqliteUserService() }],
   });
 
   await app.run();
@@ -369,41 +392,45 @@ async function createSqliteAppWithUserTable() {
 }
 
 describe("Database transactions", () => {
-  it("should share the transaction between a service and its repository", async () => {
+  it("should share the transaction between a repository and its executor", async () => {
     const { app, database } = await createSqliteAppWithUserTable();
 
-    await app.get(SqliteUserService).create("committed");
+    const users = new SqliteUserRepository(database);
 
-    const users = new SqliteUserRepository(database.get<TestDatabase>());
+    await users.transaction(async (repository) => {
+      await repository.insert("committed");
+    });
 
     expect(await users.selectAll()).toEqual([{ id: 1, name: "committed" }]);
 
     await app.dispose();
   });
 
-  it("should roll back repository writes when the service transaction fails", async () => {
+  it("should roll back repository writes when the transaction fails", async () => {
     const { app, database } = await createSqliteAppWithUserTable();
 
-    await expect(app.get(SqliteUserService).createAndFail("rolled-back")).rejects.toThrow(
-      "rollback",
-    );
+    const users = new SqliteUserRepository(database);
 
-    const users = new SqliteUserRepository(database.get<TestDatabase>());
+    await expect(
+      users.transaction(async (repository) => {
+        await repository.insert("rolled-back");
+
+        throw new Error("rollback");
+      }),
+    ).rejects.toThrow("rollback");
 
     expect(await users.selectAll()).toEqual([]);
 
     await app.dispose();
   });
 
-  it("should run a transaction on the requested connectionName", async () => {
+  it("should pass access mode and isolation level to the driver", async () => {
+    const connection = new RecordingConnection({});
     const app = await createApp({
       name: "TestApp",
       extensions: [
         createDatabaseExtension({
-          connections: {
-            main: new FakeConnection("main"),
-            replica: new FakeConnection("replica"),
-          },
+          connection,
           plugins: [],
         }),
       ],
@@ -412,26 +439,26 @@ describe("Database transactions", () => {
 
     await app.run();
 
-    const events: [string, string][] = [];
+    const users = new SqliteUserRepository(app.get(DatabaseService));
 
-    app.emitter.on("db:query", (name, query) => {
-      events.push([name, query]);
-    });
+    const result = await users.transaction(
+      async (repository) => {
+        await repository.selectAll();
 
-    const result = await app.get(DatabaseService).transaction<TestDatabase>(async (trx) => {
-      await trx.selectFrom("user").selectAll().execute();
-
-      return "done";
-    }, "replica");
+        return "done";
+      },
+      { accessMode: "read only", isolationLevel: "serializable" },
+    );
 
     expect(result).toBe("done");
-    expect(events.length).toBeGreaterThan(0);
-    expect(events.every(([name]) => name === "replica")).toBe(true);
+    expect(connection.driver.settings).toEqual([
+      { accessMode: "read only", isolationLevel: "serializable" },
+    ]);
 
     await app.dispose();
   });
 
-  it("should roll back on the requested connectionName when the handler fails", async () => {
+  it("should roll back on the repository connection when the handler fails", async () => {
     const app = await createApp({
       name: "TestApp",
       extensions: [
@@ -454,12 +481,14 @@ describe("Database transactions", () => {
       events.push([name, query]);
     });
 
+    const repository = new ReplicaRepository(app.get(DatabaseService));
+
     await expect(
-      app.get(DatabaseService).transaction<TestDatabase>(async (trx) => {
+      repository.transaction(async (_repository, trx) => {
         await trx.selectFrom("user").selectAll().execute();
 
         throw new Error("rollback");
-      }, "replica"),
+      }),
     ).rejects.toThrow("rollback");
 
     expect(events.some(([name, query]) => name === "replica" && query.includes("select"))).toBe(
@@ -468,6 +497,59 @@ describe("Database transactions", () => {
     expect(events.every(([name]) => name === "replica")).toBe(true);
 
     await app.dispose();
+  });
+
+  it("should start the transaction on the repository connection", async () => {
+    const app = await createApp({
+      name: "TestApp",
+      extensions: [
+        createDatabaseExtension({
+          connections: {
+            main: new FakeConnection("main"),
+            analytics: new FakeConnection("analytics"),
+          },
+          plugins: [],
+        }),
+      ],
+      expose: { database: DatabaseService },
+    });
+
+    await app.run();
+
+    const events: [string, string][] = [];
+
+    app.emitter.on("db:query", (name, query) => {
+      events.push([name, query]);
+    });
+
+    const repository = new AnalyticsRepository(app.get(DatabaseService));
+
+    const result = await repository.transaction(async (repo, trx) => {
+      expectTypeOf(repo).toEqualTypeOf<AnalyticsRepository>();
+      expectTypeOf(trx).toEqualTypeOf<DatabaseTransaction<TestDatabase, "analytics">>();
+
+      await repo.selectAll();
+
+      return "done";
+    });
+
+    expect(result).toBe("done");
+    expect(events.length).toBeGreaterThan(0);
+    expect(events.every(([name]) => name === "analytics")).toBe(true);
+
+    await app.dispose();
+  });
+
+  it("should reject executors from another connection", () => {
+    expect(constructMainFromAnalytics).toBeTypeOf("function");
+    expect(constructMainFromService).toBeTypeOf("function");
+    expect(withMainExecutor).toBeTypeOf("function");
+  });
+
+  it("should accept executors from the same connection", () => {
+    expect(constructAnalytics).toBeTypeOf("function");
+    expect(constructAnalyticsFromService).toBeTypeOf("function");
+    expect(withAnalyticsExecutor).toBeTypeOf("function");
   });
 });
 

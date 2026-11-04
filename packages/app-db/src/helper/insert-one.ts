@@ -1,9 +1,8 @@
-import type { Kysely, Insertable, Selectable } from "kysely";
-import type { DatabaseExecutor } from "../core/types";
+import type { Kysely, Insertable, Selectable, Transaction } from "kysely";
 import { PrimaryPlugin } from "../plugins/primary-plugin";
 
 export async function insertOne<DB, T extends keyof DB & string>(
-  db: DatabaseExecutor<DB>,
+  db: Kysely<DB> | Transaction<DB>,
   table: T,
   values: Insertable<DB[T]>,
   pk = "id",

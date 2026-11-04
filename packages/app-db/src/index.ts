@@ -5,7 +5,6 @@ export * from "./core/connection";
 export * from "./core/service";
 
 export * from "./base/repository";
-export * from "./base/service";
 export * from "./base/table";
 
 export * from "./helper/insert-one";

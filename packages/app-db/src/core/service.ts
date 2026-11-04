@@ -1,7 +1,7 @@
 import type { AppContext, Emitter, ExtensionCreator } from "@resolid/app";
-import type { Kysely, Transaction } from "kysely";
+import type { Kysely } from "kysely";
 import type { CommonConfig, DatabaseConnection } from "./connection";
-import type { Database } from "./database";
+import type { ConnectionScope } from "./types";
 import { type AppDbEvents, createLoggerFactory } from "./utils";
 
 export type DatabaseConfig<
@@ -82,7 +82,7 @@ export class DatabaseService<
     }
   }
 
-  get<DB>(name?: string): Kysely<DB> {
+  get<DB, Name extends string = string>(name?: Name): Kysely<DB> & ConnectionScope<Name> {
     const key = name ?? this._defaultName;
     const connection = this._connections[key];
 
@@ -90,14 +90,7 @@ export class DatabaseService<
       throw new Error(`Connection with name ${key} does not exist.`);
     }
 
-    return connection.database as Kysely<DB>;
-  }
-
-  transaction<DB = Database, T = unknown>(
-    handler: (trx: Transaction<DB>) => Promise<T>,
-    name: string = this._defaultName,
-  ): Promise<T> {
-    return this.get<DB>(name).transaction().execute(handler);
+    return connection.database as Kysely<DB> & ConnectionScope<Name>;
   }
 }
 

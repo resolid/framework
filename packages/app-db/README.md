@@ -230,9 +230,9 @@ export interface StatusTable {
 
 Physical table names derive from the table identifier used in the query (normally the `Database` key, or the `defineTable` name when a repository queries by it): `snakeCaseTables` (enabled by default) names tables after the word-segmented camelCase names (`userOrders` → `user_orders`, `HTTPServer` → `http_server`, `SERVER2` → `server_2`), and an optional `tablePrefix` is prepended to each final name (`status` → `rx_status`). Set `snakeCaseTables: false` to keep identifiers verbatim.
 
-## Repositories and services
+## Repositories
 
-Extend `BaseRepository` for data access and `BaseService` for business logic:
+Extend `BaseRepository` for data access:
 
 ```ts
 import { BaseRepository } from "@resolid/app-db";
@@ -244,61 +244,73 @@ export class SystemRepository extends BaseRepository {
 }
 ```
 
-`BaseRepository` exposes `this.db` — a fully typed Kysely instance. `BaseRepository<DB>` takes the database schema as its type parameter and defaults to the shared `Database` interface, so a repository bound to another schema can be written explicitly.
+`BaseRepository` exposes `this.db` — a fully typed Kysely instance. `BaseRepository<DB, Name>` takes the database schema and an optional connection name as its type parameters; `DB` defaults to the shared `Database` interface, and `Name` defaults to `string` (unchecked).
 
-`BaseService` exposes `this.database`, the injected `DatabaseService`, with `get<DB>(name)` for a typed Kysely instance and `transaction(handler, name)` for transactions. It has no schema type parameter.
-
-Both classes resolve `DatabaseService` through DI, so constructing them without arguments only works while a provider or extension factory is running. If you create one later by hand, pass the `DatabaseService` or a transaction executor explicitly.
+`BaseRepository` resolves `DatabaseService` through DI, so constructing it without arguments only works while a provider or extension factory is running. If you create one later by hand, pass the `DatabaseService` or a transaction executor explicitly.
 
 ### Transactions
 
-`BaseRepository` uses the pooled connection of the injected `DatabaseService`. To group writes, start a transaction from a service and give the executor to the repositories that should run inside it:
+Start transactions from the repository that owns the connection. `transaction()` uses the repository's connection and accepts Kysely transaction settings:
 
 ```ts
-import { BaseRepository, BaseService, type Database } from "@resolid/app-db";
+import { BaseRepository, type Database } from "@resolid/app-db";
 
-class OrderRepository extends BaseRepository {
+class OrderRepository extends BaseRepository<Database, "main"> {
+  protected override connectionName = "main" as const;
+
   create(input: NewOrder) {
     return this.db.insertInto("order").values(input).executeTakeFirstOrThrow();
   }
 }
 
-class PaymentRepository extends BaseRepository {
+class PaymentRepository extends BaseRepository<Database, "main"> {
+  protected override connectionName = "main" as const;
+
   create(orderId: number) {
     return this.db.insertInto("payment").values({ orderId }).execute();
   }
 }
 
-export class OrderService extends BaseService {
-  placeOrder(input: NewOrder) {
-    return this.database.transaction<Database>(async (trx) => {
-      const orders = new OrderRepository(trx);
-      const payments = new PaymentRepository(trx);
+const orders = new OrderRepository(databaseService);
 
-      const order = await orders.create(input);
-      await payments.create(order.id);
+await orders.transaction(
+  async (repo, trx) => {
+    const order = await repo.create(input);
+    await new PaymentRepository(trx).create(order.id);
 
-      return order;
-    });
-  }
-}
+    return order;
+  },
+  { isolationLevel: "repeatable read", accessMode: "read write" },
+);
 ```
 
-The Kysely transaction is itself a database executor (`DatabaseExecutor<DB>` is `Kysely<DB> | Transaction<DB>`), so `new OrderRepository(trx)` makes every query in that repository use the transaction. Repositories constructed without an executor keep using the pool. The second argument of `transaction` selects the connection name and defaults to the default connection.
+The handler's first argument, `repo`, is the repository bound to the transaction; the second argument is the raw Kysely `trx` for repositories that are not passed through the helper. The Kysely transaction is itself a database executor (`DatabaseExecutor<DB>` is `Kysely<DB> | Transaction<DB>`), so `new PaymentRepository(trx)` makes every query in that repository use the transaction. Repositories constructed without an executor keep using the pool.
 
-If a service already holds a repository instance, call `withExecutor(trx)` to get a new instance of the same repository bound to the transaction instead of constructing one:
+The transaction executor carries the same connection name, so TypeScript rejects a repository from another connection:
 
 ```ts
-return this.database.transaction(async (trx) => {
-  const orders = this.orders.withExecutor(trx);
+class AnalyticsRepository extends BaseRepository<Database, "analytics"> {
+  protected override connectionName = "analytics" as const;
+}
 
-  // ...
+await orders.transaction(async (_orders, trx) => {
+  new AnalyticsRepository(trx); // type error: "main" is not assignable to "analytics"
 });
+```
+
+The check also applies to `withExecutor`. Repositories that leave `Name` at its `string` default are unchecked and accept any executor, which keeps existing code compatible. A repository constructed from an executor cannot start another transaction; use the original repository instead.
+
+The settings map to Kysely's `setAccessMode` / `setIsolationLevel`; the database must support them (PostgreSQL and MySQL do, SQLite ignores them).
+
+The handler's first argument is already the transaction-bound repository. `withExecutor(trx)` remains available when you need to bind a repository to an executor manually:
+
+```ts
+const scoped = this.orders.withExecutor(trx);
 ```
 
 `withExecutor` constructs the repository with the executor as its only argument, so a repository with other constructor dependencies has to accept them as optional or be rebuilt explicitly.
 
-The executor is a local callback argument, so a singleton service can run concurrent transactions safely; each call gets its own executor. Keep the repositories created for a transaction inside that callback.
+The executor is a local callback argument, so a singleton repository can run concurrent transactions safely; each call gets its own executor. Keep the repositories created for a transaction inside that callback.
 
 ## Inserting rows
 
