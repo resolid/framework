@@ -1,9 +1,10 @@
 import type { MetaDescriptor } from "react-router";
 
-export function mergeMeta<A extends { matches: { meta?: MetaDescriptor[] }[] }>(
-  metaFn: (args: A) => MetaDescriptor[],
-  titleJoin = " - ",
-): (args: A) => MetaDescriptor[] {
+export function mergeMeta<
+  A extends {
+    matches: ({ meta?: MetaDescriptor[] } | undefined)[];
+  },
+>(metaFn: (args: A) => MetaDescriptor[], titleJoin = " - "): (args: A) => MetaDescriptor[] {
   return (args) => {
     const mergedMeta = [...metaFn(args)];
 

@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import type { MetaDescriptor } from "react-router";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { mergeMeta } from "./merge-meta";
 
 describe("mergeMeta", () => {
@@ -145,5 +146,24 @@ describe("mergeMeta", () => {
         title: "Home | Dashboard",
       },
     ]);
+  });
+
+  it("should accept generated route meta args and keep the function assignable", () => {
+    // Mirrors React Router's generated `Route.MetaArgs`, whose `matches` is a tuple
+    // with `undefined` entries at the tail.
+    type Args = {
+      loaderData: { meta: { title: string } };
+      matches: [{ meta?: { title: string }[] }, ...({ meta?: { title: string }[] } | undefined)[]];
+    };
+
+    type MetaFunction = (args: Args) => MetaDescriptor[];
+
+    const fn: MetaFunction = mergeMeta(({ loaderData }: Args) => [
+      {
+        title: loaderData.meta.title,
+      },
+    ]);
+
+    expectTypeOf(fn).toEqualTypeOf<MetaFunction>();
   });
 });
