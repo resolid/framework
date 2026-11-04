@@ -252,8 +252,8 @@ importers:
         specifier: workspace:^
         version: link:../app-log
       '@resolid/utils':
-        specifier: ^1.7.3
-        version: 1.7.3
+        specifier: ^2.0.0
+        version: 2.0.0
       react-hook-form:
         specifier: ^7.91.0
         version: 7.91.0(@types/react@19.3.0)(react@19.3.1)
@@ -365,8 +365,8 @@ importers:
         specifier: ^2.1.6
         version: 2.1.6(hono@4.13.16)
       '@resolid/utils':
-        specifier: ^1.7.3
-        version: 1.7.3
+        specifier: ^2.0.0
+        version: 2.0.0
       '@vercel/nft':
         specifier: ^1.11.0
         version: 1.11.0
@@ -462,8 +462,8 @@ importers:
         specifier: ^0.3.7
         version: 0.3.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(tailwindcss@4.3.4)
       '@resolid/utils':
-        specifier: ^1.7.3
-        version: 1.7.3
+        specifier: ^2.0.0
+        version: 2.0.0
       '@tailwindcss/typography':
         specifier: ^0.5.20
         version: 0.5.20(tailwindcss@4.3.4)
@@ -1628,6 +1628,10 @@ packages:
 
   '@resolid/utils@1.7.3':
     resolution: {integrity: sha512-xj0d15nAzQxpVZhSsuSs72YpMXgqjETq6m18jMdRAgJylc6W6c9MwBGwES8bZ1VE5R4CbYkZjjFzD4FPo0oYxg==}
+    engines: {node: ^22.22.0 || >=24}
+
+  '@resolid/utils@2.0.0':
+    resolution: {integrity: sha512-TFMcDzL34gWyesv2FVY05SAHLO7xQHw824rInHEUwVcOSsWpJAxoGSOIQgmBRl1kXLjuj/ldcCAYg59aLHxyqA==}
     engines: {node: ^22.22.0 || >=24}
 
   '@rolldown/binding-android-arm-eabi@1.2.16':
@@ -4862,6 +4866,11 @@ snapshots:
       - tailwind-merge
 
   '@resolid/utils@1.7.3':
+    dependencies:
+      '@noble/hashes': 2.4.0
+      nanoid: 6.0.2
+
+  '@resolid/utils@2.0.0':
     dependencies:
       '@noble/hashes': 2.4.0
       nanoid: 6.0.2

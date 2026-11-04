@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^2.1.6",
-    "@resolid/utils": "^1.7.3",
+    "@resolid/utils": "^2.0.0",
     "@vercel/nft": "^1.11.0",
     "hono": "^4.13.16",
     "minimatch": "^10.2.6",

@@ -1,7 +1,7 @@
 import type { Resolver } from "react-hook-form";
 import type * as z from "zod";
 import { createFieldErrors, validateData, type ServiceResult } from "@resolid/app/validate";
-import { omit, random } from "@resolid/utils";
+import { omit, randomString } from "@resolid/utils";
 import { verifyPassword, hashPassword } from "@resolid/utils/password";
 import type {
   authPasswordForgotSchema,
@@ -129,7 +129,7 @@ export abstract class AuthService<
   }
 
   async createSession(session: AuthSessionData<TAuth, TGroup>, expiresAt: Date): Promise<string> {
-    const sessionId = random();
+    const sessionId = randomString();
 
     await this._repository.createSession({
       id: sessionId,
@@ -176,7 +176,7 @@ export abstract class AuthService<
       return [result.errors, undefined];
     }
 
-    const resetId = random();
+    const resetId = randomString();
 
     return await this._repository.transaction(async (repo) => {
       const identity = await repo.findByEmail(result.values.email);
