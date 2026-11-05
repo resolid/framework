@@ -459,8 +459,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(@resolid/cache@1.3.0)
       '@resolid/react-ui':
-        specifier: ^0.3.7
-        version: 0.3.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(tailwindcss@4.3.4)
+        specifier: ^0.3.8
+        version: 0.3.8(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(tailwindcss@4.3.4)
       '@resolid/utils':
         specifier: ^2.0.0
         version: 2.0.0
@@ -1619,16 +1619,12 @@ packages:
       typescript:
         optional: true
 
-  '@resolid/react-ui@0.3.7':
-    resolution: {integrity: sha512-Dfy4BELgdKDQCvL+V2urOLg709p1p4mgYENosscXqkvBEKBAr1GsFFCF0rnnKRdGfxdcWaYDexTUEiIU2al8Rg==}
+  '@resolid/react-ui@0.3.8':
+    resolution: {integrity: sha512-zaRR833JVK6D2AC0tNX7D76qV+wNDpf0mlnQaHc+ZC58bPKnwkUQkdc1cSwAMBT6hFP3NjJLGAnLGS+7AmkWuw==}
     peerDependencies:
       react: ^19.3.1
       react-dom: ^19.3.1
-      tailwindcss: ^4.3.2
-
-  '@resolid/utils@1.7.3':
-    resolution: {integrity: sha512-xj0d15nAzQxpVZhSsuSs72YpMXgqjETq6m18jMdRAgJylc6W6c9MwBGwES8bZ1VE5R4CbYkZjjFzD4FPo0oYxg==}
-    engines: {node: ^22.22.0 || >=24}
+      tailwindcss: ^4.3.4
 
   '@resolid/utils@2.0.0':
     resolution: {integrity: sha512-TFMcDzL34gWyesv2FVY05SAHLO7xQHw824rInHEUwVcOSsWpJAxoGSOIQgmBRl1kXLjuj/ldcCAYg59aLHxyqA==}
@@ -2526,8 +2522,8 @@ packages:
       oxc-resolver:
         optional: true
 
-  electron-to-chromium@1.5.473:
-    resolution: {integrity: sha512-9njcRQK+6FOXNAWw5g+h2RPiyazqo5RFMVJ39ZMHjDHUNnnFlhnOGV7O0WmJetODDx19ES5p+FLi+KCVFQGugw==}
+  electron-to-chromium@1.5.476:
+    resolution: {integrity: sha512-LnPnRZ0esKB9NjsSIaC+mffW+5dAtBui6kbK5f9Qykblj4Q33cn6yIhuCcTVjwpvL3YJPqqQ4IlsNyriGNpyFQ==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -3606,17 +3602,9 @@ packages:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
 
-  tailwind-variants@3.3.1:
-    resolution: {integrity: sha512-4pAvwUtM4HKBiRZftncAbpn6V9Hhwoa5Fl7O2u5zbp7Z5Cvu+/o/6+176WY3WCEES209543quG8zFIcXCsc5Jw==}
+  tailwind-variants@4.0.1:
+    resolution: {integrity: sha512-VumzgPklIwpneDWtskGuhEqPlfZZ2DeN1nIb2um9DRhk9XBX580s4N84A533j+oHN+dLz274HkKvSjr+64fggA==}
     engines: {node: '>=16.9.x', pnpm: '>=7.x'}
-    peerDependencies:
-      tailwind-merge: '>=3.0.0'
-      tailwindcss: '*'
-    peerDependenciesMeta:
-      tailwind-merge:
-        optional: true
-      tailwindcss:
-        optional: true
 
   tailwindcss@4.3.4:
     resolution: {integrity: sha512-PCJZTFFdG+sL3gvnP1Do9o6GbkvH2q0p04xSs3f7cSvmAeK+sttG+/7ncK1fdRwKFfC7n+wDDJaOMBSefkI9ow==}
@@ -4853,22 +4841,15 @@ snapshots:
       oxlint-tsgolint: 7.0.2005
       typescript: 7.0.2
 
-  '@resolid/react-ui@0.3.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(tailwindcss@4.3.4)':
+  '@resolid/react-ui@0.3.8(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(tailwindcss@4.3.4)':
     dependencies:
       '@floating-ui/react': 0.27.20(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@resolid/utils': 1.7.3
+      '@resolid/utils': 2.0.0
       '@tanstack/react-virtual': 3.14.26(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
-      tailwind-variants: 3.3.1(tailwindcss@4.3.4)
+      tailwind-variants: 4.0.1
       tailwindcss: 4.3.4
-    transitivePeerDependencies:
-      - tailwind-merge
-
-  '@resolid/utils@1.7.3':
-    dependencies:
-      '@noble/hashes': 2.4.0
-      nanoid: 6.0.2
 
   '@resolid/utils@2.0.0':
     dependencies:
@@ -5364,7 +5345,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.11.35
       caniuse-lite: 1.0.30001820
-      electron-to-chromium: 1.5.473
+      electron-to-chromium: 1.5.476
       node-releases: 2.0.63
       update-browserslist-db: 1.3.4(browserslist@4.29.5)
 
@@ -5512,7 +5493,7 @@ snapshots:
 
   dts-resolver@3.0.0: {}
 
-  electron-to-chromium@1.5.473: {}
+  electron-to-chromium@1.5.476: {}
 
   emoji-regex@10.6.0: {}
 
@@ -6510,9 +6491,7 @@ snapshots:
 
   tagged-tag@1.0.0: {}
 
-  tailwind-variants@3.3.1(tailwindcss@4.3.4):
-    optionalDependencies:
-      tailwindcss: 4.3.4
+  tailwind-variants@4.0.1: {}
 
   tailwindcss@4.3.4: {}
 
