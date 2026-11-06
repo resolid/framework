@@ -1,4 +1,4 @@
-import { createApp, loadProviders } from "@resolid/app";
+import { createApp, resolveProviders, type ProviderModule } from "@resolid/app";
 import { createCacheExtension, MemoryCache } from "@resolid/app-cache";
 import { createDatabaseExtension } from "@resolid/app-db";
 import { MySqlConnection } from "@resolid/app-db/adapters/mysql";
@@ -16,6 +16,20 @@ const inVercel = import.meta.env.RESOLID_PLATFORM == "vercel";
 const attachDatabasePool = inVercel
   ? (({ attachDatabasePool }) => attachDatabasePool)(await import("@vercel/functions"))
   : undefined;
+
+const injectableModules =
+  import.meta.env.RESOLID_LOADER == "vite"
+    ? Object.values(
+        import.meta.glob<ProviderModule>(
+          ["./**/repository.server.ts", "./**/service.server.ts", "./**/*.service.server.ts"],
+          {
+            base: "../modules",
+            import: "*",
+            eager: true,
+          },
+        ),
+      )
+    : [];
 
 export const app = await createApp({
   name: "Resolid",
@@ -68,18 +82,7 @@ export const app = await createApp({
       defaultTransport: "smtp",
     }),
   ],
-  providers: loadProviders(
-    Object.values(
-      import.meta.glob(
-        ["./**/repository.server.ts", "./**/service.server.ts", "./**/*.service.server.ts"],
-        {
-          base: "../modules",
-          import: "*",
-          eager: true,
-        },
-      ),
-    ),
-  ),
+  providers: resolveProviders(injectableModules),
   expose: {
     logger: LogService,
     mailer: MailService,

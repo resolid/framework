@@ -28,6 +28,7 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
 
       const baseConfig: UserConfig = {
         define: {
+          "import.meta.env.RESOLID_LOADER": JSON.stringify("vite"),
           "import.meta.env.RESOLID_PLATFORM": JSON.stringify(options.platform),
           "import.meta.env.RESOLID_BASENAME": JSON.stringify(reactRouterConfig.basename),
           "import.meta.env.RESOLID_BUILD_DIR": JSON.stringify(reactRouterConfig.buildDir),

@@ -48,14 +48,14 @@ export type AppOptions<E extends ExposeSchema = Record<string, never>> = AppConf
   readonly expose?: E;
 };
 
-export class App<E extends ExposeSchema = Record<string, never>> {
+class App<E extends ExposeSchema = Record<string, never>> {
   private readonly _root: string;
   private readonly _container: Container;
   private readonly _context: AppContext;
   private readonly _bootstraps: BootstrapFunction[] = [];
   private readonly _expose?: E;
 
-  private _startPromise?: Promise<void>;
+  private _runPromise?: Promise<void>;
   private _disposePromise?: Promise<void>;
 
   public readonly name: string;
@@ -91,9 +91,7 @@ export class App<E extends ExposeSchema = Record<string, never>> {
       timezone: resolvedTimezone,
       emitter: this.emitter,
       container: this._container,
-      /* istanbul ignore next -- @preserve */
       rootPath: (...paths: string[]) => this.rootPath(...paths),
-      /* istanbul ignore next -- @preserve */
       runtimePath: (...paths: string[]) => this.runtimePath(...paths),
     };
 
@@ -147,12 +145,12 @@ export class App<E extends ExposeSchema = Record<string, never>> {
       throw new Error("Cannot run a disposed application.");
     }
 
-    this._startPromise ??= this._start();
+    this._runPromise ??= this._run();
 
-    return this._startPromise;
+    return this._runPromise;
   }
 
-  private async _start(): Promise<void> {
+  private async _run(): Promise<void> {
     for (const bootstrap of this._bootstraps) {
       // oxlint-disable-next-line no-await-in-loop
       await bootstrap(this._context);
@@ -169,7 +167,7 @@ export class App<E extends ExposeSchema = Record<string, never>> {
 
   private async _dispose(): Promise<void> {
     try {
-      await this._startPromise?.catch(() => undefined);
+      await this._runPromise?.catch(() => undefined);
       await this._container.dispose();
     } finally {
       this.emitter.offAll();
@@ -205,29 +203,27 @@ export async function createApp<E extends ExposeSchema = Record<string, never>>(
   return app;
 }
 
-function isProvider(value: unknown): value is Provider {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
+export type ProviderModule = Readonly<Record<string, unknown>>;
 
-  const candidate = value as Partial<Provider>;
-
-  return candidate.token !== undefined && typeof candidate.factory === "function";
-}
-
-function isProviderClass(value: unknown): value is new () => unknown {
-  return typeof value === "function" && value.prototype !== undefined && /^[A-Z]/.test(value.name);
-}
-
-export function loadProviders(modules: Record<string, unknown>[]): Provider[] {
+export function resolveProviders(modules: ProviderModule[]): Provider[] {
   const providers: Map<Token, Provider> = new Map();
 
   for (const mod of modules) {
     for (const value of Object.values(mod)) {
-      if (isProvider(value)) {
-        providers.set(value.token, value);
-      } else if (isProviderClass(value)) {
-        providers.set(value, { token: value, factory: () => new value() });
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        "token" in value &&
+        "factory" in value &&
+        typeof (value as Provider).factory === "function"
+      ) {
+        providers.set((value as Provider).token, value as Provider);
+      } else if (
+        typeof value === "function" &&
+        value.prototype !== undefined &&
+        /^[A-Z]/.test(value.name)
+      ) {
+        providers.set(value, { token: value, factory: () => new (value as new () => unknown)() });
       }
     }
   }

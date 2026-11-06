@@ -1,4 +1,3 @@
-/// <reference types="vite/client" />
 /// <reference types="@resolid/dev/env" />
 
 declare namespace NodeJS {

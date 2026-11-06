@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   createApp,
   type ExtensionCreator,
-  loadProviders,
+  resolveProviders,
   type PathResolver,
   type Token,
 } from "./index";
@@ -426,7 +426,7 @@ describe("loadProviders", () => {
 
     const app = await createApp({
       name: "TestApp",
-      providers: loadProviders([{ MyService }]),
+      providers: resolveProviders([{ MyService }]),
       expose: { myService: MyService },
     });
 
@@ -438,13 +438,13 @@ describe("loadProviders", () => {
     const TOKEN = Symbol("TOKEN");
     const provider = { token: TOKEN, factory: () => ({ name: "explicit" }) };
 
-    const providers = loadProviders([{ provider }]);
+    const providers = resolveProviders([{ provider }]);
 
     expect(providers).toEqual([provider]);
   });
 
   it("should skip values that are neither providers nor constructible classes", async () => {
-    const providers = loadProviders([
+    const providers = resolveProviders([
       {
         value: 42,
         text: "hello",
@@ -461,7 +461,7 @@ describe("loadProviders", () => {
   });
 
   it("should ignore objects that only look like providers", () => {
-    const providers = loadProviders([
+    const providers = resolveProviders([
       { partial: { token: Symbol("TOKEN") } },
       { wrongFactory: { token: Symbol("TOKEN"), factory: "not a function" } },
       { noToken: { factory: () => undefined } },
@@ -473,7 +473,7 @@ describe("loadProviders", () => {
   it("should keep the last provider when a token is registered more than once", async () => {
     const TOKEN = Symbol("TOKEN");
 
-    const providers = loadProviders([
+    const providers = resolveProviders([
       { first: { token: TOKEN, factory: () => "first" } },
       { second: { token: TOKEN, factory: () => "second" } },
     ]);
