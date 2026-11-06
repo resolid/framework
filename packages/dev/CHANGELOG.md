@@ -1,5 +1,16 @@
 # @resolid/dev
 
+## 0.14.0
+
+### Minor Changes
+
+- [`7ea5105`](https://github.com/resolid/framework/commit/7ea5105e54630e0a0818237975aca83aef67ec81) - refactor!: make server creation synchronous
+  
+  - remove async/await from createHonoServer and the platform creators
+  - return the Netlify handler directly instead of accepting a handle option
+  
+  BREAKING CHANGE: createHonoNetlifyServer no longer accepts `handle`, and all createHono*Server functions now return synchronously.
+
 ## 0.13.0
 
 ### Minor Changes
