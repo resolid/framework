@@ -592,14 +592,14 @@ describe("SqliteConnection", () => {
     await app.dispose();
   });
 
-  it("should prefix table names through the tablePrefix config", async () => {
+  it("should prefix table names through the tableName config", async () => {
     const app = await createApp({
       name: "TestApp",
       extensions: [
         createDatabaseExtension({
           connection: new SqliteConnection({
             databaseFile: ":memory:",
-            tablePrefix: "rx_",
+            tableName: { prefix: "rx_" },
           }),
         }),
       ],
@@ -665,14 +665,14 @@ describe("SqliteConnection", () => {
     await app.dispose();
   });
 
-  it("should keep table names verbatim when snakeCaseTables is disabled", async () => {
+  it("should keep table names verbatim when snakeCase is disabled", async () => {
     const app = await createApp({
       name: "TestApp",
       extensions: [
         createDatabaseExtension({
           connection: new SqliteConnection({
             databaseFile: ":memory:",
-            snakeCaseTables: false,
+            tableName: { snakeCase: false },
           }),
         }),
       ],

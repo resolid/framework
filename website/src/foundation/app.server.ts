@@ -54,7 +54,7 @@ export const app = await createApp({
     }),
     createDatabaseExtension({
       connection: new MySqlConnection({
-        tablePrefix: env.RX_DB_TABLE_PREFIX,
+        tableName: { prefix: env.RX_DB_TABLE_PREFIX },
         poolOptions: {
           uri: env.RX_DB_URI,
           ssl: {

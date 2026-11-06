@@ -35,7 +35,7 @@ export const app = await createApp({
   extensions: [
     createDatabaseExtension({
       connection: new MySqlConnection({
-        tablePrefix: env.RX_DB_TABLE_PREFIX,
+        tableName: { prefix: env.RX_DB_TABLE_PREFIX },
         poolOptions: { uri: env.RX_DB_URI },
       }),
       logger: __DEV__,
@@ -49,7 +49,7 @@ export const app = await createApp({
 
 Connection options shared by every adapter:
 
-- `tablePrefix` — runtime table prefix (see [Table names](#table-names)); unset or empty means no plugin
+- `tableName` — physical table naming (see [Table names](#table-names)): `snakeCase` is enabled by default, `prefix` is applied when non-empty
 - `plugins` — extra [Kysely plugins](https://kysely.dev/docs/categories/Plugins), e.g. `CamelCasePlugin`
 - `logger` — `true` to also print queries to the console, or a custom Kysely `Logger`
 
@@ -181,7 +181,7 @@ declare module "@resolid/app-db" {
 | `$update`          | accepted update values (`Updateable`)                      |
 | `filterData(data)` | shallow copy of `data` containing only the table's columns |
 
-`column<T>()` is type-only: it records the column type for inference and has no runtime value. `defineTable` uses only the column keys, so it does not generate migrations, defaults or constraints — those stay in your schema/migration tooling. `name` is the table name used in queries; when a query uses it, the snake-case and prefix plugins rewrite the identifier to the physical name. The key in the `Database` augmentation is a separate, type-level key: Kysely types queries by that key, while the plugins rewrite whatever identifier the query uses. Keeping the key and `name` identical avoids two different physical names for the same table.
+`column<T>()` is type-only: it records the column type for inference and has no runtime value. `defineTable` uses only the column keys, so it does not generate migrations, defaults or constraints — those stay in your schema/migration tooling. `name` is the table name used in queries; when a query uses it, the table-name plugin rewrites the identifier to the physical name. The key in the `Database` augmentation is a separate, type-level key: Kysely types queries by that key, while the plugins rewrite whatever identifier the query uses. Keeping the key and `name` identical avoids two different physical names for the same table.
 
 Shared column sets are plain objects, so they can be spread into several tables and reused. `InferTable` gives the column interface on its own:
 
@@ -228,7 +228,17 @@ export interface StatusTable {
 
 ### Table names
 
-Physical table names derive from the table identifier used in the query (normally the `Database` key, or the `defineTable` name when a repository queries by it): `snakeCaseTables` (enabled by default) names tables after the word-segmented camelCase names (`userOrders` → `user_orders`, `HTTPServer` → `http_server`, `SERVER2` → `server_2`), and an optional `tablePrefix` is prepended to each final name (`status` → `rx_status`). Set `snakeCaseTables: false` to keep identifiers verbatim.
+Physical table names derive from the table identifier used in the query (normally the `Database` key, or the `defineTable` name when a repository queries by it). The `tableName` connection option controls both rewrites:
+
+- `snakeCase` (enabled by default) names tables after the word-segmented camelCase names (`userOrders` → `user_orders`, `HTTPServer` → `http_server`, `SERVER2` → `server_2`). Set it to `false` to keep identifiers verbatim.
+- `prefix` prepends a string to each final name when non-empty (`status` → `rx_status`). Omit it or leave it empty to disable prefixing.
+
+```ts
+new MySqlConnection({
+  tableName: { snakeCase: true, prefix: "rx_" },
+  poolOptions: { uri: env.RX_DB_URI },
+});
+```
 
 ## Repositories
 

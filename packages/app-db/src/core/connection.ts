@@ -1,8 +1,7 @@
 import { type Dialect, Kysely, type KyselyPlugin, type Logger } from "kysely";
 import { KyselyReplicationDialect, type ReplicaStrategy } from "kysely-replication";
 import { RoundRobinReplicaStrategy } from "kysely-replication/strategy/round-robin";
-import { TablePrefixPlugin } from "../plugins/table-prefix-plugin";
-import { TableSnakeCasePlugin } from "../plugins/table-snake-case-plugin";
+import { TableNamePlugin, type TableNamePluginOptions } from "../plugins/table-name-plugin";
 
 export type ReplicationConfig = {
   /** 默认 RoundRobinReplicaStrategy({ onTransaction: "error" }) */
@@ -16,8 +15,7 @@ export type CommonConfig = {
 
 export type ConnectionConfig<C> = C &
   CommonConfig & {
-    tablePrefix?: string;
-    snakeCaseTables?: boolean;
+    tableName?: TableNamePluginOptions;
   };
 
 export abstract class DatabaseConnection<C> {
@@ -56,8 +54,7 @@ export abstract class DatabaseConnection<C> {
       plugins: [
         ...(context.plugins ?? []),
         ...(this.config.plugins ?? []),
-        ...(this.config.snakeCaseTables === false ? [] : [new TableSnakeCasePlugin()]),
-        ...(this.config.tablePrefix ? [new TablePrefixPlugin(this.config.tablePrefix)] : []),
+        new TableNamePlugin(this.config.tableName),
       ],
       log: context.logger,
     });
