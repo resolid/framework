@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.14.1
+
+### Patch Changes
+
+- [`afe115b`](https://github.com/resolid/framework/commit/afe115b7965a817cfae9402cb732a3a6e863eb68) - refactor: move cacheControl into server utils
+
 ## 0.14.0
 
 ### Minor Changes
