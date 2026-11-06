@@ -26,9 +26,7 @@ export type HonoNodeServerOptions = HonoServerOptions<NodeEnv> & {
   onShutdown?: () => Promise<void> | void;
 };
 
-export async function createHonoNodeServer(
-  options: HonoNodeServerOptions = {},
-): Promise<Hono<NodeEnv>> {
+export function createHonoNodeServer(options: HonoNodeServerOptions = {}): Hono<NodeEnv> {
   const mode = resolveServerMode();
   const isProduction = mode == "production";
   const basename = import.meta.env.RESOLID_BASENAME;
@@ -52,7 +50,7 @@ export async function createHonoNodeServer(
     ...restOptions,
   };
 
-  const app = await createHonoServer(mode, {
+  const app = createHonoServer(mode, {
     honoConfig: async (hono) => {
       if (isProduction) {
         const clientBuildPath = `${import.meta.env.RESOLID_BUILD_DIR}/client`;
@@ -83,7 +81,7 @@ export async function createHonoNodeServer(
         }),
       );
 
-      await mergedOptions.honoConfig?.(hono);
+      mergedOptions.honoConfig?.(hono);
     },
     honoOptions: mergedOptions.honoOptions,
   });

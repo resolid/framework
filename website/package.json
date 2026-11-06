@@ -35,7 +35,7 @@
     "@tailwindcss/typography": "^0.5.20",
     "@vercel/analytics": "^2.0.1",
     "@vercel/functions": "^3.10.6",
-    "@vercel/speed-insights": "^2.0.0",
+    "@vercel/speed-insights": "^2.1.0",
     "bowser": "^2.15.0",
     "isbot": "^5.2.2",
     "kysely": "^0.29.8",

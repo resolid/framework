@@ -1,4 +1,3 @@
-import { handle } from "@hono/netlify";
 import {
   createHonoNetlifyServer,
   createHonoNodeServer,
@@ -25,15 +24,14 @@ function honoConfig<E extends Env>(hono: Hono<E>) {
 }
 
 export default import.meta.env.RESOLID_PLATFORM == "netlify"
-  ? await createHonoNetlifyServer({
-      handle,
+  ? createHonoNetlifyServer({
       honoConfig,
     })
   : import.meta.env.RESOLID_PLATFORM == "vercel"
-    ? await createHonoVercelServer({
+    ? createHonoVercelServer({
         honoConfig,
       })
-    : await createHonoNodeServer({
+    : createHonoNodeServer({
         port: env.SERVER_PORT,
         honoConfig,
         async onShutdown() {

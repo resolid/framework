@@ -73,9 +73,9 @@ export default reactRouterConfig;
 // src/server.ts
 import { createHonoVercelServer, createHonoNodeServer } from "@resolid/dev/http";
 
-export default await (import.meta.env.RESOLID_PLATFORM == "vercel"
+export default import.meta.env.RESOLID_PLATFORM == "vercel"
   ? createHonoVercelServer()
-  : createHonoNodeServer());
+  : createHonoNodeServer();
 ```
 
 ### 5) React Router document

@@ -11,14 +11,12 @@ import {
 
 export type HonoVercelServerOptions = HonoServerOptions<NodeEnv>;
 
-export async function createHonoVercelServer(
-  options: HonoVercelServerOptions = {},
-): Promise<Hono<NodeEnv>> {
+export function createHonoVercelServer(options: HonoVercelServerOptions = {}): Hono<NodeEnv> {
   const mode = resolveServerMode();
 
   const { honoConfig, ...rest } = options;
 
-  return await createHonoServer<NodeEnv>(mode, {
+  return createHonoServer<NodeEnv>(mode, {
     honoConfig: async (hono) => {
       hono.use(
         requestId((ctx) => ctx.req.raw.headers.get("x-vercel-id") ?? ""),
@@ -28,7 +26,7 @@ export async function createHonoVercelServer(
         })),
       );
 
-      await honoConfig?.(hono);
+      honoConfig?.(hono);
     },
     ...rest,
   });

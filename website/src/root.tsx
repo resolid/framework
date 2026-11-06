@@ -1,12 +1,14 @@
 import type { PropsWithChildren } from "react";
 import { ConfigProvider } from "@resolid/react-ui";
-import zhCN from "@resolid/react-ui/locales/zh-CN";
+import uiLocale from "@resolid/react-ui/locales/zh-CN";
 import { Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import * as z from "zod";
+import zodLocale from "zod/v4/locales/zh-CN.js";
 import { ErrorComponent } from "~/components/error-component";
 import { RouteProgressBar } from "~/components/route-progress-bar";
 import type { Route } from "../.react-router/types/src/+types/root";
 
-import "~/zod";
+z.config(zodLocale());
 
 import style from "./root.css?url";
 
@@ -27,7 +29,7 @@ export function Layout({ children }: PropsWithChildren) {
       </head>
       <body className="min-h-screen overflow-y-scroll">
         <RouteProgressBar />
-        <ConfigProvider locale={zhCN} colorMode={{ disableTransition: true }}>
+        <ConfigProvider locale={uiLocale} colorMode={{ disableTransition: true }}>
           {children}
         </ConfigProvider>
         <ScrollRestoration />

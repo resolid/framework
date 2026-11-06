@@ -1,5 +1,4 @@
 import type { HttpBindings } from "@hono/node-server";
-import type { MaybePromise } from "@resolid/utils";
 import type { HonoOptions } from "hono/hono-base";
 import { type Context, type Env, Hono } from "hono";
 import { env } from "node:process";
@@ -18,7 +17,7 @@ export type NodeEnv = {
 };
 
 export interface HonoServerOptions<E extends Env> {
-  honoConfig?: (hono: Hono<E>) => MaybePromise<void>;
+  honoConfig?: (hono: Hono<E>) => void;
   honoOptions?: HonoOptions<E>;
 }
 
@@ -26,14 +25,14 @@ export function resolveServerMode(): string | undefined {
   return env.NODE_ENV == "test" ? "development" : env.NODE_ENV;
 }
 
-export async function createHonoServer<E extends Env>(
+export function createHonoServer<E extends Env>(
   mode: string | undefined,
   options: HonoServerOptions<E>,
-): Promise<Hono<E>> {
+): Hono<E> {
   const hono: Hono<E> = new Hono(options.honoOptions);
 
   if (options.honoConfig) {
-    await options.honoConfig(hono);
+    options.honoConfig(hono);
   }
 
   const app: Hono<E> = new Hono({
