@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.13.0
+
+### Minor Changes
+
+- [`bd0fd74`](https://github.com/resolid/framework/commit/bd0fd7441d3fa9a6139721b1dc70d5a187342084) - feat(dev): add loader environment variable for Vite
+
 ## 0.12.2
 
 ### Patch Changes
