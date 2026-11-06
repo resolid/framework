@@ -1,6 +1,6 @@
 import type { HttpBindings } from "@hono/node-server";
 import type { HonoOptions } from "hono/hono-base";
-import { type Context, type Env, Hono } from "hono";
+import { type Context, type Env, Hono, type MiddlewareHandler } from "hono";
 import { env } from "node:process";
 import {
   createContext,
@@ -63,4 +63,20 @@ export function createHonoServer<E extends Env>(
   }
 
   return hono;
+}
+
+export function cacheControl(seconds: number, immutable = false): MiddlewareHandler {
+  return async (ctx, next) => {
+    if (!/\.[a-zA-Z0-9]+$/.test(ctx.req.path) || ctx.req.path.endsWith(".data")) {
+      return next();
+    }
+
+    await next();
+
+    if (!ctx.res.ok || ctx.res.headers.has("Cache-Control")) {
+      return;
+    }
+
+    ctx.header("Cache-Control", `public, max-age=${seconds}${immutable ? ", immutable" : ""}`);
+  };
 }

@@ -1,4 +1,4 @@
-import type { Context, Hono, MiddlewareHandler } from "hono";
+import type { Context, Hono } from "hono";
 import type { AddressInfo } from "node:net";
 import { serve, type ServerType } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
@@ -9,13 +9,14 @@ import { requestId } from "../middlewares/request-id";
 import { requestInfo } from "../middlewares/request-info";
 import { getRequestInfo, type TrustProxy } from "../utils/forwarded";
 import {
+  cacheControl,
   createHonoServer,
   type HonoServerOptions,
   type NodeEnv,
   resolveServerMode,
 } from "../utils/server";
 
-export type { NodeEnv } from "../utils/server";
+export type { NodeEnv, cacheControl } from "../utils/server";
 
 export type HonoNodeServerOptions = HonoServerOptions<NodeEnv> & {
   port?: number;
@@ -52,18 +53,19 @@ export function createHonoNodeServer(options: HonoNodeServerOptions = {}): Hono<
 
   const app = createHonoServer(mode, {
     honoConfig: async (hono) => {
-      if (isProduction) {
-        const clientBuildPath = `${import.meta.env.RESOLID_BUILD_DIR}/client`;
+      const clientBuildPath = `${import.meta.env.RESOLID_BUILD_DIR}/client`;
 
-        hono.use(
-          `/${import.meta.env.RESOLID_ASSETS_DIR}/*`,
-          cacheControl(60 * 60 * 24 * 365, true),
-          serveStatic({ root: clientBuildPath }),
-        );
-        hono.use("*", cacheControl(60 * 60), serveStatic({ root: clientBuildPath }));
-      } else {
-        hono.use("*", cacheControl(60 * 60), serveStatic({ root: "./public" }));
-      }
+      hono.use(
+        `/${import.meta.env.RESOLID_ASSETS_DIR}/*`,
+        cacheControl(60 * 60 * 24 * 365, true),
+        serveStatic({ root: clientBuildPath }),
+      );
+
+      hono.use(
+        "*",
+        cacheControl(60 * 60),
+        serveStatic({ root: isProduction ? clientBuildPath : "./public" }),
+      );
 
       if (mergedOptions.defaultLogger) {
         hono.use("*", logger());
@@ -163,20 +165,4 @@ function gracefulShutdown(
   for (const sig of ["SIGINT", "SIGTERM"] as const) {
     globalThis.process.on(sig, shutdown);
   }
-}
-
-export function cacheControl(seconds: number, immutable = false): MiddlewareHandler {
-  return async (c, next) => {
-    if (!/\.[a-zA-Z0-9]+$/.test(c.req.path) || c.req.path.endsWith(".data")) {
-      return next();
-    }
-
-    await next();
-
-    if (!c.res.ok) {
-      return;
-    }
-
-    c.header("Cache-Control", `public, max-age=${seconds}${immutable ? ", immutable" : ""}`);
-  };
 }
