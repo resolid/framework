@@ -26,8 +26,6 @@ import { HistoryLink, HistoryNavLink } from "~/components/history-link";
 import { ResolidLogo } from "~/components/resolid-logo";
 import { ResolidUiLogo } from "~/components/resolid-ui-logo";
 import { SpriteIcon } from "~/components/sprite-icon";
-import { VercelAnalytics } from "~/extensions/vercel/vercel-analytics";
-import { VercelSpeedInsights } from "~/extensions/vercel/vercel-speed-insights";
 import { UserSessionService } from "~/modules/user/session.service.server";
 import type { Route } from "./+types/layout";
 import { AuthContext, useAuth } from "./auth";
@@ -110,9 +108,9 @@ export default function SiteLayout({ loaderData }: Route.ComponentProps) {
       <header className="sticky top-0 z-20 w-full border-b border-bd-normal bg-bg-normal">
         <NavBar />
       </header>
-      <div className="min-h-[calc(100vh-var(--spacing)*16-108px)]">
+      <main className="min-h-[calc(100vh-var(--spacing)*16-108px)]">
         <Outlet />
-      </div>
+      </main>
       <footer className="border-t border-bd-normal">
         <div className="mx-auto flex max-w-288 flex-col gap-1 p-4 text-center text-sm text-fg-muted">
           <p>Released under the MIT License</p>
@@ -122,28 +120,9 @@ export default function SiteLayout({ loaderData }: Route.ComponentProps) {
               <SpriteIcon className="me-1" name="status" />
               运行状态
             </Badge>
-            {import.meta.env.RESOLID_PLATFORM == "vercel" && (
-              <Badge className="pointer-events-none" color="neutral">
-                部署于 Vercel
-              </Badge>
-            )}
-            {import.meta.env.RESOLID_PLATFORM == "netlify" && (
-              <Badge className="pointer-events-none" color="secondary">
-                部署于 Netlify
-              </Badge>
-            )}
           </p>
         </div>
       </footer>
-      {import.meta.env.RESOLID_PLATFORM == "vercel" && (
-        <>
-          <VercelAnalytics endpoint="/growth" scriptSrc="/growth/script.js" />
-          <VercelSpeedInsights
-            endpoint="/speed-growth/vitals"
-            scriptSrc="/speed-growth/script.js"
-          />
-        </>
-      )}
     </AuthContext>
   );
 }

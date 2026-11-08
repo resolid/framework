@@ -1,10 +1,4 @@
-import {
-  createHonoNetlifyServer,
-  createHonoNodeServer,
-  createHonoVercelServer,
-  type Env,
-  type Hono,
-} from "@resolid/dev/http";
+import { createHonoNodeServer, type Env, type Hono } from "@resolid/dev/http";
 import { env } from "node:process";
 import { type App, app } from "~/foundation/app.server";
 
@@ -23,18 +17,11 @@ function honoConfig<E extends Env>(hono: Hono<E>) {
   });
 }
 
-export default import.meta.env.RESOLID_PLATFORM == "netlify"
-  ? createHonoNetlifyServer({
-      honoConfig,
-    })
-  : import.meta.env.RESOLID_PLATFORM == "vercel"
-    ? createHonoVercelServer({
-        honoConfig,
-      })
-    : createHonoNodeServer({
-        port: env.SERVER_PORT,
-        honoConfig,
-        async onShutdown() {
-          await app.dispose();
-        },
-      });
+export default createHonoNodeServer({
+  port: env.SERVER_PORT,
+  trustProxy: "loopback",
+  honoConfig,
+  async onShutdown() {
+    await app.dispose();
+  },
+});

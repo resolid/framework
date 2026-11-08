@@ -57,7 +57,7 @@
     "@resolid/app-db": "workspace:^",
     "kysely": "^0.29.8",
     "react-router": "^8.5.1",
-    "tsdown": "^0.23.5",
+    "tsdown": "^0.23.7",
     "zod": "^4.6.7"
   },
   "peerDependencies": {

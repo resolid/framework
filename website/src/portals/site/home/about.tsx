@@ -11,8 +11,8 @@ export default function About() {
       <h1 className="text-center">关于</h1>
       <p>
         Resolid 是使用 React Router 驱动的全栈网站，旨在展示使用 React Router、React、Tailwind
-        CSS、Vite、Kysely、MySQL、Hono、Node.js 和 Vercel 等现代 Web
-        技术构建高性能、可扩展和用户友好的 Web 应用程序的最佳实践。
+        CSS、Vite、Kysely、MySQL、Hono 和 Node.js 等现代 Web 技术构建高性能、可扩展和用户友好的 Web
+        应用程序的最佳实践。
       </p>
       <h2>技术栈</h2>
       <div className="flex justify-center">
@@ -25,7 +25,6 @@ export default function About() {
           <SpriteIcon name="nodejs" size="3rem" />
           <SpriteIcon name="mysql" size="3rem" />
           <SpriteIcon name="hono" size="3rem" />
-          <SpriteIcon name="vercel" size="3rem" />
         </div>
       </div>
       <h3>React</h3>
@@ -78,8 +77,6 @@ export default function About() {
         运行的是 V8 JavaScript 引擎，这是 Google Chrome 浏览器的核心，但在浏览器之外运行。这使得
         Node.js 具有很高的性能。
       </p>
-      <h3>Vercel</h3>
-      <p>Vercel 的前端云为开发人员提供构建、扩展和保护更快、更个性化 Web 的体验和基础设施。</p>
       <h3>Aiven for MySQL</h3>
       <p>
         完全托管和管理

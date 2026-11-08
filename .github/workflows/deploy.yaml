@@ -1,0 +1,41 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  build:
+    # prevents this action from running on forks
+    if: github.repository == 'resolid/framework'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: PNPM Setup
+        uses: pnpm/setup@v3
+        with:
+          node-version-file: false
+          runtime: node@lts
+          cache: true
+
+      - name: Build Website
+        run: pnpm run build
+
+      - name: Rsync Build
+        uses: burnett01/rsync-deployments@v9
+        with:
+          switches: -avzr --delete --no-owner --no-group
+          path: website/build/
+          remote_host: ${{ secrets.HOST }}
+          remote_port: ${{ secrets.PORT }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.PRIVATE_KEY }}
+          remote_path: /home/websites/resolid/build/

@@ -1,21 +1,13 @@
 import { createApp, resolveProviders, type ProviderModule } from "@resolid/app";
-import { createCacheExtension, MemoryCache } from "@resolid/app-cache";
+import { createCacheExtension } from "@resolid/app-cache";
 import { createDatabaseExtension } from "@resolid/app-db";
 import { MySqlConnection } from "@resolid/app-db/adapters/mysql";
-import { createLogExtension, type LoggerEntity, LogService } from "@resolid/app-log";
+import { createLogExtension, LogService } from "@resolid/app-log";
 import { rotatingFileTarget } from "@resolid/app-log/targets";
 import { MailService, createMailExtension, createMailTransport } from "@resolid/app-mail";
 import { FileCache } from "@resolid/cache-file";
-import { RedisCache } from "@resolid/cache-redis";
 import { __DEV__ } from "@resolid/utils";
 import { env } from "node:process";
-
-const inNode = import.meta.env.RESOLID_PLATFORM == "node";
-const inVercel = import.meta.env.RESOLID_PLATFORM == "vercel";
-
-const attachDatabasePool = inVercel
-  ? (({ attachDatabasePool }) => attachDatabasePool)(await import("@vercel/functions"))
-  : undefined;
 
 const injectableModules =
   import.meta.env.RESOLID_LOADER == "vite"
@@ -35,22 +27,16 @@ export const app = await createApp({
   name: "Resolid",
   extensions: [
     createLogExtension({
-      targets: {
-        ...(inNode && { app: (ctx) => rotatingFileTarget(ctx, "app") }),
-      },
+      targets: { app: (ctx) => rotatingFileTarget(ctx, "app") },
       loggers: [
-        inNode && {
+        {
           category: "app",
           sinks: ["app"],
         },
-      ].filter(Boolean) as LoggerEntity[],
+      ],
     }),
     createCacheExtension({
-      store: inNode
-        ? (ctx) => new FileCache(ctx.runtimePath("cache"))
-        : inVercel
-          ? new RedisCache(env.RX_CACHE_REDIS)
-          : new MemoryCache(),
+      store: (ctx) => new FileCache(ctx.runtimePath("cache")),
     }),
     createDatabaseExtension({
       connection: new MySqlConnection({
@@ -62,7 +48,6 @@ export const app = await createApp({
             rejectUnauthorized: false,
           },
         },
-        onPoolCreated: attachDatabasePool,
       }),
       logger: __DEV__,
     }),

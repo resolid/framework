@@ -23,9 +23,6 @@ declare namespace NodeJS {
 
     readonly RX_PROXY: number;
     readonly RX_PROXY_COUNT: number;
-
-    readonly VERCEL: number;
-    readonly NETLIFY: boolean;
   }
 }
 

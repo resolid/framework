@@ -1,10 +1,9 @@
 import { defineDevConfig } from "@resolid/dev";
-import { env } from "node:process";
 
 export const { vitePluginOptions, reactRouterConfig } = defineDevConfig({
   appDirectory: "src",
-  nodeVersion: env.NETLIFY ? 24 : 26,
-  platform: env.VERCEL == 1 ? "vercel" : env.NETLIFY ? "netlify" : "node",
+  nodeVersion: 26,
+  platform: "node",
   reactRouterConfig: {
     future: {
       unstable_optimizeDeps: true,
