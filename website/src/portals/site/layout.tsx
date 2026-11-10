@@ -33,7 +33,7 @@ import { AuthContext, useAuth } from "./auth";
 export const meta = ({ loaderData }: Route.ComponentProps) => {
   const ogUrl = trimEnd(loaderData.publicOrigin, "/");
   const ogImage = new URL("/images/og-image-v2.png", loaderData.publicOrigin).href;
-  const siteName = "Resolid";
+  const siteName = "现代化的 Resolid";
   const title = siteName;
   const description =
     "使用 React Router 驱动的全栈网站，展示使用现代 Web 技术构建高性能、可扩展和用户友好的 Web 应用程序的最佳实践。";
@@ -113,8 +113,8 @@ export default function SiteLayout({ loaderData }: Route.ComponentProps) {
       </main>
       <footer className="border-t border-bd-normal">
         <div className="mx-auto flex max-w-288 flex-col gap-1 p-4 text-center text-sm text-fg-muted">
-          <p>Released under the MIT License</p>
-          <p>Copyright Ⓒ 2022-present Resolid Tech</p>
+          <p>采用 MIT 许可证发布</p>
+          <p>版权所有 © 2022-至今 Resolid Tech</p>
           <p className="inline-flex items-center justify-center gap-2">
             <Badge color="success" render={(props) => <HistoryLink {...props} to="status" />}>
               <SpriteIcon className="me-1" name="status" />
