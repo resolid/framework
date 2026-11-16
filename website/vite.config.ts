@@ -13,7 +13,7 @@ export default defineConfig(({ command }) => {
     plugins: [
       resolidVite(vitePluginOptions),
       tailwindcss(),
-      rolldownBabel({ presets: [reactCompilerPreset()] }),
+      rolldownBabel({ parallel: true, presets: [reactCompilerPreset()] }),
     ],
     build: {
       rolldownOptions: {

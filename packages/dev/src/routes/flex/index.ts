@@ -1,5 +1,5 @@
 import { getAppDirectory, type RouteConfigEntry } from "@react-router/dev/routes";
-import { makeRe } from "minimatch";
+import { Minimatch } from "minimatch";
 import nodePath from "node:path";
 import { filesToRouteManifest, routeManifestToRouteConfig, visitFiles } from "./utils";
 
@@ -14,14 +14,12 @@ export async function flexRoutes(options: FolderRoutesOptions = {}): Promise<Rou
   const { routesDirectory = "routes", ignoredRouteFiles = [] } = options;
 
   const appDirectory = getAppDirectory();
-  const ignoredFileRegex = ignoredRouteFiles
-    .map((re) => makeRe(re))
-    .filter((re): re is RegExp => !!re);
+  const miniMatchs = ignoredRouteFiles.map((pattern) => new Minimatch(pattern));
 
   const files: string[] = [];
 
   await visitFiles(nodePath.join(appDirectory, routesDirectory), (file) => {
-    if (ignoredFileRegex.some((regex) => regex.test(file))) {
+    if (miniMatchs.some((mm) => mm.match(file))) {
       return;
     }
 

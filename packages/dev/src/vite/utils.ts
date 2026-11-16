@@ -1,5 +1,5 @@
 import type { BuildManifest, Config as ReactRouterConfig } from "@react-router/dev/config";
-import { makeRe } from "minimatch";
+import { Minimatch } from "minimatch";
 import nodePath from "node:path";
 import { type UserConfig, normalizePath } from "vite";
 import type { VitePluginOptions } from "../config";
@@ -49,10 +49,16 @@ export function resolveReactRouterPluginConfig(
   };
 }
 
-export function createExcludePatterns(appDir: string, userExclude?: (string | RegExp)[]): RegExp[] {
+type ExcludeMatchers = { patterns: RegExp[]; matchers: Minimatch[] };
+
+export function createExcludeMatchers(
+  appDir: string,
+  userExclude?: (string | RegExp)[],
+): ExcludeMatchers {
   const appPath = normalizePath(appDir);
   const [appRoot] = appPath.split("/");
 
+  const matchers: Minimatch[] = [];
   const patterns: RegExp[] = [
     new RegExp(`^(?=\\/${appPath}\\/)((?!.*\\.data(\\?|$)).*\\..*(\\?.*)?$)`),
     new RegExp(`^(?=\\/${appPath}\\/.*\\/\\..*\\/.*)`),
@@ -66,23 +72,19 @@ export function createExcludePatterns(appDir: string, userExclude?: (string | Re
   }
 
   if (userExclude) {
-    for (const pattern of userExclude) {
-      if (pattern instanceof RegExp) {
-        patterns.push(pattern);
+    for (const exclude of userExclude) {
+      if (exclude instanceof RegExp) {
+        patterns.push(exclude);
       } else {
-        try {
-          patterns.push(makeRe(pattern) as RegExp);
-        } catch {
-          // do nothing
-        }
+        matchers.push(new Minimatch(exclude));
       }
     }
   }
 
-  return patterns;
+  return { patterns, matchers };
 }
 
-export function shouldExcludeUrl(url: string, patterns: RegExp[]): boolean {
+export function shouldExcludeUrl(url: string, matchers: ExcludeMatchers): boolean {
   if (
     url.includes("/node_modules/") ||
     url.startsWith("/.vite") ||
@@ -97,8 +99,15 @@ export function shouldExcludeUrl(url: string, patterns: RegExp[]): boolean {
     return true;
   }
 
-  for (const pattern of patterns) {
+  for (const pattern of matchers.patterns) {
     if (pattern.test(url)) {
+      return true;
+    }
+  }
+
+  for (const matcher of matchers.matchers) {
+    // oxlint-disable-next-line unicorn/prefer-regexp-test
+    if (matcher.match(url)) {
       return true;
     }
   }

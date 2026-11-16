@@ -46,16 +46,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hookform/resolvers": "^6.0.2",
+    "@hookform/resolvers": "^7.0.6",
     "@resolid/di": "workspace:^",
     "@resolid/event": "workspace:^"
   },
   "devDependencies": {
-    "react-hook-form": "^7.91.0",
+    "react-hook-form": "^7.92.0",
     "tsdown": "^0.23.7"
   },
   "peerDependencies": {
-    "react-hook-form": "^7.91.0",
+    "react-hook-form": "^7.92.0",
     "zod": "^4.6.7"
   },
   "engines": {

@@ -6,7 +6,7 @@ import { pathToFileURL } from "node:url";
 import type { VitePluginOptions } from "../config";
 import { getServerBundleInfos } from "../base/utils";
 import {
-  createExcludePatterns,
+  createExcludeMatchers,
   type ReactRouterPluginConfig,
   resolveReactRouterPluginConfig,
   shouldExcludeUrl,
@@ -86,11 +86,11 @@ export function resolidViteDev(options: VitePluginOptions): VitePlugin {
 
       const { appDir, entryFile } = reactRouterConfig;
 
-      const excludePatterns = createExcludePatterns(appDir, options.devExclude);
+      const matchers = createExcludeMatchers(appDir, options.devExclude);
 
       server.middlewares.use(async (req, res, next) => {
         if (req.url) {
-          if (shouldExcludeUrl(req.url, excludePatterns)) {
+          if (shouldExcludeUrl(req.url, matchers)) {
             return next();
           }
 
