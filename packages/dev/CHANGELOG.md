@@ -1,5 +1,11 @@
 # @resolid/dev
 
+## 0.14.2
+
+### Patch Changes
+
+- [`b9c892d`](https://github.com/resolid/framework/commit/b9c892dfe3458bf6541a320a00858654620c9b7f) - chore: upgrade minimatch to v11
+
 ## 0.14.1
 
 ### Patch Changes
