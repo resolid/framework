@@ -46,7 +46,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hookform/resolvers": "^7.0.7",
+    "@hookform/resolvers": "^7.0.8",
     "@resolid/di": "workspace:^",
     "@resolid/event": "workspace:^"
   },
