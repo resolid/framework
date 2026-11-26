@@ -27,16 +27,16 @@
     "@commitlint/config-conventional": "^21.2.4",
     "@resolid/config": "^6.3.14",
     "@tailwindcss/language-server": "^0.16.0",
-    "@types/node": "^24.19.2",
-    "@vitest/coverage-v8": "^5.1.1",
-    "eslint-plugin-react-you-might-not-need-an-effect": "^1.3.1",
-    "lefthook": "^2.2.2",
+    "@types/node": "^24.19.4",
+    "@vitest/coverage-v8": "^5.1.2",
+    "eslint-plugin-react-you-might-not-need-an-effect": "^1.3.3",
+    "lefthook": "^2.2.3",
     "oxfmt": "^0.80.0",
     "oxlint": "^1.95.0",
     "oxlint-tsgolint": "^7.0.2008",
     "turbo": "^2.11.13",
     "typescript": "^7.0.2",
-    "vitest": "^5.1.1"
+    "vitest": "^5.1.2"
   },
   "engines": {
     "node": "^22.22.0 || >=24"
